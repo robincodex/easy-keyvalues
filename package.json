@@ -1,0 +1,16 @@
+{
+  "name": "easy-keyvalues",
+  "version": "0.0.1",
+  "description": "Parse Valve KeyValues Format to easy use for nodejs",
+  "main": "dist/index.js",
+  "scripts": {
+    "watch": "tsc --watch -p ./",
+    "test": "node ./test/test_index.js"
+  },
+  "author": "RobinCode",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^13.11.1",
+    "typescript": "^3.8.3"
+  }
+}

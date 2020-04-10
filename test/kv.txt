@@ -1,0 +1,61 @@
+
+#base "abilities/monopoly.kv"
+#base "abilities-monopoly.kv" // import other file
+#base "abilities/monopoly-a"
+
+"DOTAAbilities"
+{
+	"building_system_active_preview"
+	{
+		"BaseClass"             		"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityTextureName"			"sylph_flash_blast"
+		"MaxLevel"						"1"
+
+		"c1"
+		{
+			"kkkkkkkkkkkkkkkk1"	"v1"
+			"kkkkkkkkkkkkkk2"	"v2"
+			"kkkkkkkk3"	"v3"
+			"kkkkkkkk3"	"v3"
+			"kkkkkkkk3"	"v3"
+			"c2"
+			{
+				"kkkkkkkkkkk1"	"v1"
+				"kkkkkkkk2"	"v2"
+				"kkkkk3"	"v3"
+				"kkkkkkkk3"	"v3"
+				"kkkkkkkk3"	"v3"
+				"kkkkkkkk3"	"v3"
+				"c3"
+				{
+					"kkkkkkk1"	"v1"
+					"kkkkk2"	"v2"
+					"kkkkk3"	"v3"
+					"kkkkkkkk3"	"v3"
+					"kkkkkkkk3"	"v3" // haha
+					"c4"
+                    // list
+					{
+						"kkkkkk1"	"v1"
+						"kkkkk2"	"v2"
+						"kkkk3"	"v3"
+						"kkkkkkkk3"	"v3"
+						"c5"
+						{
+							"kkkk1"	"v1"
+							"kkkk2"	"v2"
+							"k3"	"v3"
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	"BaseClass"             		"ability_datadriven"
+	"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+	"AbilityTextureName"			"sylph_flash_blast"
+	"MaxLevel"						"1"
+}
