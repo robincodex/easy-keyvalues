@@ -18,7 +18,7 @@
 			"kkkkkkkkkkkkkk2"	"v2"
 			"kkkkkkkk3"	"v3"
 			"kkkkkkkk3"	"v3"
-			"kkkkkkkk3"	"v3"
+			"kkkkkkkk3"	"v3 \"test\""
 			"c2"
 			{
 				"kkkkkkkkkkk1"	"v1"

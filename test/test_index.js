@@ -16,12 +16,12 @@ const kvText = `
     "children"// this is children
     {
         "c1"    "1" // comment05
-        "c2"    "2"
+        "c2"    "2 \\"two\\""
 
     // comment07
         // comment08
         "c3"    "sss
-    <br/>this is child index 3
+    <br/>this is child\\n index 3
     88"
         "c4"   
         {

@@ -64,6 +64,7 @@ async function keyValuesParser(s) {
                     }
                     if (c === '\\') {
                         i++;
+                        str += c + line[i];
                         continue;
                     }
                     if (c === '"') {

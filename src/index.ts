@@ -66,6 +66,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
                 }
                 if (c === '\\') {
                     i++;
+                    str += c + line[i];
                     continue;
                 }
                 if (c === '"') {
