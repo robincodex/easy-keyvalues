@@ -16,7 +16,7 @@ var KeyValuesType;
     KeyValuesType[KeyValuesType["EndOfLineComment"] = 1] = "EndOfLineComment";
     KeyValuesType[KeyValuesType["KeyValue"] = 2] = "KeyValue";
     KeyValuesType[KeyValuesType["BaseStatement"] = 3] = "BaseStatement";
-})(KeyValuesType || (KeyValuesType = {}));
+})(KeyValuesType = exports.KeyValuesType || (exports.KeyValuesType = {}));
 /**
  * Read from KeyValues file
  * @param path A file path of KeyValues
@@ -180,7 +180,7 @@ async function keyValuesParser(s) {
  * @param kvList KeyValues list
  * @param tab spaces
  */
-function FormatKeyValues(kvList, tab = '') {
+function formatKeyValues(kvList, tab = '') {
     let text = '';
     for (let [i, kv] of kvList.entries()) {
         if (kv.Type === KeyValuesType.Comment) {
@@ -202,7 +202,7 @@ function FormatKeyValues(kvList, tab = '') {
             }
             if (Array.isArray(kv.Value)) {
                 text += `${tab}"${kv.Key}"${endOfLineComment}\n${tab}{\n`;
-                text += FormatKeyValues(kv.Value, tab + '    ');
+                text += formatKeyValues(kv.Value, tab + '    ');
                 text += `${tab}}\n`;
             }
             else {
@@ -212,5 +212,5 @@ function FormatKeyValues(kvList, tab = '') {
     }
     return text;
 }
-exports.FormatKeyValues = FormatKeyValues;
+exports.formatKeyValues = formatKeyValues;
 //# sourceMappingURL=index.js.map

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import * as stream from 'stream';
 
-enum KeyValuesType {
+export enum KeyValuesType {
     Comment,
     EndOfLineComment,
     KeyValue,
@@ -13,7 +13,7 @@ enum KeyValuesType {
  * When the key is "//", it's a comment.  
  * When the key is "#base", it's a base statement. Example: #base "file path"
  */
-type KeyValues = {
+export type KeyValues = {
     Type: KeyValuesType,
     Key?: string,
     Value?: string | KeyValues[],
@@ -180,7 +180,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
  * @param kvList KeyValues list
  * @param tab spaces
  */
-export function FormatKeyValues(kvList: KeyValues[], tab = ''): string {
+export function formatKeyValues(kvList: KeyValues[], tab = ''): string {
     let text = '';
 
     for(let [i, kv] of kvList.entries()) {
@@ -204,7 +204,7 @@ export function FormatKeyValues(kvList: KeyValues[], tab = ''): string {
 
             if (Array.isArray(kv.Value)) {
                 text += `${tab}"${kv.Key}"${endOfLineComment}\n${tab}{\n`;
-                text += FormatKeyValues(kv.Value, tab + '    ');
+                text += formatKeyValues(kv.Value, tab + '    ');
                 text += `${tab}}\n`;
             }
             else {

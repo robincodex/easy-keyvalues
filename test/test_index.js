@@ -34,9 +34,9 @@ const kvText = `
 ;(async function() {
     console.log("--> read kv.txt")
     let result = await kvLib.readFromFile(path.join(__dirname, 'kv.txt'));
-    console.log(kvLib.FormatKeyValues(result));
+    console.log(kvLib.formatKeyValues(result));
 
     console.log("--> read from string")
     result = await kvLib.readFromString(kvText);
-    console.log(kvLib.FormatKeyValues(result));
+    console.log(kvLib.formatKeyValues(result));
 })();

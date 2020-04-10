@@ -1,4 +1,4 @@
-declare enum KeyValuesType {
+export declare enum KeyValuesType {
     Comment = 0,
     EndOfLineComment = 1,
     KeyValue = 2,
@@ -8,7 +8,7 @@ declare enum KeyValuesType {
  * When the key is "//", it's a comment.
  * When the key is "#base", it's a base statement. Example: #base "file path"
  */
-declare type KeyValues = {
+export declare type KeyValues = {
     Type: KeyValuesType;
     Key?: string;
     Value?: string | KeyValues[];
@@ -29,5 +29,4 @@ export declare function readFromString(content: string): Promise<KeyValues[]>;
  * @param kvList KeyValues list
  * @param tab spaces
  */
-export declare function FormatKeyValues(kvList: KeyValues[], tab?: string): string;
-export {};
+export declare function formatKeyValues(kvList: KeyValues[], tab?: string): string;

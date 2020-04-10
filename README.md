@@ -15,9 +15,9 @@ const kvText = `
 
 ;(async function() {
     let result = await kvLib.readFromFile('path/to/file');
-    console.log(kvLib.FormatKeyValues(result));
+    console.log(kvLib.formatKeyValues(result));
 
     result = await kvLib.readFromString(kvText);
-    console.log(kvLib.FormatKeyValues(result));
+    console.log(kvLib.formatKeyValues(result));
 })();
 ```
