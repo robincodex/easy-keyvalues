@@ -8,6 +8,10 @@
     "test": "node ./test/test_index.js"
   },
   "author": "RobinCode",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinCodeX/easy-keyvalues.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^13.11.1",
