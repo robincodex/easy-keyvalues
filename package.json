@@ -8,10 +8,14 @@
     "test": "node ./test/test_index.js"
   },
   "author": "RobinCode",
+  "homepage": "https://github.com/RobinCodeX/easy-keyvalues",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/RobinCodeX/easy-keyvalues.git"
   },
+  "keywords": [
+    "Valve KeyValues Format"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^13.11.1",
