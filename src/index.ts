@@ -15,9 +15,15 @@ export enum KeyValuesType {
  */
 export type KeyValues = {
     Type: KeyValuesType,
-    Key?: string,
-    Value?: string | KeyValues[],
+    Key: string,
+    Value: string | KeyValues[],
 };
+
+export const emptyKeyValues = {Type: KeyValuesType.KeyValue, Key:'', Value:''};
+
+export function NewKeyValues(Key: string, Value: string | KeyValues[]) {
+    return {Type: KeyValuesType.KeyValue, Key, Value};
+}
 
 /**
  * Read from KeyValues file
@@ -70,7 +76,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
                     continue;
                 }
                 if (c === '"') {
-                    if(!kv.Key) {
+                    if(kv.Key === null) {
                         kv.Key = str;
                     } else {
                         kv.Value = str;
@@ -91,12 +97,24 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
                 }
                 let comment: KeyValues = null;
                 if (isEndOfLineComment) {
-                    comment = { Type: KeyValuesType.EndOfLineComment };
+                    comment = {
+                        Type: KeyValuesType.EndOfLineComment,
+                        Key: '',
+                        Value: null,
+                    };
                 } else {
                     if (kv !== null && kv.Type === KeyValuesType.KeyValue && !kv.Value) {
-                        comment = { Type: KeyValuesType.EndOfLineComment };
+                        comment = {
+                            Type: KeyValuesType.EndOfLineComment,
+                            Key: '',
+                            Value: null,
+                        };
                     } else {
-                        comment = { Type: KeyValuesType.Comment };
+                        comment = {
+                            Type: KeyValuesType.Comment,
+                            Key: '',
+                            Value: null,
+                        };
                     }
                 }
                 comment.Value = line.substring(i + 2);
@@ -112,6 +130,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
                     kv = {
                         Type: KeyValuesType.BaseStatement,
                         Key: "#base",
+                        Value: null,
                     };
                     result.push(kv);
                     continue;
@@ -127,6 +146,8 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
                 if(kv === null) {
                     kv = {
                         Type: KeyValuesType.KeyValue,
+                        Key: null,
+                        Value: null,
                     };
                     result.push(kv);
                 }

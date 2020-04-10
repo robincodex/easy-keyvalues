@@ -10,8 +10,18 @@ export declare enum KeyValuesType {
  */
 export declare type KeyValues = {
     Type: KeyValuesType;
-    Key?: string;
-    Value?: string | KeyValues[];
+    Key: string;
+    Value: string | KeyValues[];
+};
+export declare const emptyKeyValues: {
+    Type: KeyValuesType;
+    Key: string;
+    Value: string;
+};
+export declare function NewKeyValues(Key: string, Value: string | KeyValues[]): {
+    Type: KeyValuesType;
+    Key: string;
+    Value: string | KeyValues[];
 };
 /**
  * Read from KeyValues file
