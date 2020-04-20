@@ -17,6 +17,11 @@ var KeyValues3Type;
     KeyValues3Type[KeyValues3Type["KeyValue_Object"] = 10] = "KeyValue_Object";
     KeyValues3Type[KeyValues3Type["Header"] = 11] = "Header";
 })(KeyValues3Type = exports.KeyValues3Type || (exports.KeyValues3Type = {}));
+exports.emptyKeyValues = { Type: KeyValues3Type.KeyValue_String, Key: '', Value: '' };
+function NewKeyValues(Key, Value) {
+    return { Type: KeyValues3Type.KeyValue_String, Key, Value };
+}
+exports.NewKeyValues = NewKeyValues;
 /**
  * Read from KeyValues file
  * @param path A file path of KeyValues

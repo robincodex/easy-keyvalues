@@ -17,6 +17,8 @@ export declare type KeyValues3 = {
     Key: string;
     Value: string | KeyValues3[];
 };
+export declare const emptyKeyValues: KeyValues3;
+export declare function NewKeyValues(Key: string, Value: string | KeyValues3[]): KeyValues3;
 /**
  * Read from KeyValues file
  * @param path A file path of KeyValues

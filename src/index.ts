@@ -18,9 +18,9 @@ export type KeyValues = {
     Value: string | KeyValues[],
 };
 
-export const emptyKeyValues = {Type: KeyValuesType.KeyValue, Key:'', Value:''};
+export const emptyKeyValues: KeyValues = {Type: KeyValuesType.KeyValue, Key:'', Value:''};
 
-export function NewKeyValues(Key: string, Value: string | KeyValues[]) {
+export function NewKeyValues(Key: string, Value: string | KeyValues[]): KeyValues {
     return {Type: KeyValuesType.KeyValue, Key, Value};
 }
 

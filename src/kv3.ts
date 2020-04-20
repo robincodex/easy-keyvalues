@@ -22,6 +22,12 @@ export type KeyValues3 = {
     Value: string | KeyValues3[],
 };
 
+export const emptyKeyValues: KeyValues3 = {Type: KeyValues3Type.KeyValue_String, Key:'', Value:''};
+
+export function NewKeyValues(Key: string, Value: string | KeyValues3[]): KeyValues3 {
+    return {Type: KeyValues3Type.KeyValue_String, Key, Value};
+}
+
 /**
  * Read from KeyValues file
  * @param path A file path of KeyValues

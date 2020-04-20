@@ -1,6 +1,6 @@
 {
   "name": "easy-keyvalues",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Parse Valve KeyValues Format to easy use for nodejs",
   "main": "dist/index.js",
   "scripts": {
