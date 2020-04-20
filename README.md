@@ -14,11 +14,12 @@ const kvText = `
 `
 
 ;(async function() {
-    let result = await kvLib.readFromFile('path/to/file');
+    let result = await kvLib.loadFromFile('path/to/file');
     console.log(kvLib.formatKeyValues(result));
 
-    result = await kvLib.readFromString(kvText);
+    result = await kvLib.loadFromString(kvText);
     console.log(kvLib.formatKeyValues(result));
+    await kvLib.writeFile(path.join(__dirname, 'kv.txt'), result)
 })();
 ```
 
@@ -55,7 +56,7 @@ const kv3Text = `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32
         }, '    '));
     }
 
-    printKV3( await kv3Lib.readFromString(kv3Text) )
-    console.log( kv3Lib.formatKeyValues( await kv3Lib.readFromString(kv3Text) ) );
+    printKV3( await kv3Lib.loadFromString(kv3Text) )
+    console.log( kv3Lib.formatKeyValues( await kv3Lib.loadFromString(kv3Text) ) );
 })();
 ```
