@@ -233,4 +233,10 @@ function formatKeyValues(kvList, tab = '') {
     return text;
 }
 exports.formatKeyValues = formatKeyValues;
+exports.default = {
+    readFromFile,
+    readFromString,
+    formatKeyValues,
+    KeyValuesType,
+};
 //# sourceMappingURL=index.js.map

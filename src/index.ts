@@ -10,7 +10,6 @@ export enum KeyValuesType {
 }
 
 /**
- * When the key is "//", it's a comment.  
  * When the key is "#base", it's a base statement. Example: #base "file path"
  */
 export type KeyValues = {
@@ -236,3 +235,10 @@ export function formatKeyValues(kvList: KeyValues[], tab = ''): string {
 
     return text;
 }
+
+export default {
+    readFromFile,
+    readFromString,
+    formatKeyValues,
+    KeyValuesType,
+};

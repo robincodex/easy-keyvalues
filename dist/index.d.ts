@@ -5,7 +5,6 @@ export declare enum KeyValuesType {
     BaseStatement = 3
 }
 /**
- * When the key is "//", it's a comment.
  * When the key is "#base", it's a base statement. Example: #base "file path"
  */
 export declare type KeyValues = {
@@ -40,3 +39,10 @@ export declare function readFromString(content: string): Promise<KeyValues[]>;
  * @param tab spaces
  */
 export declare function formatKeyValues(kvList: KeyValues[], tab?: string): string;
+declare const _default: {
+    readFromFile: typeof readFromFile;
+    readFromString: typeof readFromString;
+    formatKeyValues: typeof formatKeyValues;
+    KeyValuesType: typeof KeyValuesType;
+};
+export default _default;
