@@ -1,17 +1,16 @@
 export declare enum KeyValues3Type {
     Comment = 0,
-    EndOfLineComment = 1,
-    MultiLineComment = 2,
-    KeyValue_Boolean = 3,
-    KeyValue_Int = 4,
-    KeyValue_Double = 5,
-    KeyValue_String = 6,
-    KeyValue_MultiLineString = 7,
-    KeyValue_Resource = 8,
-    KeyValue_Deferred_Resource = 9,
-    KeyValue_Array = 10,
-    KeyValue_Object = 11,
-    Header = 12
+    MultiLineComment = 1,
+    KeyValue_Boolean = 2,
+    KeyValue_Int = 3,
+    KeyValue_Double = 4,
+    KeyValue_String = 5,
+    KeyValue_MultiLineString = 6,
+    KeyValue_Resource = 7,
+    KeyValue_Deferred_Resource = 8,
+    KeyValue_Array = 9,
+    KeyValue_Object = 10,
+    Header = 11
 }
 export declare type KeyValues3 = {
     Type: KeyValues3Type;

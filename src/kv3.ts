@@ -3,7 +3,6 @@ import { Buffer } from 'buffer';
 
 export enum KeyValues3Type {
     Comment,
-    EndOfLineComment,
     MultiLineComment,
     KeyValue_Boolean,
     KeyValue_Int,

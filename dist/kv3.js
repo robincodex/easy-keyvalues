@@ -5,18 +5,17 @@ const buffer_1 = require("buffer");
 var KeyValues3Type;
 (function (KeyValues3Type) {
     KeyValues3Type[KeyValues3Type["Comment"] = 0] = "Comment";
-    KeyValues3Type[KeyValues3Type["EndOfLineComment"] = 1] = "EndOfLineComment";
-    KeyValues3Type[KeyValues3Type["MultiLineComment"] = 2] = "MultiLineComment";
-    KeyValues3Type[KeyValues3Type["KeyValue_Boolean"] = 3] = "KeyValue_Boolean";
-    KeyValues3Type[KeyValues3Type["KeyValue_Int"] = 4] = "KeyValue_Int";
-    KeyValues3Type[KeyValues3Type["KeyValue_Double"] = 5] = "KeyValue_Double";
-    KeyValues3Type[KeyValues3Type["KeyValue_String"] = 6] = "KeyValue_String";
-    KeyValues3Type[KeyValues3Type["KeyValue_MultiLineString"] = 7] = "KeyValue_MultiLineString";
-    KeyValues3Type[KeyValues3Type["KeyValue_Resource"] = 8] = "KeyValue_Resource";
-    KeyValues3Type[KeyValues3Type["KeyValue_Deferred_Resource"] = 9] = "KeyValue_Deferred_Resource";
-    KeyValues3Type[KeyValues3Type["KeyValue_Array"] = 10] = "KeyValue_Array";
-    KeyValues3Type[KeyValues3Type["KeyValue_Object"] = 11] = "KeyValue_Object";
-    KeyValues3Type[KeyValues3Type["Header"] = 12] = "Header";
+    KeyValues3Type[KeyValues3Type["MultiLineComment"] = 1] = "MultiLineComment";
+    KeyValues3Type[KeyValues3Type["KeyValue_Boolean"] = 2] = "KeyValue_Boolean";
+    KeyValues3Type[KeyValues3Type["KeyValue_Int"] = 3] = "KeyValue_Int";
+    KeyValues3Type[KeyValues3Type["KeyValue_Double"] = 4] = "KeyValue_Double";
+    KeyValues3Type[KeyValues3Type["KeyValue_String"] = 5] = "KeyValue_String";
+    KeyValues3Type[KeyValues3Type["KeyValue_MultiLineString"] = 6] = "KeyValue_MultiLineString";
+    KeyValues3Type[KeyValues3Type["KeyValue_Resource"] = 7] = "KeyValue_Resource";
+    KeyValues3Type[KeyValues3Type["KeyValue_Deferred_Resource"] = 8] = "KeyValue_Deferred_Resource";
+    KeyValues3Type[KeyValues3Type["KeyValue_Array"] = 9] = "KeyValue_Array";
+    KeyValues3Type[KeyValues3Type["KeyValue_Object"] = 10] = "KeyValue_Object";
+    KeyValues3Type[KeyValues3Type["Header"] = 11] = "Header";
 })(KeyValues3Type = exports.KeyValues3Type || (exports.KeyValues3Type = {}));
 /**
  * Read from KeyValues file
