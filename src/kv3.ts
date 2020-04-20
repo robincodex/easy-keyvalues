@@ -293,6 +293,10 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
             // start create key
             if (checkKey) {
                 if (isSpace || code === LR || code === EQUAL) {
+                    const numCode = str.charCodeAt(0);
+                    if (numCode <= 57 && numCode >= 48) {
+                        throw new Error(`Invalid key in line ${ctx.line}, col ${ctx.column} : key="${str}" start character cannot be a number`);
+                    }
                     state = ParserState.None;
                     kv = {
                         Type: KeyValues3Type.KeyValue_String,
