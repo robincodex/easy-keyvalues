@@ -82,6 +82,7 @@ const kv3Text = `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32
             b = 123
         }
         j = {a=123 b=["456","789", true, {b=456}]}
+        i = [[123],[456,789,false]]
 	}
 }
 `;
@@ -109,6 +110,6 @@ function printKV3( obj ) {
     console.log(kvLib.formatKeyValues(result));
 
     console.log("--> read from kv3 string")
-    printKV3( await kv3Lib.readFromFile(path.join(__dirname, 'kv3.txt')) )
-    printKV3( await kv3Lib.readFromString(kv3Text) )
+    console.log(kv3Lib.formatKeyValues(await kv3Lib.readFromFile(path.join(__dirname, 'kv3.txt'))));
+    console.log(kv3Lib.formatKeyValues(await kv3Lib.readFromString(kv3Text)));
 })();

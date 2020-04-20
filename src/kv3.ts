@@ -52,6 +52,69 @@ export async function readFromString(content: string): Promise<KeyValues3[]>  {
     return await _keyValues3Parser(ctx);
 }
 
+export function formatKeyValues(root: KeyValues3[], tab = '', isParentArray = false): string {
+    let text = '';
+
+    for(const kv of root) {
+        switch (kv.Type) {
+            case KeyValues3Type.Header:
+                text += kv.Value + "\n";
+                break;
+            case KeyValues3Type.KeyValue_Object:
+                if (Array.isArray(kv.Value)) {
+                    if (isParentArray) {
+                        text += `${tab}{\n`;
+                        text += formatKeyValues(kv.Value, tab + "    ");
+                        text += `${tab}},\n`;
+                        break;
+                    }
+                    if (kv.Key) {
+                        text += `${tab}${kv.Key} = \n${tab}{\n`;
+                    } else {
+                        text += `${tab}{\n`;
+                    }
+                    text += formatKeyValues(kv.Value, tab + "    ");
+                    text += `${tab}}\n`;
+                }
+                break;
+            case KeyValues3Type.KeyValue_Array:
+                if (Array.isArray(kv.Value)) {
+                    if (isParentArray) {
+                        text += `${tab}[\n`;
+                        text += formatKeyValues(kv.Value, tab + "    ", true);
+                        text += `${tab}],\n`;
+                        break;
+                    }
+                    text += `${tab}${kv.Key} = \n${tab}[\n`;
+                    text += formatKeyValues(kv.Value, tab + "    ", true);
+                    text += `${tab}]\n`;
+                }
+                break;
+            case KeyValues3Type.KeyValue_Boolean:
+            case KeyValues3Type.KeyValue_Int:
+            case KeyValues3Type.KeyValue_Double:
+            case KeyValues3Type.KeyValue_String:
+            case KeyValues3Type.KeyValue_MultiLineString:
+            case KeyValues3Type.KeyValue_Resource:
+            case KeyValues3Type.KeyValue_Deferred_Resource:
+                if (isParentArray) {
+                    text += `${tab}${kv.Value},\n`;
+                    break;
+                }
+                text += `${tab}${kv.Key} = ${kv.Value}\n`;
+                break;
+            case KeyValues3Type.Comment:
+                text += `${tab}//${kv.Value}\n`;
+                break;
+            case KeyValues3Type.MultiLineComment:
+                text += `${tab}\/*${kv.Value}*\/\n`;
+                break;
+        }
+    }
+
+    return text;
+}
+
 type kv3ParserContext = {
     readonly content: Buffer,
     index: number,
@@ -429,5 +492,6 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
 export default {
     readFromFile,
     readFromString,
+    formatKeyValues,
     KeyValues3Type,
 };

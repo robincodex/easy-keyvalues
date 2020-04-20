@@ -47,6 +47,68 @@ async function readFromString(content) {
     return await _keyValues3Parser(ctx);
 }
 exports.readFromString = readFromString;
+function formatKeyValues(root, tab = '', isParentArray = false) {
+    let text = '';
+    for (const kv of root) {
+        switch (kv.Type) {
+            case KeyValues3Type.Header:
+                text += kv.Value + "\n";
+                break;
+            case KeyValues3Type.KeyValue_Object:
+                if (Array.isArray(kv.Value)) {
+                    if (isParentArray) {
+                        text += `${tab}{\n`;
+                        text += formatKeyValues(kv.Value, tab + "    ");
+                        text += `${tab}},\n`;
+                        break;
+                    }
+                    if (kv.Key) {
+                        text += `${tab}${kv.Key} = \n${tab}{\n`;
+                    }
+                    else {
+                        text += `${tab}{\n`;
+                    }
+                    text += formatKeyValues(kv.Value, tab + "    ");
+                    text += `${tab}}\n`;
+                }
+                break;
+            case KeyValues3Type.KeyValue_Array:
+                if (Array.isArray(kv.Value)) {
+                    if (isParentArray) {
+                        text += `${tab}[\n`;
+                        text += formatKeyValues(kv.Value, tab + "    ", true);
+                        text += `${tab}],\n`;
+                        break;
+                    }
+                    text += `${tab}${kv.Key} = \n${tab}[\n`;
+                    text += formatKeyValues(kv.Value, tab + "    ", true);
+                    text += `${tab}]\n`;
+                }
+                break;
+            case KeyValues3Type.KeyValue_Boolean:
+            case KeyValues3Type.KeyValue_Int:
+            case KeyValues3Type.KeyValue_Double:
+            case KeyValues3Type.KeyValue_String:
+            case KeyValues3Type.KeyValue_MultiLineString:
+            case KeyValues3Type.KeyValue_Resource:
+            case KeyValues3Type.KeyValue_Deferred_Resource:
+                if (isParentArray) {
+                    text += `${tab}${kv.Value},\n`;
+                    break;
+                }
+                text += `${tab}${kv.Key} = ${kv.Value}\n`;
+                break;
+            case KeyValues3Type.Comment:
+                text += `${tab}//${kv.Value}\n`;
+                break;
+            case KeyValues3Type.MultiLineComment:
+                text += `${tab}\/*${kv.Value}*\/\n`;
+                break;
+        }
+    }
+    return text;
+}
+exports.formatKeyValues = formatKeyValues;
 var ParserState;
 (function (ParserState) {
     ParserState[ParserState["None"] = 0] = "None";
@@ -403,6 +465,7 @@ async function _keyValues3Parser(ctx, isArray = false) {
 exports.default = {
     readFromFile,
     readFromString,
+    formatKeyValues,
     KeyValues3Type,
 };
 //# sourceMappingURL=kv3.js.map

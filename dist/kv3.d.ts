@@ -28,9 +28,11 @@ export declare function readFromFile(path: string, encoding?: string): Promise<K
  * @param content A string of KeyValues format
  */
 export declare function readFromString(content: string): Promise<KeyValues3[]>;
+export declare function formatKeyValues(root: KeyValues3[], tab?: string, isParentArray?: boolean): string;
 declare const _default: {
     readFromFile: typeof readFromFile;
     readFromString: typeof readFromString;
+    formatKeyValues: typeof formatKeyValues;
     KeyValues3Type: typeof KeyValues3Type;
 };
 export default _default;

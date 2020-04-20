@@ -56,5 +56,6 @@ const kv3Text = `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32
     }
 
     printKV3( await kv3Lib.readFromString(kv3Text) )
+    console.log( kv3Lib.formatKeyValues( await kv3Lib.readFromString(kv3Text) ) );
 })();
 ```
