@@ -1,5 +1,5 @@
 
-const kvLib = require('../dist/index');
+const kvLib = require('../');
 const kv3Lib = require('../dist/kv3');
 const path = require('path');
 const fs = require('fs');
