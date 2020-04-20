@@ -42,7 +42,15 @@ const kvText2 = `
 "Ha"
 {
 	test	"123"
-	haha	false
+    01haha	false
+    t1
+    {
+        asd 456
+        ggg 
+        {
+            hjjj sss
+        }
+    }
 }
 `;
 
@@ -92,8 +100,12 @@ function printKV3( obj ) {
     let result = await kvLib.readFromFile(path.join(__dirname, 'kv.txt'));
     console.log(kvLib.formatKeyValues(result));
 
-    console.log("--> read from string")
+    console.log("--> read from string kvText")
     result = await kvLib.readFromString(kvText);
+    console.log(kvLib.formatKeyValues(result));
+
+    console.log("--> read from string kvText2")
+    result = await kvLib.readFromString(kvText2);
     console.log(kvLib.formatKeyValues(result));
 
     console.log("--> read from kv3 string")

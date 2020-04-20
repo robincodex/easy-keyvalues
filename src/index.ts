@@ -51,6 +51,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
 
     let n = 0;
     let leftMark = false;
+    let isSpecialMark = false;
     let breaceCount = 0;
     let str = '';
     let kv: KeyValues = null;
@@ -62,10 +63,33 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
         let isEndOfLineComment = false;
 
         for(let i=0; i<line.length; i++) {
-            let c = line[i];
-
+            const c = line[i];
+            const isSpace = c === ' ' || c === '\t' || c === '\r' || c === '\n';
+            
             // If leftMark is true then merge char to str
             if (leftMark) {
+                if (isSpecialMark) {
+                    if (c === '{' || c === '\"' || c === '[' || c === ']' ) {
+                        throw new Error(`Not readable in line ${n}`);
+                    }
+                    if (isSpace || c === '}') {
+                        if(kv.Key === null) {
+                            kv.Key = str;
+                        } else {
+                            kv.Value = str;
+                            kv = null;
+                        }
+                        leftMark = false;
+                        isSpecialMark = false;
+                        str = '';
+                        if (c === '}') {
+                            i--;
+                        }
+                        continue;
+                    }
+                    str += c;
+                    continue;
+                }
                 if (i === 0) {
                     str += '\n';
                 }
@@ -82,6 +106,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
                         kv = null;
                     }
                     leftMark = false;
+                    isSpecialMark = false;
                     str = '';
                     continue;
                 }
@@ -140,6 +165,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
             // If start merge string
             if (c === '"') {
                 leftMark = true;
+                isSpecialMark = false;
                 str = '';
                 isEndOfLineComment = true;
                 if(kv === null) {
@@ -156,7 +182,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
             // If open breace
             if (c === '{') {
                 if (kv === null || kv.Type !== KeyValuesType.KeyValue) {
-                    throw new Error(`Format error in line ${n}, col ${i} : ${c}`);
+                    throw new Error(`Not readable in line ${n}, col ${i} : ${c}`);
                 }
                 breaceCount++;
                 isEndOfLineComment = true;
@@ -169,7 +195,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
             // If close breace
             if (c === '}') {
                 if (kv !== null) {
-                    throw new Error(`Format error in line ${n}, col ${i} : ${c}`);
+                    throw new Error(`Not readable in line ${n}, col ${i} : ${c}`);
                 }
                 kv = kvQueue.pop();
                 kv.Value = result;
@@ -180,11 +206,22 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
             }
 
             // If space
-            if (c === ' ' || c === '\t') {
+            if (isSpace) {
                 continue;
             }
 
-            throw new Error(`Read error in line ${n}, col ${i} : ${c}`);
+            leftMark = true;
+            isSpecialMark = true;
+            str = c;
+            isEndOfLineComment = true;
+            if(kv === null) {
+                kv = {
+                    Type: KeyValuesType.KeyValue,
+                    Key: null,
+                    Value: null,
+                };
+                result.push(kv);
+            }
         }
     }
 
