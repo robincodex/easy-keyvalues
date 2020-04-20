@@ -27,7 +27,7 @@ export type KeyValues3 = {
  * @param path A file path of KeyValues
  * @param encoding Default utf8
  */
-export async function readFromFile(path: string, encoding = 'utf8'): Promise<KeyValues3[]>  {
+export async function loadFromFile(path: string, encoding = 'utf8'): Promise<KeyValues3[]>  {
     const s = await fs.promises.readFile(path, {encoding});
     const ctx: kv3ParserContext = {
         content: Buffer.from(s),
@@ -42,7 +42,7 @@ export async function readFromFile(path: string, encoding = 'utf8'): Promise<Key
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-export async function readFromString(content: string): Promise<KeyValues3[]>  {
+export async function loadFromString(content: string): Promise<KeyValues3[]>  {
     const ctx: kv3ParserContext = {
         content: Buffer.from(content, 'utf8'),
         index: 0,
@@ -113,6 +113,15 @@ export function formatKeyValues(root: KeyValues3[], tab = '', isParentArray = fa
     }
 
     return text;
+}
+
+/**
+ * @param path file path
+ * @param root KeyValues3 object
+ * @param encoding Default utf8
+ */
+export async function writeFile(path, root: KeyValues3[], encoding = 'utf8') {
+    await fs.promises.writeFile(path, formatKeyValues(root), {encoding});
 }
 
 type kv3ParserContext = {
@@ -490,8 +499,9 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
 }
 
 export default {
-    readFromFile,
-    readFromString,
+    loadFromFile,
+    loadFromString,
     formatKeyValues,
+    writeFile,
     KeyValues3Type,
 };

@@ -22,7 +22,7 @@ var KeyValues3Type;
  * @param path A file path of KeyValues
  * @param encoding Default utf8
  */
-async function readFromFile(path, encoding = 'utf8') {
+async function loadFromFile(path, encoding = 'utf8') {
     const s = await fs.promises.readFile(path, { encoding });
     const ctx = {
         content: buffer_1.Buffer.from(s),
@@ -32,12 +32,12 @@ async function readFromFile(path, encoding = 'utf8') {
     };
     return await _keyValues3Parser(ctx);
 }
-exports.readFromFile = readFromFile;
+exports.loadFromFile = loadFromFile;
 /**
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-async function readFromString(content) {
+async function loadFromString(content) {
     const ctx = {
         content: buffer_1.Buffer.from(content, 'utf8'),
         index: 0,
@@ -46,7 +46,7 @@ async function readFromString(content) {
     };
     return await _keyValues3Parser(ctx);
 }
-exports.readFromString = readFromString;
+exports.loadFromString = loadFromString;
 function formatKeyValues(root, tab = '', isParentArray = false) {
     let text = '';
     for (const kv of root) {
@@ -109,6 +109,15 @@ function formatKeyValues(root, tab = '', isParentArray = false) {
     return text;
 }
 exports.formatKeyValues = formatKeyValues;
+/**
+ * @param path file path
+ * @param root KeyValues3 object
+ * @param encoding Default utf8
+ */
+async function writeFile(path, root, encoding = 'utf8') {
+    await fs.promises.writeFile(path, formatKeyValues(root), { encoding });
+}
+exports.writeFile = writeFile;
 var ParserState;
 (function (ParserState) {
     ParserState[ParserState["None"] = 0] = "None";
@@ -463,9 +472,10 @@ async function _keyValues3Parser(ctx, isArray = false) {
     return result;
 }
 exports.default = {
-    readFromFile,
-    readFromString,
+    loadFromFile,
+    loadFromString,
     formatKeyValues,
+    writeFile,
     KeyValues3Type,
 };
 //# sourceMappingURL=kv3.js.map

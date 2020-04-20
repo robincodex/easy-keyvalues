@@ -27,20 +27,20 @@ exports.NewKeyValues = NewKeyValues;
  * @param path A file path of KeyValues
  * @param encoding Default utf8
  */
-async function readFromFile(path, encoding = 'utf8') {
+async function loadFromFile(path, encoding = 'utf8') {
     const s = fs.createReadStream(path, { encoding });
     return await keyValuesParser(s);
 }
-exports.readFromFile = readFromFile;
+exports.loadFromFile = loadFromFile;
 /**
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-async function readFromString(content) {
+async function loadFromString(content) {
     const s = stream.Readable.from(content);
     return await keyValuesParser(s);
 }
-exports.readFromString = readFromString;
+exports.loadFromString = loadFromString;
 async function keyValuesParser(s) {
     var e_1, _a;
     const rl = readline.createInterface({
@@ -271,10 +271,20 @@ function formatKeyValues(kvList, tab = '') {
     return text;
 }
 exports.formatKeyValues = formatKeyValues;
+/**
+ * @param path file path
+ * @param root KeyValues3 object
+ * @param encoding Default utf8
+ */
+async function writeFile(path, root, encoding = 'utf8') {
+    await fs.promises.writeFile(path, formatKeyValues(root), { encoding });
+}
+exports.writeFile = writeFile;
 exports.default = {
-    readFromFile,
-    readFromString,
+    loadFromFile,
+    loadFromString,
     formatKeyValues,
+    writeFile,
     KeyValuesType,
 };
 //# sourceMappingURL=index.js.map

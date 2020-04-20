@@ -97,19 +97,21 @@ function printKV3( obj ) {
 }
 
 ;(async function() {
-    console.log("--> read kv.txt")
-    let result = await kvLib.readFromFile(path.join(__dirname, 'kv.txt'));
+    console.log("--> load kv.txt")
+    let result = await kvLib.loadFromFile(path.join(__dirname, 'kv.txt'));
     console.log(kvLib.formatKeyValues(result));
 
-    console.log("--> read from string kvText")
-    result = await kvLib.readFromString(kvText);
+    console.log("--> load from string kvText")
+    result = await kvLib.loadFromString(kvText);
+    console.log(kvLib.formatKeyValues(result));
+    await kvLib.writeFile(path.join(__dirname, 'kv_w.txt'), result)
+
+    console.log("--> load from string kvText2")
+    result = await kvLib.loadFromString(kvText2);
     console.log(kvLib.formatKeyValues(result));
 
-    console.log("--> read from string kvText2")
-    result = await kvLib.readFromString(kvText2);
-    console.log(kvLib.formatKeyValues(result));
-
-    console.log("--> read from kv3 string")
-    console.log(kv3Lib.formatKeyValues(await kv3Lib.readFromFile(path.join(__dirname, 'kv3.txt'))));
-    console.log(kv3Lib.formatKeyValues(await kv3Lib.readFromString(kv3Text)));
+    console.log("--> load from kv3 string")
+    console.log(kv3Lib.formatKeyValues(await kv3Lib.loadFromFile(path.join(__dirname, 'kv3.txt'))));
+    console.log(kv3Lib.formatKeyValues(await kv3Lib.loadFromString(kv3Text)));
+    await kv3Lib.writeFile(path.join(__dirname, 'kv3_w.txt'), await kv3Lib.loadFromString(kv3Text))
 })();

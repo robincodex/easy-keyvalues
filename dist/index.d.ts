@@ -27,22 +27,29 @@ export declare function NewKeyValues(Key: string, Value: string | KeyValues[]): 
  * @param path A file path of KeyValues
  * @param encoding Default utf8
  */
-export declare function readFromFile(path: string, encoding?: string): Promise<KeyValues[]>;
+export declare function loadFromFile(path: string, encoding?: string): Promise<KeyValues[]>;
 /**
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-export declare function readFromString(content: string): Promise<KeyValues[]>;
+export declare function loadFromString(content: string): Promise<KeyValues[]>;
 /**
  * Format KeyValues object to string
  * @param kvList KeyValues list
  * @param tab spaces
  */
 export declare function formatKeyValues(kvList: KeyValues[], tab?: string): string;
+/**
+ * @param path file path
+ * @param root KeyValues3 object
+ * @param encoding Default utf8
+ */
+export declare function writeFile(path: any, root: KeyValues[], encoding?: string): Promise<void>;
 declare const _default: {
-    readFromFile: typeof readFromFile;
-    readFromString: typeof readFromString;
+    loadFromFile: typeof loadFromFile;
+    loadFromString: typeof loadFromString;
     formatKeyValues: typeof formatKeyValues;
+    writeFile: typeof writeFile;
     KeyValuesType: typeof KeyValuesType;
 };
 export default _default;

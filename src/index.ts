@@ -29,7 +29,7 @@ export function NewKeyValues(Key: string, Value: string | KeyValues[]) {
  * @param path A file path of KeyValues
  * @param encoding Default utf8
  */
-export async function readFromFile(path: string, encoding = 'utf8'): Promise<KeyValues[]>  {
+export async function loadFromFile(path: string, encoding = 'utf8'): Promise<KeyValues[]>  {
     const s = fs.createReadStream(path, {encoding});
     return await keyValuesParser(s);
 }
@@ -38,7 +38,7 @@ export async function readFromFile(path: string, encoding = 'utf8'): Promise<Key
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-export async function readFromString(content: string): Promise<KeyValues[]>  {
+export async function loadFromString(content: string): Promise<KeyValues[]>  {
     const s = stream.Readable.from(content);
     return await keyValuesParser(s);
 }
@@ -273,9 +273,19 @@ export function formatKeyValues(kvList: KeyValues[], tab = ''): string {
     return text;
 }
 
+/**
+ * @param path file path
+ * @param root KeyValues3 object
+ * @param encoding Default utf8
+ */
+export async function writeFile(path, root: KeyValues[], encoding = 'utf8') {
+    await fs.promises.writeFile(path, formatKeyValues(root), {encoding});
+}
+
 export default {
-    readFromFile,
-    readFromString,
+    loadFromFile,
+    loadFromString,
     formatKeyValues,
+    writeFile,
     KeyValuesType,
 };
