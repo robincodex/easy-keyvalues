@@ -93,8 +93,6 @@ function formatKeyValues(root, tab = '', isParentArray = false) {
             case KeyValues3Type.KeyValue_Boolean:
             case KeyValues3Type.KeyValue_Int:
             case KeyValues3Type.KeyValue_Double:
-            case KeyValues3Type.KeyValue_String:
-            case KeyValues3Type.KeyValue_MultiLineString:
             case KeyValues3Type.KeyValue_Resource:
             case KeyValues3Type.KeyValue_Deferred_Resource:
                 if (isParentArray) {
@@ -102,6 +100,21 @@ function formatKeyValues(root, tab = '', isParentArray = false) {
                     break;
                 }
                 text += `${tab}${kv.Key} = ${kv.Value}\n`;
+                break;
+            case KeyValues3Type.KeyValue_String:
+                if (isParentArray) {
+                    text += `${tab}"${kv.Value}",\n`;
+                    break;
+                }
+                text += `${tab}${kv.Key} = "${kv.Value}"\n`;
+                break;
+            case KeyValues3Type.KeyValue_MultiLineString:
+                const lastLR = kv.Value[kv.Value.length - 1] === '\n' ? '' : '\n';
+                if (isParentArray) {
+                    text += `${tab}"""${kv.Value}${lastLR}""",\n`;
+                    break;
+                }
+                text += `${tab}${kv.Key} = """${kv.Value}${lastLR}"""\n`;
                 break;
             case KeyValues3Type.Comment:
                 text += `${tab}//${kv.Value}\n`;
@@ -241,14 +254,15 @@ async function _keyValues3Parser(ctx, isArray = false) {
                     str += c;
                     continue;
                 }
-                else if (isSpace || code === LR || c === "/") {
+                else if (isSpace || code === LR || c === "/" ||
+                    code === COMMA || code === RightBrace || code === RightBracket) {
                     state = ParserState.None;
                     kv.Type = KeyValues3Type.KeyValue_String;
                     kv.Value = '';
                     str = '';
                     result.push(kv);
                     kv = null;
-                    if (c === "/") {
+                    if (c === "/" || code === RightBrace || code === RightBracket) {
                         ctx.index--;
                     }
                     continue;
@@ -258,7 +272,6 @@ async function _keyValues3Parser(ctx, isArray = false) {
                 }
             }
             else if (str.length >= 2 && c === '\"' && str[str.length - 1] !== '\\') {
-                str += c;
                 state = ParserState.None;
                 if (str.startsWith("resource:")) {
                     kv.Type = KeyValues3Type.KeyValue_Resource;
@@ -268,6 +281,7 @@ async function _keyValues3Parser(ctx, isArray = false) {
                 }
                 else {
                     kv.Type = KeyValues3Type.KeyValue_String;
+                    str = str.substring(1);
                 }
                 kv.Value = str;
                 result.push(kv);
@@ -283,7 +297,7 @@ async function _keyValues3Parser(ctx, isArray = false) {
             if (str.length >= 6 && ctx.column === 3 && c === '\"') {
                 str += c;
                 if (str.endsWith('\"\"\"')) {
-                    kv.Value = str;
+                    kv.Value = str.substring(3, str.length - 3);
                     kv.Type = KeyValues3Type.KeyValue_MultiLineString;
                     result.push(kv);
                     kv = null;
