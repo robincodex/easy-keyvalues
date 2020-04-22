@@ -24,8 +24,23 @@ export type KeyValues3 = {
 
 export const emptyKeyValues: KeyValues3 = {Type: KeyValues3Type.KeyValue_String, Key:'', Value:''};
 
-export function NewKeyValues(Key: string, Value: string | KeyValues3[]): KeyValues3 {
+export function NewKeyValue(Key: string, Value: string): KeyValues3 {
     return {Type: KeyValues3Type.KeyValue_String, Key, Value};
+}
+export function NewKeyValueInt(Key: string, Value: number): KeyValues3 {
+    return {Type: KeyValues3Type.KeyValue_Int, Key, Value: Math.floor(Value).toString()};
+}
+export function NewKeyValueDouble(Key: string, Value: number): KeyValues3 {
+    return {Type: KeyValues3Type.KeyValue_Double, Key, Value: Value.toString()};
+}
+export function NewKeyValueBoolean(Key: string, Value: boolean): KeyValues3 {
+    return {Type: KeyValues3Type.KeyValue_Boolean, Key, Value: Value.toString()};
+}
+export function NewKeyValuesArray(Key: string, Value: KeyValues3[]): KeyValues3 {
+    return {Type: KeyValues3Type.KeyValue_Array, Key, Value};
+}
+export function NewKeyValuesObject(Key: string, Value: KeyValues3[]): KeyValues3 {
+    return {Type: KeyValues3Type.KeyValue_Object, Key, Value};
 }
 
 /**
@@ -275,7 +290,7 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
                     str += c;
                     continue;
                 } else if(isSpace || code === LR || c === "/" || 
-                    code === COMMA || code === RightBrace || code === RightBracket) {
+                    (isArray && code === COMMA) || code === RightBrace || code === RightBracket) {
                     state = ParserState.None;
                     kv.Type = KeyValues3Type.KeyValue_String;
                     kv.Value = '';
@@ -307,6 +322,8 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
                 str = '';
                 kv = null;
                 continue;
+            } else if (isArray && str.length === 1 && code === COMMA) {
+                throw new Error(`Invalid string value in line ${ctx.line}.`); 
             }
             str += c;
             continue;
@@ -327,6 +344,8 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
                     throw new Error(`Invalid multi-line string ending in line ${ctx.line}, the """ require at the beginning of line`); 
                 }
                 continue;
+            } else if (isArray && str.length === 3 && code === COMMA) {
+                throw new Error(`Invalid string value in line ${ctx.line}.`); 
             }
             str += c;
             continue;

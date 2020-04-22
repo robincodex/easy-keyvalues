@@ -18,10 +18,30 @@ var KeyValues3Type;
     KeyValues3Type[KeyValues3Type["Header"] = 11] = "Header";
 })(KeyValues3Type = exports.KeyValues3Type || (exports.KeyValues3Type = {}));
 exports.emptyKeyValues = { Type: KeyValues3Type.KeyValue_String, Key: '', Value: '' };
-function NewKeyValues(Key, Value) {
+function NewKeyValue(Key, Value) {
     return { Type: KeyValues3Type.KeyValue_String, Key, Value };
 }
-exports.NewKeyValues = NewKeyValues;
+exports.NewKeyValue = NewKeyValue;
+function NewKeyValueInt(Key, Value) {
+    return { Type: KeyValues3Type.KeyValue_Int, Key, Value: Math.floor(Value).toString() };
+}
+exports.NewKeyValueInt = NewKeyValueInt;
+function NewKeyValueDouble(Key, Value) {
+    return { Type: KeyValues3Type.KeyValue_Double, Key, Value: Value.toString() };
+}
+exports.NewKeyValueDouble = NewKeyValueDouble;
+function NewKeyValueBoolean(Key, Value) {
+    return { Type: KeyValues3Type.KeyValue_Boolean, Key, Value: Value.toString() };
+}
+exports.NewKeyValueBoolean = NewKeyValueBoolean;
+function NewKeyValuesArray(Key, Value) {
+    return { Type: KeyValues3Type.KeyValue_Array, Key, Value };
+}
+exports.NewKeyValuesArray = NewKeyValuesArray;
+function NewKeyValuesObject(Key, Value) {
+    return { Type: KeyValues3Type.KeyValue_Object, Key, Value };
+}
+exports.NewKeyValuesObject = NewKeyValuesObject;
 /**
  * Read from KeyValues file
  * @param path A file path of KeyValues
@@ -255,7 +275,7 @@ async function _keyValues3Parser(ctx, isArray = false) {
                     continue;
                 }
                 else if (isSpace || code === LR || c === "/" ||
-                    code === COMMA || code === RightBrace || code === RightBracket) {
+                    (isArray && code === COMMA) || code === RightBrace || code === RightBracket) {
                     state = ParserState.None;
                     kv.Type = KeyValues3Type.KeyValue_String;
                     kv.Value = '';
@@ -289,6 +309,9 @@ async function _keyValues3Parser(ctx, isArray = false) {
                 kv = null;
                 continue;
             }
+            else if (isArray && str.length === 1 && code === COMMA) {
+                throw new Error(`Invalid string value in line ${ctx.line}.`);
+            }
             str += c;
             continue;
         }
@@ -308,6 +331,9 @@ async function _keyValues3Parser(ctx, isArray = false) {
                     throw new Error(`Invalid multi-line string ending in line ${ctx.line}, the """ require at the beginning of line`);
                 }
                 continue;
+            }
+            else if (isArray && str.length === 3 && code === COMMA) {
+                throw new Error(`Invalid string value in line ${ctx.line}.`);
             }
             str += c;
             continue;

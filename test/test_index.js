@@ -102,6 +102,15 @@ function printKV3( obj ) {
     }, '    '));
 }
 
+function printKV( obj ) {
+    console.log(JSON.stringify(obj, (key, value) => {
+        if (key === "Type" && typeof value === "number") {
+            return kvLib.KeyValuesType[value];
+        }
+        return value;
+    }, '    '));
+}
+
 ;(async function() {
     console.log("--> load kv.txt")
     let result = await kvLib.loadFromFile(path.join(__dirname, 'kv.txt'));
@@ -120,4 +129,17 @@ function printKV3( obj ) {
     console.log(kv3Lib.formatKeyValues(await kv3Lib.loadFromFile(path.join(__dirname, 'kv3.txt'))));
     console.log(kv3Lib.formatKeyValues(await kv3Lib.loadFromString(kv3Text)));
     await kv3Lib.writeFile(path.join(__dirname, 'kv3_w.txt'), await kv3Lib.loadFromString(kv3Text))
+
+    const testNewKV = [];
+    testNewKV.push(kv3Lib.NewKeyValuesObject("children", [
+        kv3Lib.NewKeyValue("k01", "str"),
+        kv3Lib.NewKeyValueInt("k02", 123),
+        kv3Lib.NewKeyValueDouble("k03", 123.4),
+        kv3Lib.NewKeyValueBoolean("k04", true),
+        kv3Lib.NewKeyValuesArray("k05", [
+            kv3Lib.NewKeyValue("", "str"),
+            kv3Lib.NewKeyValueInt("", 123),
+        ]),
+    ]));
+    printKV3(testNewKV);
 })();
