@@ -1,6 +1,11 @@
 # easy-keyvalues
+[![npm tag](https://img.shields.io/npm/v/easy-keyvalues/latest)](https://www.npmjs.com/package/easy-keyvalues)
+![support tag](https://img.shields.io/badge/support-KeyValues-blue)
+![support tag](https://img.shields.io/badge/support-KeyValues3-blue)
+
 Parse Valve KeyValues Format to easy use for nodejs
 
+# KeyValues
 ```js
 const kvLib = require('easy-keyvalues');
 
@@ -72,6 +77,8 @@ function printKV( obj ) {
 ```
 
 # KeyValues3
+
+> :warning:Since the format of KeyValues3 is more complicated than KeyValues, it may parse errors.
 
 ```js
 const kv3Lib = require('easy-keyvalues/dist/kv3');
