@@ -1,7 +1,7 @@
 # easy-keyvalues
 [![npm tag](https://img.shields.io/npm/v/easy-keyvalues/latest)](https://www.npmjs.com/package/easy-keyvalues)
-![support tag](https://img.shields.io/badge/support-KeyValues-blue)
-![support tag](https://img.shields.io/badge/support-KeyValues3-blue)
+[![support tag](https://img.shields.io/badge/support-KeyValues-blue)](#keyvalues)
+[![support tag](https://img.shields.io/badge/support-KeyValues3-blue)](#keyvalues3)
 
 Parse Valve KeyValues Format to easy use for nodejs
 
