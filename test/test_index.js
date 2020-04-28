@@ -62,6 +62,7 @@ const kv3Text = `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32
 First line of a multi-line string literal.
 Second line of a multi-line string literal.
 """]
+    "a.b" = 123
 	arrayValue =
 	[
 		1,

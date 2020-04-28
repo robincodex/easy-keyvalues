@@ -424,7 +424,7 @@ async function _keyValues3Parser(ctx, isArray = false) {
                     state = ParserState.None;
                     kv = {
                         Type: KeyValues3Type.KeyValue_String,
-                        Key: str,
+                        Key: str + c,
                         Value: '',
                     };
                     str = '';

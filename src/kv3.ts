@@ -437,7 +437,7 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
                     state = ParserState.None;
                     kv = {
                         Type: KeyValues3Type.KeyValue_String, // Default value type is string
-                        Key: str,
+                        Key: str + c,
                         Value: '',
                     };
                     str = '';
