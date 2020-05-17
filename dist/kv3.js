@@ -406,7 +406,7 @@ async function _keyValues3Parser(ctx, isArray = false) {
                     }
                     continue;
                 }
-                const list = c.match(/[a-zA-Z0-9_]/);
+                const list = c.match(/[a-zA-Z0-9_\.]/);
                 if (list && list[0] === c) {
                     str += c;
                 }

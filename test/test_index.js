@@ -63,7 +63,7 @@ First line of a multi-line string literal.
 Second line of a multi-line string literal.
 """]
     "a.b" = 123
-	arrayValue =
+	array.Value =
 	[
 		1,
         2,
