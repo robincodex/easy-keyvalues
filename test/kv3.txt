@@ -29,4 +29,40 @@ Second line of a multi-line string literal.
 	/* multi
 	line
 	comment */
+    
+    a05=789
+    bb = ""
+    cc = [123, "", {a=""}, """asd
+First line of a multi-line string literal.
+Second line of a multi-line string literal.
+"""]
+    "a.b" = 123
+	array.Value =
+	[
+		1,
+        2,
+        "",
+        {
+            a = 123
+            b = "456"
+            c = -1.5
+            g = {a=123 b=["456","789", true, {b=456}]}
+            t = [
+                3,
+                6,
+            ]
+        }
+	]
+	objectValue =
+	{
+		n = 5
+        s = "foo"
+        h = ["a", 456]
+        g = 
+        {
+            b = 123
+        }
+        j = {a=123 b=["456","789", true, {b=456}]}
+        i = [[123],[456,789,false]]
+	}
 }

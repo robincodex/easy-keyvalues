@@ -59,3 +59,48 @@
 	"AbilityTextureName"			"sylph_flash_blast"
 	"MaxLevel"						"1"
 }
+
+"Ha"
+{
+	test	"123"
+    01haha	false
+    t1
+    {
+        asd 456
+        ggg 
+        {
+            hjjj sss
+        }
+    }
+}
+
+// test object
+"test"
+{
+    // comment01
+    "key"   "value"
+
+    // comment02
+    // comment03
+    // comment04
+    "children"// this is children
+    {
+        "c1"    "1" // comment05
+        "c2"    "2 \"two\""
+
+    // comment07
+        // comment08
+        "c3"    "sss
+    <br/>this is child\n index 3
+    88"
+        "c4"   
+        {
+            "one"   "two"
+        }
+    }
+
+    "test" 
+    {
+        "three"   "two"
+    }
+}
