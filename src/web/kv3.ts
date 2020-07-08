@@ -44,14 +44,14 @@ export function NewKeyValuesObject(Key: string, Value: KeyValues3[]): KeyValues3
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-export async function loadFromString(content: string): Promise<KeyValues3[]>  {
+export function loadFromString(content: string): KeyValues3[]  {
     const ctx: kv3ParserContext = {
         content,
         index: 0,
         line: 1,
         column: 0,
     };
-    return await _keyValues3Parser(ctx);
+    return _keyValues3Parser(ctx);
 }
 
 export function formatKeyValues(root: KeyValues3[], tab = '', isParentArray = false): string {
@@ -158,7 +158,7 @@ const RightBracket = 93;    // ]
 const COMMA = 44;           // ,
 const EQUAL = 61;           // =
 
-async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promise<KeyValues3[]> {
+function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): KeyValues3[] {
     let result: KeyValues3[] = [];
     let state: ParserState = ParserState.None;
     let str = '';
@@ -436,7 +436,7 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
             if (code === LeftBrace) {
                 ctx.index++;
                 kv.Type = KeyValues3Type.KeyValue_Object;
-                kv.Value = await _keyValues3Parser(ctx);
+                kv.Value = _keyValues3Parser(ctx);
                 result.push(kv);
                 kv = null;
                 str = '';
@@ -448,7 +448,7 @@ async function _keyValues3Parser(ctx: kv3ParserContext, isArray = false): Promis
             if (code === LeftBracket) {
                 ctx.index++;
                 kv.Type = KeyValues3Type.KeyValue_Array;
-                kv.Value = await _keyValues3Parser(ctx, true);
+                kv.Value = _keyValues3Parser(ctx, true);
                 result.push(kv);
                 kv = null;
                 str = '';

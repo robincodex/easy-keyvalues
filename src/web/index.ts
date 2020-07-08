@@ -24,11 +24,11 @@ export function NewKeyValues(Key: string, Value: string | KeyValues[]): KeyValue
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-export async function loadFromString(content: string): Promise<KeyValues[]>  {
-    return await keyValuesParser(content);
+export function loadFromString(content: string): KeyValues[] {
+    return keyValuesParser(content);
 }
 
-async function keyValuesParser(content: string): Promise<KeyValues[]> {
+function keyValuesParser(content: string): KeyValues[] {
     let n = 0;
     let leftMark = false;
     let isSpecialMark = false;

@@ -28,7 +28,7 @@ export declare function NewKeyValuesObject(Key: string, Value: KeyValues3[]): Ke
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-export declare function loadFromString(content: string): Promise<KeyValues3[]>;
+export declare function loadFromString(content: string): KeyValues3[];
 export declare function formatKeyValues(root: KeyValues3[], tab?: string, isParentArray?: boolean): string;
 declare const _default: {
     loadFromString: typeof loadFromString;

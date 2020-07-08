@@ -18,7 +18,7 @@ export declare function NewKeyValues(Key: string, Value: string | KeyValues[]): 
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-export declare function loadFromString(content: string): Promise<KeyValues[]>;
+export declare function loadFromString(content: string): KeyValues[];
 /**
  * Format KeyValues object to string
  * @param kvList KeyValues list

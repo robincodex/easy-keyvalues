@@ -17,11 +17,11 @@ exports.NewKeyValues = NewKeyValues;
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
-async function loadFromString(content) {
-    return await keyValuesParser(content);
+function loadFromString(content) {
+    return keyValuesParser(content);
 }
 exports.loadFromString = loadFromString;
-async function keyValuesParser(content) {
+function keyValuesParser(content) {
     let n = 0;
     let leftMark = false;
     let isSpecialMark = false;
