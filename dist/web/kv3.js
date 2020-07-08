@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writeFile = exports.formatKeyValues = exports.loadFromString = exports.loadFromFile = exports.NewKeyValuesObject = exports.NewKeyValuesArray = exports.NewKeyValueBoolean = exports.NewKeyValueDouble = exports.NewKeyValueInt = exports.NewKeyValue = exports.emptyKeyValues = exports.KeyValues3Type = void 0;
-const fs = require("fs");
-const buffer_1 = require("buffer");
+exports.formatKeyValues = exports.loadFromString = exports.NewKeyValuesObject = exports.NewKeyValuesArray = exports.NewKeyValueBoolean = exports.NewKeyValueDouble = exports.NewKeyValueInt = exports.NewKeyValue = exports.emptyKeyValues = exports.KeyValues3Type = void 0;
 var KeyValues3Type;
 (function (KeyValues3Type) {
     KeyValues3Type[KeyValues3Type["Comment"] = 0] = "Comment";
@@ -44,28 +42,12 @@ function NewKeyValuesObject(Key, Value) {
 }
 exports.NewKeyValuesObject = NewKeyValuesObject;
 /**
- * Read from KeyValues file
- * @param path A file path of KeyValues
- * @param encoding Default utf8
- */
-async function loadFromFile(path, encoding = 'utf8') {
-    const s = await fs.promises.readFile(path, { encoding });
-    const ctx = {
-        content: buffer_1.Buffer.from(s),
-        index: 0,
-        line: 1,
-        column: 0,
-    };
-    return await _keyValues3Parser(ctx);
-}
-exports.loadFromFile = loadFromFile;
-/**
  * Read from KeyValues format
  * @param content A string of KeyValues format
  */
 async function loadFromString(content) {
     const ctx = {
-        content: buffer_1.Buffer.from(content, 'utf8'),
+        content,
         index: 0,
         line: 1,
         column: 0,
@@ -148,15 +130,6 @@ function formatKeyValues(root, tab = '', isParentArray = false) {
     return text;
 }
 exports.formatKeyValues = formatKeyValues;
-/**
- * @param path file path
- * @param root KeyValues3 object
- * @param encoding Default utf8
- */
-async function writeFile(path, root, encoding = 'utf8') {
-    await fs.promises.writeFile(path, formatKeyValues(root), { encoding });
-}
-exports.writeFile = writeFile;
 var ParserState;
 (function (ParserState) {
     ParserState[ParserState["None"] = 0] = "None";
@@ -184,9 +157,9 @@ async function _keyValues3Parser(ctx, isArray = false) {
     let checkKey = false;
     let kv = null;
     for (; ctx.index < ctx.content.length; ctx.index++, ctx.column++) {
-        const code = ctx.content[ctx.index];
+        const c = ctx.content[ctx.index];
+        const code = c.charCodeAt(0);
         const isSpace = code === SPACE || code === HT;
-        const c = String.fromCharCode(code);
         // console.log(c, code);
         if (code === HT) {
             ctx.column += 3;
@@ -417,7 +390,7 @@ async function _keyValues3Parser(ctx, isArray = false) {
             }
             else {
                 if (c === "\\") {
-                    str += c + String.fromCharCode(ctx.content[ctx.index + 1]);
+                    str += c + ctx.content[ctx.index + 1];
                     ctx.index += 1;
                     continue;
                 }
@@ -518,10 +491,8 @@ async function _keyValues3Parser(ctx, isArray = false) {
     return result;
 }
 exports.default = {
-    loadFromFile,
     loadFromString,
     formatKeyValues,
-    writeFile,
     KeyValues3Type,
 };
 //# sourceMappingURL=kv3.js.map
