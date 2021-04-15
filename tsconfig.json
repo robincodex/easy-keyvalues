@@ -6,14 +6,9 @@
         "outDir": "dist",
         "sourceMap": true,
         "target": "ES2017",
-        "lib": [
-            "ES2017"
-        ]
+        "strict": true,
+        "lib": ["ES2017"]
     },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-    ]
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"]
 }
