@@ -9,7 +9,7 @@
 	{
 		"BaseClass"             		"ability_datadriven"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
-		"AbilityTextureName"			"sylph_flash_blast"
+		"AbilityTextureName"			"abaddon/mistral_fiend_icons//abaddon_borrowed_time"
 		"MaxLevel"						"1"
 
 		"c1"
@@ -60,6 +60,8 @@
 	"MaxLevel"						"1"
 }
 
+// -> ha
+
 "Ha"
 {
 	test	"123"
@@ -72,6 +74,8 @@
             hjjj sss
         }
     }
+    "test" "345"
+    test 789
 }
 
 //test object

@@ -1,5 +1,7 @@
 import { KeyValuesComments } from './Comments';
 
+const KeyValuesRootMark = '__KeyValues_Root__';
+
 export default class KeyValues {
     /**
      * The children of this KeyValues
@@ -32,10 +34,10 @@ export default class KeyValues {
     }
 
     /**
-     * Return true that the parent is undefined.
+     * Return true that the KeyValues is root.
      */
     public IsRoot() {
-        return !this.parent;
+        return this.Key === KeyValuesRootMark;
     }
 
     /**
@@ -55,6 +57,23 @@ export default class KeyValues {
 
     public GetChildCount() {
         return this.GetChildren().length;
+    }
+
+    public GetFirstChild(): KeyValues | undefined {
+        return this.GetChildren()[0];
+    }
+
+    public GetLastChild(): KeyValues | undefined {
+        return this.GetChildren()[this.GetChildCount() - 1];
+    }
+
+    /**
+     * Create a KeyValues to children and return it.
+     */
+    public CreateChild(key: string, value: string | KeyValues[]) {
+        const kv = new KeyValues(key, value);
+        this.Append(kv);
+        return kv;
     }
 
     /**
@@ -86,6 +105,7 @@ export default class KeyValues {
             this.value = v;
             delete this.children;
         }
+        return this;
     }
 
     /**
@@ -123,7 +143,7 @@ export default class KeyValues {
         callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
     ): KeyValues | undefined {
         if (!this.children) {
-            throw new Error(`The KeyValues [Key = ${this.Key}] does not have children`);
+            return;
         }
         for (const [i, kv] of this.children.entries()) {
             if (callback(kv, i, this) === true) {
@@ -139,7 +159,7 @@ export default class KeyValues {
         callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
     ): KeyValues[] {
         if (!this.children) {
-            throw new Error(`The KeyValues [Key = ${this.Key}] does not have children`);
+            return [];
         }
         const result: KeyValues[] = [];
         for (const [i, kv] of this.children.entries()) {
@@ -171,7 +191,7 @@ export default class KeyValues {
         callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
     ): KeyValues | undefined {
         if (!this.children) {
-            throw new Error(`The KeyValues [Key = ${this.Key}] does not have children`);
+            return;
         }
         return KeyValues.FindRecursive(this, callback);
     }
@@ -201,7 +221,7 @@ export default class KeyValues {
      */
     public Delete(child: string | KeyValues): KeyValues | undefined {
         if (!this.children) {
-            throw new Error(`The KeyValues [Key = ${this.Key}] does not have children`);
+            return;
         }
         let kv: KeyValues | undefined;
         if (typeof child === 'string') {
@@ -211,6 +231,7 @@ export default class KeyValues {
         }
         if (kv) {
             this.children = this.children.filter((v) => v !== kv);
+            kv.Free();
         }
         return kv;
     }
@@ -226,6 +247,9 @@ export default class KeyValues {
         return this;
     }
 
+    /**
+     * Format KeyValues to file text
+     */
     public Format(tab: string = '', maxLength: number = -1): string {
         if (this.IsRoot()) {
             if (!this.children) {
@@ -250,7 +274,7 @@ export default class KeyValues {
             }
             text += `\n${tab}{`;
             for (const kv of this.children) {
-                text += '\n' + kv.Format(tab + '    ', maxLength + 2);
+                text += '\n' + kv.Format(tab + '    ', maxLength);
             }
             text += `\n${tab}}`;
         } else {
@@ -277,11 +301,17 @@ export default class KeyValues {
     }
 
     /**
+     * Create root node
+     */
+    public static CreateRoot() {
+        return new KeyValues(KeyValuesRootMark, []);
+    }
+
+    /**
      * Parse string
      */
     public static Parse(body: string): KeyValues {
-        let root = new KeyValues('');
-        root.SetValue([]);
+        let root = this.CreateRoot();
         this._parse({ body, pos: 0, line: 1 }, root);
         return root;
     }
@@ -363,11 +393,8 @@ export default class KeyValues {
                             if (key) {
                                 kv.Comments.SetEndOfLineComment(comment);
                             } else {
-                                parent
-                                    .GetChildren()
-                                    [
-                                        parent.GetChildCount() - 1
-                                    ].Comments.SetEndOfLineComment(comment);
+                                const lastChild = parent.GetLastChild();
+                                lastChild?.Comments.SetEndOfLineComment(comment);
                             }
                         } else {
                             kv.Comments.AppendComment(comment);
@@ -401,6 +428,7 @@ export default class KeyValues {
                 continue;
             }
 
+            // start merge char
             key = !key;
             leftMark = true;
             inQoute = c === '"';

@@ -5,92 +5,95 @@
 {
     "building_system_active_preview"
     {
-        "BaseClass"               "ability_datadriven"
-        "AbilityBehavior"         "DOTA_ABILITY_BEHAVIOR_POINT"
-        "AbilityTextureName"      "sylph_flash_blast"
-        "MaxLevel"                "1"
+        "BaseClass"             "ability_datadriven"
+        "AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName"    "abaddon/mistral_fiend_icons//abaddon_borrowed_time"
+        "MaxLevel"              "1"
         "c1"
         {
-            "kkkkkkkkkkkkkkkk1"      "v1"
-            "kkkkkkkkkkkkkk2"        "v2"
-            "kkkkkkkk3"              "v3"
-            "kkkkkkkk3"              "v3"
-            "kkkkkkkk3"              "v3 \"test\""
+            "kkkkkkkkkkkkkkkk1"    "v1"
+            "kkkkkkkkkkkkkk2"      "v2"
+            "kkkkkkkk3"            "v3"
+            "kkkkkkkk3"            "v3"
+            "kkkkkkkk3"            "v3 \"test\""
             "c2"
             {
-                "kkkkkkkkkkk1"      "v1"
-                "kkkkkkkk2"         "v2"
-                "kkkkk3"            "v3"
-                "kkkkkkkk3"         "v3"
-                "kkkkkkkk3"         "v3"
-                "kkkkkkkk3"         "v3"
+                "kkkkkkkkkkk1"    "v1"
+                "kkkkkkkk2"       "v2"
+                "kkkkk3"          "v3"
+                "kkkkkkkk3"       "v3"
+                "kkkkkkkk3"       "v3"
+                "kkkkkkkk3"       "v3"
                 "c3"
                 {
-                    "kkkkkkk1"       "v1"
-                    "kkkkk2"         "v2"
-                    "kkkkk3"         "v3"
-                    "kkkkkkkk3"      "v3"
-                    "kkkkkkkk3"      "v3" // haha
+                    "kkkkkkk1"     "v1"
+                    "kkkkk2"       "v2"
+                    "kkkkk3"       "v3"
+                    "kkkkkkkk3"    "v3"
+                    "kkkkkkkk3"    "v3" // haha
                     // list
                     "c4"
                     {
-                        "kkkkkk1"        "v1"
-                        "kkkkk2"         "v2"
-                        "kkkk3"          "v3"
-                        "kkkkkkkk3"      "v3"
+                        "kkkkkk1"      "v1"
+                        "kkkkk2"       "v2"
+                        "kkkk3"        "v3"
+                        "kkkkkkkk3"    "v3"
                         "c5"
                         {
-                            "kkkk1"      "v1"
-                            "kkkk2"      "v2"
-                            "k3"         "v3"
+                            "kkkk1"    "v1"
+                            "kkkk2"    "v2"
+                            "k3"       "v3"
                         }
                     }
                 }
             }
         }
     }
-    "BaseClass"                           "ability_lua"
-    "AbilityBehavior"                     "DOTA_ABILITY_BEHAVIOR_POINT"
-    "AbilityTextureName"                  "sylph_flash_blast"
-    "MaxLevel"                            "1"
+    "BaseClass"                         "ability_lua"
+    "AbilityBehavior"                   "DOTA_ABILITY_BEHAVIOR_POINT"
+    "AbilityTextureName"                "sylph_flash_blast"
+    "MaxLevel"                          "1"
 }
+// -> ha
 "Ha"
 {
-    "test"        "123"
-    "01haha"      "false"
+    "test"      "123"
+    "01haha"    "false"
     "t1"
     {
-        "asd"      "456"
+        "asd"    "456"
         "ggg"
         {
-            "hjjj"      "sss"
+            "hjjj"    "sss"
         }
     }
+    "test"      "345"
+    "test"      "789"
 }
 // test object
 "test"
 {
     // comment01
-    "key"           "value"
+    "key"         "value"
     // comment02
     // comment03
     // comment04
     "children" // this is children
     {
-        "c1"      "1" // comment05
-        "c2"      "2 \"two\""
+        "c1"    "1" // comment05
+        "c2"    "2 \"two\""
         // comment07
         // comment08
-        "c3"      "sss
+        "c3"    "sss
     <br/>this is child\n index 3
     88"
         "c4"
         {
-            "one"      "two"
+            "one"    "two"
         }
     }
     "test"
     {
-        "three"      "two"
+        "three"    "two"
     }
 }

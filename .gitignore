@@ -2,3 +2,4 @@ node_modules
 kv3_w.txt
 kv_w.txt
 dist
+/coverage

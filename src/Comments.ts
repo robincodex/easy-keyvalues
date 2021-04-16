@@ -19,6 +19,7 @@ export class KeyValuesComments {
             }
         }
         this.comments = list;
+        return this;
     }
 
     public AppendComment(text: string) {

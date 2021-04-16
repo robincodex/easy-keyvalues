@@ -2,6 +2,8 @@ import { readFile, writeFile } from 'fs/promises';
 import { readFileSync, writeFileSync } from 'fs';
 import KeyValues from './KeyValues';
 
+export { KeyValues };
+
 export async function LoadKeyValues(file: string, encoding: BufferEncoding = 'utf8') {
     const body = await readFile(file, encoding);
     return KeyValues.Parse(body);
