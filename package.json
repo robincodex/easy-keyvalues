@@ -9,7 +9,9 @@
     "engineStrict": true,
     "scripts": {
         "watch": "tsc --watch -p ./",
-        "test": "jest"
+        "test": "jest",
+        "lint:prettier": "prettier --check .",
+        "write-prettier": "prettier --write ."
     },
     "author": "RobinCode",
     "homepage": "https://github.com/RobinCodeX/easy-keyvalues",
@@ -25,6 +27,7 @@
         "@types/jest": "^26.0.22",
         "@types/node": "^14.14.37",
         "jest": "^26.6.3",
+        "prettier": "^2.2.1",
         "ts-jest": "^26.5.4",
         "ts-node": "^9.1.1",
         "typescript": "^4.2.4"

@@ -316,10 +316,7 @@ export default class KeyValues {
         return root;
     }
 
-    protected static _parse(
-        data: { body: string; pos: number; line: number },
-        parent: KeyValues
-    ) {
+    protected static _parse(data: { body: string; pos: number; line: number }, parent: KeyValues) {
         let kv = new KeyValues('');
         let key = false;
         let leftMark = false;

@@ -1,11 +1,5 @@
 import { join } from 'path';
-import {
-    LoadKeyValues,
-    SaveKeyValues,
-    KeyValues,
-    LoadKeyValuesSync,
-    SaveKeyValuesSync,
-} from '../';
+import { LoadKeyValues, SaveKeyValues, KeyValues, LoadKeyValuesSync, SaveKeyValuesSync } from '../';
 
 function testKV(kv: KeyValues) {
     expect(kv.GetChildCount()).toBe(6);
@@ -28,15 +22,11 @@ function testKV(kv: KeyValues) {
     expect(findAll?.map((v) => v.Key)).toEqual(['test', 'test', 'test']);
     expect(findAll?.map((v) => v.GetValue())).toEqual(['123', '345', '789']);
 
-    expect(kv.FindRecursive((kv) => kv.Key === 'BaseClass')?.GetValue()).toBe(
-        'ability_datadriven'
-    );
+    expect(kv.FindRecursive((kv) => kv.Key === 'BaseClass')?.GetValue()).toBe('ability_datadriven');
 
     expect(kv.FindRecursive((kv) => kv.Key === 'k3')?.GetValue()).toBe('v3');
 
-    expect(kv.FindKey('DOTAAbilities')?.FindKey('BaseClass')?.GetValue()).toBe(
-        'ability_lua'
-    );
+    expect(kv.FindKey('DOTAAbilities')?.FindKey('BaseClass')?.GetValue()).toBe('ability_lua');
 
     expect(
         kv
@@ -46,9 +36,7 @@ function testKV(kv: KeyValues) {
             ?.GetValue()
     ).toBe('abaddon/mistral_fiend_icons//abaddon_borrowed_time');
 
-    expect(kv.FindKey('test')?.FindKey('children')?.FindKey('c2')?.GetValue()).toBe(
-        '2 \\"two\\"'
-    );
+    expect(kv.FindKey('test')?.FindKey('children')?.FindKey('c2')?.GetValue()).toBe('2 \\"two\\"');
 
     expect(kv.FindKey('test')?.Comments?.GetComments()[0]).toBe('test object');
 
@@ -58,9 +46,9 @@ function testKV(kv: KeyValues) {
         'comment04',
     ]);
 
-    expect(
-        kv.FindKey('test')?.FindKey('children')?.Comments?.GetEndOfLineComment()
-    ).toBe('this is children');
+    expect(kv.FindKey('test')?.FindKey('children')?.Comments?.GetEndOfLineComment()).toBe(
+        'this is children'
+    );
 
     expect(kv.FindKey('test')?.FindKey('children')?.FindKey('c3')?.GetValue()).toBe(
         'sss\n    <br/>this is child\\n index 3\n    88'

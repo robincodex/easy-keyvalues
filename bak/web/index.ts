@@ -9,15 +9,15 @@ export enum KeyValuesType {
  * When the key is "#base", it's a base statement. Example: #base "file path"
  */
 export type KeyValues = {
-    Type: KeyValuesType,
-    Key: string,
-    Value: string | KeyValues[],
+    Type: KeyValuesType;
+    Key: string;
+    Value: string | KeyValues[];
 };
 
-export const emptyKeyValues: KeyValues = {Type: KeyValuesType.KeyValue, Key:'', Value:''};
+export const emptyKeyValues: KeyValues = { Type: KeyValuesType.KeyValue, Key: '', Value: '' };
 
 export function NewKeyValues(Key: string, Value: string | KeyValues[]): KeyValues {
-    return {Type: KeyValuesType.KeyValue, Key, Value};
+    return { Type: KeyValuesType.KeyValue, Key, Value };
 }
 
 /**
@@ -38,26 +38,26 @@ function keyValuesParser(content: string): KeyValues[] {
     let result: KeyValues[] = [];
     let resultQueue: KeyValues[][] = [];
     let kvQueue: KeyValues[] = [];
-    
+
     content = content.replace(/\r\n/g, '\n');
     const lines = content.split('\n');
 
-    for(const line of lines) {
+    for (const line of lines) {
         n++;
         let isEndOfLineComment = false;
 
-        for(let i=0; i<line.length; i++) {
+        for (let i = 0; i < line.length; i++) {
             const c = line[i];
             const isSpace = c === ' ' || c === '\t' || c === '\r' || c === '\n';
-            
+
             // If leftMark is true then merge char to str
             if (leftMark) {
                 if (isSpecialMark) {
-                    if (c === '{' || c === '\"' || c === '[' || c === ']' ) {
+                    if (c === '{' || c === '"' || c === '[' || c === ']') {
                         throw new Error(`Not readable in line ${n}`);
                     }
                     if (isSpace || c === '}') {
-                        if(kv.Key === null) {
+                        if (kv.Key === null) {
                             kv.Key = str;
                         } else {
                             kv.Value = str;
@@ -83,7 +83,7 @@ function keyValuesParser(content: string): KeyValues[] {
                     continue;
                 }
                 if (c === '"') {
-                    if(kv.Key === null) {
+                    if (kv.Key === null) {
                         kv.Key = str;
                     } else {
                         kv.Value = str;
@@ -100,7 +100,7 @@ function keyValuesParser(content: string): KeyValues[] {
 
             // If comment
             if (c === '/') {
-                if (line[i+1] !== '/') {
+                if (line[i + 1] !== '/') {
                     throw new Error(`Comment error in line ${n}`);
                 }
                 let comment: KeyValues = null;
@@ -132,12 +132,12 @@ function keyValuesParser(content: string): KeyValues[] {
 
             // If base statement
             if (c === '#') {
-                if(line.substr(i+1, 4) === 'base') {
+                if (line.substr(i + 1, 4) === 'base') {
                     i += 4;
                     isEndOfLineComment = true;
                     kv = {
                         Type: KeyValuesType.BaseStatement,
-                        Key: "#base",
+                        Key: '#base',
                         Value: null,
                     };
                     result.push(kv);
@@ -152,7 +152,7 @@ function keyValuesParser(content: string): KeyValues[] {
                 isSpecialMark = false;
                 str = '';
                 isEndOfLineComment = true;
-                if(kv === null) {
+                if (kv === null) {
                     kv = {
                         Type: KeyValuesType.KeyValue,
                         Key: null,
@@ -198,7 +198,7 @@ function keyValuesParser(content: string): KeyValues[] {
             isSpecialMark = true;
             str = c;
             isEndOfLineComment = true;
-            if(kv === null) {
+            if (kv === null) {
                 kv = {
                     Type: KeyValuesType.KeyValue,
                     Key: null,
@@ -209,7 +209,7 @@ function keyValuesParser(content: string): KeyValues[] {
         }
     }
 
-    if (breaceCount%2 !== 0) {
+    if (breaceCount % 2 !== 0) {
         throw new Error(`The braces are not equal`);
     }
 
@@ -224,31 +224,28 @@ function keyValuesParser(content: string): KeyValues[] {
 export function formatKeyValues(kvList: KeyValues[], tab = ''): string {
     let text = '';
 
-    for(let [i, kv] of kvList.entries()) {
+    for (let [i, kv] of kvList.entries()) {
         if (kv.Type === KeyValuesType.Comment) {
             text += `${tab}//${kv.Value}\n`;
-        }
-        else if (kv.Type === KeyValuesType.BaseStatement) {
-            let nextKV = kvList[i+1];
+        } else if (kv.Type === KeyValuesType.BaseStatement) {
+            let nextKV = kvList[i + 1];
             let endOfLineComment = '';
             if (nextKV && nextKV.Type === KeyValuesType.EndOfLineComment) {
-                endOfLineComment = " //" + nextKV.Value as string;
+                endOfLineComment = (' //' + nextKV.Value) as string;
             }
             text += `${tab}"#base"        "${kv.Value}"${endOfLineComment}\n`;
-        }
-        else if (kv.Type === KeyValuesType.KeyValue) {
-            let nextKV = kvList[i+1];
+        } else if (kv.Type === KeyValuesType.KeyValue) {
+            let nextKV = kvList[i + 1];
             let endOfLineComment = '';
             if (nextKV && nextKV.Type === KeyValuesType.EndOfLineComment) {
-                endOfLineComment = " //" + nextKV.Value as string;
+                endOfLineComment = (' //' + nextKV.Value) as string;
             }
 
             if (Array.isArray(kv.Value)) {
                 text += `${tab}"${kv.Key}"${endOfLineComment}\n${tab}{\n`;
                 text += formatKeyValues(kv.Value, tab + '    ');
                 text += `${tab}}\n`;
-            }
-            else {
+            } else {
                 text += `${tab}"${kv.Key}"        "${kv.Value}"${endOfLineComment}\n`;
             }
         }

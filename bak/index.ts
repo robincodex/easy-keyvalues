@@ -33,10 +33,7 @@ export function NewKeyValues(Key: string, Value: string | KeyValues[]): KeyValue
  * @param path A file path of KeyValues
  * @param encoding Default utf8
  */
-export async function loadFromFile(
-    path: string,
-    encoding = 'utf8'
-): Promise<KeyValues[]> {
+export async function loadFromFile(path: string, encoding = 'utf8'): Promise<KeyValues[]> {
     const s = fs.createReadStream(path, { encoding });
     return await keyValuesParser(s);
 }
@@ -134,11 +131,7 @@ async function keyValuesParser(s: NodeJS.ReadableStream): Promise<KeyValues[]> {
                         Value: null,
                     };
                 } else {
-                    if (
-                        kv !== null &&
-                        kv.Type === KeyValuesType.KeyValue &&
-                        !kv.Value
-                    ) {
+                    if (kv !== null && kv.Type === KeyValuesType.KeyValue && !kv.Value) {
                         comment = {
                             Type: KeyValuesType.EndOfLineComment,
                             Key: '',

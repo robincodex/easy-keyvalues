@@ -1,8 +1,5 @@
 export class KeyValuesComments {
-    constructor(
-        protected comments: string[] = [],
-        protected endOfLineComment: string = ''
-    ) {}
+    constructor(protected comments: string[] = [], protected endOfLineComment: string = '') {}
 
     public GetComments(): string[] {
         return this.comments;
