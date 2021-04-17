@@ -123,6 +123,14 @@ describe('KeyValues3', () => {
             ])
         );
 
+        h.CreateObjectValue(
+            'multi.line',
+            new KeyValues3.String(`
+First line of a multi-line string literal.
+Second line of a multi-line string literal.
+`)
+        );
+
         // console.log(root.Format());
         expect(root.toString()).toBe(`${KeyValues3.CommonHeader}
 {
@@ -173,7 +181,81 @@ describe('KeyValues3', () => {
                 resource:"particles/e.vpcf",
             ]
         }
+        multi.line = """
+First line of a multi-line string literal.
+Second line of a multi-line string literal.
+"""
     }
+}`);
+
+        const root2 = KeyValues3.CreateRoot();
+        const a2 = root2.CreateObjectValue('a', new KeyValues3.String('b'));
+        a2.GetValue().Comments.AppendComment('line 1');
+        a2.GetValue().Comments.AppendComment('line 2');
+        a2.GetValue().Comments.AppendComment('multi-line 1\nmulti-line 2');
+        a2.GetValue().Comments.AppendComment('*multi-line 1\n* multi-line 2\nml3');
+        a2.GetValue().Comments.SetEndOfLineComment('end a');
+        const pa = new KeyValues3.Resource('particles/a.vpcf');
+        pa.Comments.AppendComment('line 1');
+        pa.Comments.AppendComment('line 1 \n line 2');
+        pa.Comments.SetEndOfLineComment('eeend');
+        const c2 = root2.CreateObjectValue(
+            'c',
+            new KeyValues3.Object([
+                new KeyValues3('particles', new KeyValues3.Array([pa])),
+                a2,
+                new KeyValues3('q', new KeyValues3.String('qq')),
+            ])
+        );
+        c2.GetValue().Comments.SetEndOfLineComment('end c');
+        const q = new KeyValues3.String('qq');
+        q.Comments.SetEndOfLineComment('qq');
+        const a3 = root2.CreateObjectValue('a', new KeyValues3.Array([q]));
+        a3.GetValue().Comments.SetEndOfLineComment('end');
+        // console.log(root2.toString());
+        expect(root2.toString()).toBe(`${KeyValues3.CommonHeader}
+{
+    // line 1
+    // line 2
+    /*
+    multi-line 1
+    multi-line 2
+    */
+    /*
+     * multi-line 1
+     * multi-line 2
+     * ml3
+     */
+    a = "b" // end a
+    c =
+    {
+        particles =
+        [
+            // line 1
+            /*
+            line 1 
+            line 2
+            */
+            resource:"particles/a.vpcf", // eeend
+        ]
+        // line 1
+        // line 2
+        /*
+        multi-line 1
+        multi-line 2
+        */
+        /*
+         * multi-line 1
+         * multi-line 2
+         * ml3
+         */
+        a = "b" // end a
+        q = "qq"
+    } // end c
+    a =
+    [
+        "qq", // qq
+    ] // end
 }`);
     });
 });

@@ -12,6 +12,7 @@ enum KeyValues3ValueType {
 }
 
 interface IKV3Value {
+    Comments: KeyValues3Comments;
     GetValue(): any;
     GetOwner(): KeyValues3 | undefined;
     SetOwner(owner: KeyValues3 | undefined): void;
@@ -29,6 +30,7 @@ interface IKV3Value {
 class BaseValue implements IKV3Value {
     protected value: any;
     protected owner?: KeyValues3;
+    public Comments = new KeyValues3Comments();
 
     constructor(owner?: KeyValues3) {
         this.owner = owner;
@@ -99,6 +101,9 @@ class ValueString extends BaseValue {
     }
 
     public Format(): string {
+        if (this.value.includes('\n')) {
+            return `"""${this.value}"""`;
+        }
         return `"${this.value}"`;
     }
 }
@@ -270,7 +275,15 @@ class ValueArray extends BaseValue {
         let text = '';
         let oneLine = true;
 
-        if (this.value.some((v) => v.IsArray() || v.IsObject())) {
+        if (
+            this.value.some(
+                (v) =>
+                    v.IsArray() ||
+                    v.IsObject() ||
+                    v.Comments.HasComments() ||
+                    v.Comments.HasEndOfLineComment()
+            )
+        ) {
             oneLine = false;
         } else {
             const max = this.value.reduce((pv, v) => pv + v.Format().length, 0);
@@ -291,12 +304,20 @@ class ValueArray extends BaseValue {
             text = `\n${tab}[`;
             text += this.value
                 .map((v) => {
-                    if (v.IsArray()) {
-                        return v.Format(tab + '    ') + ',';
-                    } else if (v.IsObject()) {
-                        return v.Format(tab + '    ') + ',';
+                    let comment = '';
+                    let endComment = '';
+                    if (v.Comments.HasComments()) {
+                        comment = '\n' + v.Comments.Format(tab + '    ').trimEnd();
                     }
-                    return '\n' + tab + '    ' + v.Format() + ',';
+                    if (v.Comments.HasEndOfLineComment()) {
+                        endComment = ` // ${v.Comments.GetEndOfLineComment()}`;
+                    }
+                    if (v.IsArray()) {
+                        return comment + v.Format(tab + '    ') + ',' + endComment;
+                    } else if (v.IsObject()) {
+                        return comment + v.Format(tab + '    ') + ',' + endComment;
+                    }
+                    return comment + '\n' + tab + '    ' + v.Format() + ',' + endComment;
                 })
                 .join('');
             text += `\n${tab}]`;
@@ -407,7 +428,7 @@ class ValueObject extends BaseValue {
     }
 }
 
-const KeyUseQuoteTest = /^[\w\d_]+$/;
+const KeyUseQuoteTest = /^[\w\d_\.]+$/;
 
 /**
  * https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
@@ -421,11 +442,6 @@ export default class KeyValues3 {
     public static DeferredResource = ValueDeferredResource;
     public static Array = ValueArray;
     public static Object = ValueObject;
-
-    /**
-     * Comment
-     */
-    public Comments = new KeyValues3Comments();
 
     protected value: IKV3Value;
 
@@ -525,7 +541,11 @@ export default class KeyValues3 {
         }
 
         if (root) {
-            text += this.header + '\n';
+            text += this.header;
+        }
+
+        if (this.value.Comments.HasComments()) {
+            text += this.value.Comments.Format(tab);
         }
 
         if (this.value.IsArray()) {
@@ -533,13 +553,17 @@ export default class KeyValues3 {
             text += this.value.Format(tab);
         } else if (this.value.IsObject()) {
             if (root) {
-                text += this.value.Format(tab).slice(1);
+                text += this.value.Format(tab);
             } else {
                 text += prefix;
                 text += this.value.Format(tab);
             }
         } else {
             text += prefix + ` ${this.value.Format()}`;
+        }
+
+        if (this.value.Comments.HasEndOfLineComment()) {
+            text += ` // ${this.value.Comments.GetEndOfLineComment()}`;
         }
 
         return text;
