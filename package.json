@@ -1,6 +1,6 @@
 {
     "name": "easy-keyvalues",
-    "version": "0.1.5",
+    "version": "1.0.0",
     "description": "Parse Valve KeyValues Format and easy to use in nodejs or browser.",
     "main": "dist/node.js",
     "engines": {
@@ -9,7 +9,8 @@
     "engineStrict": true,
     "scripts": {
         "watch": "tsc --watch -p ./",
-        "test": "jest",
+        "test": "jest --verbose",
+        "test:kv3": "jest --coverage=false -- __tests__/KeyValues3.test.ts",
         "lint:prettier": "prettier --check .",
         "write-prettier": "prettier --write ."
     },

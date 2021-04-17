@@ -13,7 +13,6 @@ export default class KeyValues {
     protected value?: string;
     /**
      * The parent of this KeyValues,
-     * if parent is `undefined` then this KeyValues is root.
      */
     protected parent?: KeyValues;
     /**
@@ -382,6 +381,9 @@ export default class KeyValues {
 
             // if comment
             if (c === '/') {
+                if (data.body[data.pos + 1] === '*') {
+                    throw Error(`Line ${data.line}: not support multi-line comment`);
+                }
                 if (data.body[data.pos + 1] === '/') {
                     const endIndex = data.body.indexOf('\n', data.pos + 1);
                     const comment = data.body.slice(data.pos + 2, endIndex).trim();

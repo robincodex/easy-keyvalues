@@ -85,6 +85,11 @@ describe('KeyValues', () => {
         } catch (e) {
             expect(e).toEqual(Error(`Not readable in line 1`));
         }
+        try {
+            KeyValues.Parse(`/* a */`);
+        } catch (e) {
+            expect(e).toEqual(Error(`Line 1: not support multi-line comment`));
+        }
     });
 
     test('Create/Append/Insert/Delete KeyValues', async () => {
