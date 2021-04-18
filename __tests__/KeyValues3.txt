@@ -5,6 +5,7 @@
 	doubleValue = 64.000000
 	stringValue = "hello world \n \"ss\" "
 	stringThatIsAResourceReference = resource:"particles/items3_fx/star_emblem.vpcf"
+    deferred_resource = deferred_resource:"particles/items3_fx/star_emblem.vpcf"
 	multiLineStringValue = """
 First line of a multi-line string literal.
 Second line of a multi-line string literal.
@@ -19,6 +20,7 @@ Second line of a multi-line string literal.
             c = -1.5
         },
         resource:"particles/items3_fx/star_emblem.vpcf",
+        "b\n",
 	]
 	objectValue =
 	{
@@ -33,7 +35,7 @@ Second line of a multi-line string literal.
 	line
 	comment */
     
-    a05=789
+    "a\\05"=789
     bb = ""
     cc = [123, "", {a=""}, """
 First line of a multi-line string literal.
@@ -52,7 +54,7 @@ Second line of a multi-line string literal.
         two
         three
         */
-        2,
+        2.5,
         "", // empty
         {
             a = 123
@@ -60,10 +62,11 @@ Second line of a multi-line string literal.
             c = -1.5
             g = {a=123 b=["456","789", true, {b=456}]}
             t = [
-                3,
-                6,
+                3 ,
+                6 ,
             ]
-        }
+        },
+        deferred_resource:"particles/items3_fx/star_emblem.vpcf"
 	]
 	objectValue =
 	{

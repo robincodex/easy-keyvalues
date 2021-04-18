@@ -353,7 +353,7 @@ class ValueObject extends BaseValue {
     }
 
     public SetValue(list: KeyValues3[]) {
-        this.value = list.map((v) => v.Free());
+        this.value = [...list];
         return this;
     }
 
@@ -460,8 +460,6 @@ export default class KeyValues3 {
 
     protected header?: string;
 
-    protected owner?: ValueObject;
-
     constructor(public Key: string, defaultValue: IKV3Value) {
         this.value = defaultValue;
         this.value.SetOwner(this);
@@ -493,13 +491,6 @@ export default class KeyValues3 {
             throw Error('The root node of KeyValues3 must be an object');
         }
         this.value = v;
-    }
-
-    public Free() {
-        if (this.owner) {
-            this.owner.Delete(this);
-        }
-        return this;
     }
 
     public CreateObjectValue(key: string, value: IKV3Value) {
@@ -653,14 +644,8 @@ export default class KeyValues3 {
                                 }
                                 continue;
                             }
-                            if (MatchKeyNoQuote.test(c)) {
-                                str += c;
-                                continue;
-                            } else {
-                                throw new Error(
-                                    this._parse_error(data.line, `Invalid member name '${str + c}'`)
-                                );
-                            }
+                            str += c;
+                            continue;
                         }
                         // isKey
                     } else {
@@ -682,7 +667,7 @@ export default class KeyValues3 {
                                             throw new Error(
                                                 this._parse_error(
                                                     data.line,
-                                                    `multi-line start identifier(""") must be followed by newline`
+                                                    `multi-line start identifier """ must be followed by newline`
                                                 )
                                             );
                                         }
@@ -697,7 +682,7 @@ export default class KeyValues3 {
                                                 throw new Error(
                                                     this._parse_error(
                                                         data.line,
-                                                        `multi-line end identifier(""") must be at the beginning of line`
+                                                        `multi-line end identifier """ must be at the beginning of line`
                                                     )
                                                 );
                                             }
@@ -845,6 +830,11 @@ export default class KeyValues3 {
                     if (key === '' && !inQoute) {
                         throw new Error(this._parse_error(data.line, `Invalid member name '='`));
                     }
+                    if (!inQoute && !MatchKeyNoQuote.test(key)) {
+                        throw new Error(
+                            this._parse_error(data.line, `Invalid member name '${key}'`)
+                        );
+                    }
                     isKey = false;
                     inQoute = false;
                     continue;
@@ -891,7 +881,7 @@ export default class KeyValues3 {
                                         throw new Error(
                                             this._parse_error(
                                                 data.line,
-                                                `multi-line start identifier(""") must be followed by newline`
+                                                `multi-line start identifier """ must be followed by newline`
                                             )
                                         );
                                     }
@@ -906,7 +896,7 @@ export default class KeyValues3 {
                                             throw new Error(
                                                 this._parse_error(
                                                     data.line,
-                                                    `multi-line end identifier(""") must be at the beginning of line`
+                                                    `multi-line end identifier """ must be at the beginning of line`
                                                 )
                                             );
                                         }
@@ -1017,6 +1007,7 @@ export default class KeyValues3 {
                     data.pos += 1;
                     data.tokenCounter += 1;
                     this._parse(child, data);
+                    child.value.SetOwner(parent);
                     parent.value.Append(child.value);
                     str = '';
                     inQoute = false;
@@ -1029,6 +1020,7 @@ export default class KeyValues3 {
                     data.pos += 1;
                     data.tokenCounter += 1;
                     this._parse(child, data);
+                    child.value.SetOwner(parent);
                     parent.value.Append(child.value);
                     str = '';
                     inQoute = false;

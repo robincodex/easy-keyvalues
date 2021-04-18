@@ -13,10 +13,24 @@ describe('KeyValues3', () => {
         expect(root.IsRoot()).toBe(true);
         expect(root.GetHeader()).toBe(KeyValues3.CommonHeader);
         expect(root.GetValue().IsObject()).toBe(true);
+        root.SetValue(new KeyValues3.Object());
+
+        try {
+            root.SetValue(new KeyValues3.String(''));
+        } catch (e) {
+            expect(e).toEqual(Error('The root node of KeyValues3 must be an object'));
+        }
+
+        try {
+            root.AppendValue(new KeyValues3.String(''));
+        } catch (e) {
+            expect(e).toEqual(Error('The KeyValues3 is not an array'));
+        }
 
         const a = root.CreateObjectValue('a', new KeyValues3.String('b'));
         expect(a.GetValue().IsString()).toBe(true);
         expect(a.GetValue().GetValue()).toBe('b');
+        expect(a.GetValue().GetOwner() === a).toBe(true);
 
         const b = root.CreateObjectValue('b', new KeyValues3.Int(3.5));
         expect(b.GetValue().IsInt()).toBe(true);
@@ -38,13 +52,32 @@ describe('KeyValues3', () => {
         expect(f.GetValue().IsDeferredResource()).toBe(true);
         expect(f.GetValue().GetValue()).toBe('x');
 
-        const g = root.CreateObjectValue('g', new KeyValues3.Array([]));
+        const g_ary = new KeyValues3.Array([]);
+        const g = root.CreateObjectValue('g', g_ary);
+        const g_first = new KeyValues3.String('gg');
+        g_ary.Insert(g_first, 0);
+        g_ary.Delete(g_first);
         expect(g.GetValue().IsArray()).toBe(true);
         expect(g.GetValue().GetValue()).toEqual([]);
 
-        const h = root.CreateObjectValue('h', new KeyValues3.Object([]));
+        const h_obj = new KeyValues3.Object([]);
+        const h = root.CreateObjectValue('h', h_obj);
+        const h_fist = new KeyValues3('a', new KeyValues3.String('s'));
+        h_obj.Insert(h_fist, 0);
+        h_obj.Delete(h_fist);
+        h_obj.Insert(h_fist, 0);
+        h_obj.Delete('a');
         expect(h.GetValue().IsObject()).toBe(true);
         expect(h.GetValue().GetValue()).toEqual([]);
+        h_obj.Append(h_fist);
+        h_obj.Append(h_fist);
+        h_obj.Append(h_fist);
+        expect(h.FindAllKey('a').length).toBe(3);
+        expect(h_obj.FindAllKey('a').length).toBe(3);
+        expect(h.Find(() => false)).toBe(undefined);
+        h_obj.Delete('a');
+        h_obj.Delete('a');
+        h_obj.Delete('a');
 
         try {
             a.CreateObjectValue('a', new KeyValues3.String('b'));
@@ -200,9 +233,11 @@ Second line of a multi-line string literal.
         const root = KeyValues3.CreateRoot();
         const a = root.CreateObjectValue('a', new KeyValues3.String('b'));
         a.GetValue().Comments.AppendComment('line 1');
+        expect(a.GetValue().Comments.GetComments()).toEqual(['line 1']);
+
         a.GetValue().Comments.AppendComment('line 2');
         a.GetValue().Comments.AppendComment('multi-line 1\nmulti-line 2');
-        a.GetValue().Comments.AppendComment('*multi-line 1\n* multi-line 2\n*    ml3');
+        a.GetValue().Comments.AppendComment('*multi-line 1\n* multi-line 2\n*    ml3\nm4');
         a.GetValue().Comments.SetEndOfLineComment('end a');
         const pa = new KeyValues3.Resource('particles/a.vpcf');
         pa.Comments.AppendComment('line 1');
@@ -234,6 +269,7 @@ Second line of a multi-line string literal.
      *multi-line 1
      * multi-line 2
      *    ml3
+     * m4
      */
     a = "b" // end a
     c =
@@ -257,6 +293,7 @@ Second line of a multi-line string literal.
          *multi-line 1
          * multi-line 2
          *    ml3
+         * m4
          */
         a = "b" // end a
         q = "qq"
@@ -266,6 +303,12 @@ Second line of a multi-line string literal.
         "qq", // qq
     ] // end
 }`);
+
+        try {
+            a.GetValue().Comments.SetEndOfLineComment('a\nc');
+        } catch (e) {
+            expect(e).toEqual(Error('The end of line comment only allowed one line'));
+        }
     });
 
     test('Check KeyValues3.txt', async () => {
@@ -325,4 +368,140 @@ Second line of a multi-line string literal.
                 .map((v: any) => v.GetValue())
         ).toEqual(['a', 456]);
     }
+
+    test('Check KeyValues3 Parse Error', () => {
+        try {
+            KeyValues3.Parse(`{}`);
+        } catch (e) {
+            expect(e).toEqual(Error('Invalid header'));
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n @a = 123 \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '@a'`)
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = """ a """ \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(
+                    `not readable as KeyValues3 text: Line 3: multi-line start identifier """ must be followed by newline`
+                )
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = """
+ a 
+ """ \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(
+                    `not readable as KeyValues3 text: Line 5: multi-line end identifier """ must be at the beginning of line`
+                )
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{
+    a = 
+    [
+        """ 
+        a 
+ """] \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(
+                    `not readable as KeyValues3 text: Line 5: multi-line start identifier """ must be followed by newline`
+                )
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{
+    a = 
+    [
+        """
+        a 
+ """] \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(
+                    `not readable as KeyValues3 text: Line 7: multi-line end identifier """ must be at the beginning of line`
+                )
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = """
+ a 
+"" \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(
+                    `not readable as KeyValues3 text: Line 5: multi-line string must be end with """`
+                )
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = ["""
+ a 
+""] \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(
+                    `not readable as KeyValues3 text: Line 5: multi-line string must be end with """`
+                )
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = custom:"" \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(`not readable as KeyValues3 text: Line 3: Invalid value 'custom:""'`)
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n {} = a \n}`);
+        } catch (e) {
+            expect(e).toEqual(Error(`not readable as KeyValues3 text: Line 3: Invalid char '{'`));
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n [] = a \n}`);
+        } catch (e) {
+            expect(e).toEqual(Error(`not readable as KeyValues3 text: Line 3: Invalid char '['`));
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n = a \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '='`)
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = [custom:""] \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(`not readable as KeyValues3 text: Line 3: Invalid value 'custom:""'`)
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = ["b" "c"] \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(`not readable as KeyValues3 text: Line 3: Expected ',' or ']'`)
+            );
+        }
+    });
 });
