@@ -385,6 +385,22 @@ Second line of a multi-line string literal.
         }
 
         try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n $a = 123 \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '$a'`)
+            );
+        }
+
+        try {
+            KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n #a = 123 \n}`);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '#a'`)
+            );
+        }
+
+        try {
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = """ a """ \n}`);
         } catch (e) {
             expect(e).toEqual(
