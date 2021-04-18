@@ -175,6 +175,10 @@ class ValueDouble extends BaseValue {
         this.value = v;
         return this;
     }
+
+    public Format(): string {
+        return this.value.toFixed(6);
+    }
 }
 
 /**
@@ -313,7 +317,11 @@ class ValueArray extends BaseValue {
                         endComment = ` // ${v.Comments.GetEndOfLineComment()}`;
                     }
                     if (v.IsArray()) {
-                        return comment + v.Format(tab + '    ') + ',' + endComment;
+                        let str = v.Format(tab + '    ');
+                        if (!str.startsWith('\n')) {
+                            str = '\n' + tab + '   ' + str;
+                        }
+                        return comment + str + ',' + endComment;
                     } else if (v.IsObject()) {
                         return comment + v.Format(tab + '    ') + ',' + endComment;
                     }
@@ -428,7 +436,12 @@ class ValueObject extends BaseValue {
     }
 }
 
-const KeyUseQuoteTest = /^[\w\d_\.]+$/;
+const MatchKeyNoQuote = /^[\w\d_\.]+$/;
+const MatchInt = /^-?\d+$/;
+const MatchDouble = /^-?\d+.\d+$/;
+const MatchBoolean = /^(true|false)$/;
+const MatchResource = /^resource:"(.*)"$/;
+const MatchDeferredResource = /^deferred_resource:"(.*)"$/;
 
 /**
  * https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
@@ -534,7 +547,7 @@ export default class KeyValues3 {
         let prefix = '';
         const root = this.IsRoot();
 
-        if (KeyUseQuoteTest.test(this.Key)) {
+        if (MatchKeyNoQuote.test(this.Key)) {
             prefix = `${tab}${this.Key} =`;
         } else {
             prefix = `${tab}"${this.Key}" =`;
@@ -571,5 +584,478 @@ export default class KeyValues3 {
 
     public toString() {
         return this.Format();
+    }
+
+    public static Parse(body: string): KeyValues3 {
+        let root = this.CreateRoot();
+        const firstLineIndex = body.indexOf('\n');
+        const header = body.slice(0, firstLineIndex).trim();
+        if (!header.startsWith('<!--') || !header.endsWith('-->')) {
+            throw Error('Invalid header');
+        }
+        this._parse(root, {
+            body,
+            line: 2,
+            pos: body.indexOf('{', firstLineIndex) + 1,
+            tokenCounter: 1,
+        });
+        return root;
+    }
+
+    protected static _parse(
+        parent: KeyValues3,
+        data: { body: string; line: number; pos: number; tokenCounter: number }
+    ) {
+        if (parent.value.IsObject()) {
+            let isKey = true;
+            let startMark = false;
+            let inQoute = false;
+            let key = '';
+            let str = '';
+            let isEndOfLineComment = false;
+            let commentCache: string[] = [];
+            let lastKV: KeyValues3 | undefined;
+            for (; data.pos < data.body.length; data.pos++) {
+                const c = data.body[data.pos];
+                const isNewLine = c === '\n';
+                const isSpace = isNewLine || c === ' ' || c === '\t' || c === '\r';
+
+                if (isNewLine) {
+                    data.line += 1;
+                    isEndOfLineComment = false;
+                }
+
+                if (startMark) {
+                    if (isKey) {
+                        // isKey
+                        if (inQoute) {
+                            if (c === '\\') {
+                                str += c + data.body[data.pos + 1];
+                                data.pos += 1;
+                                continue;
+                            }
+                            if (c === '"') {
+                                key = str;
+                                str = '';
+                                startMark = false;
+                                continue;
+                            } else {
+                                str += c;
+                                continue;
+                            }
+                        } else {
+                            if (isSpace || c === '=') {
+                                key = str;
+                                str = '';
+                                startMark = false;
+                                if (c === '=') {
+                                    data.pos -= 1;
+                                }
+                                continue;
+                            }
+                            if (MatchKeyNoQuote.test(c)) {
+                                str += c;
+                                continue;
+                            } else {
+                                throw new Error(
+                                    this._parse_error(data.line, `Invalid member name '${str + c}'`)
+                                );
+                            }
+                        }
+                        // isKey
+                    } else {
+                        // not isKey
+                        if (inQoute) {
+                            if (c === '\\') {
+                                str += c + data.body[data.pos + 1];
+                                data.pos += 1;
+                                continue;
+                            }
+                            if (c === '"') {
+                                if (str.length <= 0) {
+                                    // check start on multi-line
+                                    if (data.body[data.pos + 1] === '"') {
+                                        if (
+                                            data.body[data.pos + 2] !== '\n' &&
+                                            data.body[data.pos + 2] !== '\r'
+                                        ) {
+                                            throw new Error(
+                                                this._parse_error(
+                                                    data.line,
+                                                    `multi-line start identifier(""") must be followed by newline`
+                                                )
+                                            );
+                                        }
+                                        data.pos += 1;
+                                        continue;
+                                    }
+                                } else {
+                                    // check end on multi-line
+                                    if (data.body[data.pos + 1] === '"') {
+                                        if (data.body[data.pos + 2] === '"') {
+                                            if (data.body[data.pos - 1] !== '\n') {
+                                                throw new Error(
+                                                    this._parse_error(
+                                                        data.line,
+                                                        `multi-line end identifier(""") must be at the beginning of line`
+                                                    )
+                                                );
+                                            }
+                                            data.pos += 2;
+                                        } else {
+                                            throw new Error(
+                                                this._parse_error(
+                                                    data.line,
+                                                    `multi-line string must be end with """`
+                                                )
+                                            );
+                                        }
+                                    }
+                                }
+                                lastKV = parent.CreateObjectValue(key, new ValueString(str));
+                                lastKV.value.Comments.SetComments(commentCache);
+                                commentCache = [];
+                                key = '';
+                                str = '';
+                                isKey = true;
+                                inQoute = false;
+                                startMark = false;
+                                continue;
+                            } else {
+                                str += c;
+                                continue;
+                            }
+                        } else {
+                            if (isSpace || c === ']' || c === '}') {
+                                if (MatchBoolean.test(str)) {
+                                    lastKV = parent.CreateObjectValue(
+                                        key,
+                                        new ValueBoolean(str === 'true')
+                                    );
+                                } else if (MatchInt.test(str)) {
+                                    lastKV = parent.CreateObjectValue(
+                                        key,
+                                        new ValueInt(parseInt(str))
+                                    );
+                                } else if (MatchDouble.test(str)) {
+                                    lastKV = parent.CreateObjectValue(
+                                        key,
+                                        new ValueDouble(Number(str))
+                                    );
+                                } else if (MatchResource.test(str)) {
+                                    const m = MatchResource.exec(str);
+                                    let v = m ? m[1] : '';
+                                    lastKV = parent.CreateObjectValue(key, new ValueResource(v));
+                                } else if (MatchDeferredResource.test(str)) {
+                                    const m = MatchDeferredResource.exec(str);
+                                    let v = m ? m[1] : '';
+                                    lastKV = parent.CreateObjectValue(
+                                        key,
+                                        new ValueDeferredResource(v)
+                                    );
+                                } else {
+                                    throw new Error(
+                                        this._parse_error(data.line, `Invalid value '${str}'`)
+                                    );
+                                }
+                                lastKV.value.Comments.SetComments(commentCache);
+                                commentCache = [];
+                                key = '';
+                                str = '';
+                                isKey = true;
+                                inQoute = false;
+                                startMark = false;
+                                if (c === ']' || c === '}') {
+                                    data.pos -= 1;
+                                }
+                                continue;
+                            }
+                            str += c;
+                            continue;
+                        }
+                        // not isKey
+                    }
+                }
+
+                if (c === '/') {
+                    if (data.body[data.pos + 1] === '/') {
+                        const nextIndex = data.body.indexOf('\n', data.pos + 2);
+                        if (isEndOfLineComment && lastKV) {
+                            lastKV.value.Comments.SetEndOfLineComment(
+                                data.body.slice(data.pos + 2, nextIndex).trimStart()
+                            );
+                            isEndOfLineComment = false;
+                        } else {
+                            commentCache.push(data.body.slice(data.pos + 2, nextIndex).trimStart());
+                        }
+                        data.pos = nextIndex;
+                        data.line += 1;
+                        continue;
+                    } else if (data.body[data.pos + 1] === '*') {
+                        const nextIndex = data.body.indexOf('*/', data.pos + 2);
+                        commentCache.push(data.body.slice(data.pos + 2, nextIndex).trim());
+                        data.pos = nextIndex + 1;
+                        data.line += data.body.slice(data.pos, nextIndex).match(/\n/g)?.length || 1;
+                        continue;
+                    }
+                }
+
+                if (c === '{') {
+                    if (isKey) {
+                        throw new Error(this._parse_error(data.line, `Invalid char '{'`));
+                    }
+                    const child = parent.CreateObjectValue(key, new ValueObject());
+                    data.pos += 1;
+                    data.tokenCounter += 1;
+                    this._parse(child, data);
+                    key = '';
+                    str = '';
+                    isKey = true;
+                    inQoute = false;
+                    startMark = false;
+                    continue;
+                }
+
+                if (c === '[') {
+                    if (isKey) {
+                        throw new Error(this._parse_error(data.line, `Invalid char '['`));
+                    }
+                    const child = parent.CreateObjectValue(key, new ValueArray());
+                    data.pos += 1;
+                    data.tokenCounter += 1;
+                    this._parse(child, data);
+                    key = '';
+                    str = '';
+                    isKey = true;
+                    inQoute = false;
+                    startMark = false;
+                    continue;
+                }
+
+                if (c === '}' || c === ']') {
+                    data.tokenCounter += 1;
+                    return;
+                }
+
+                if (isSpace) {
+                    continue;
+                }
+
+                if (c === '=') {
+                    if (key === '' && !inQoute) {
+                        throw new Error(this._parse_error(data.line, `Invalid member name '='`));
+                    }
+                    isKey = false;
+                    inQoute = false;
+                    continue;
+                }
+
+                startMark = true;
+                inQoute = c === '"';
+                str = inQoute ? '' : c;
+                isEndOfLineComment = true;
+            }
+        } else if (parent.value.IsArray()) {
+            let startMark = false;
+            let inQoute = false;
+            let str = '';
+            let expectedEnd = false;
+            let isEndOfLineComment = false;
+            let commentCache: string[] = [];
+            let lastValue: IKV3Value | undefined;
+            for (; data.pos < data.body.length; data.pos++) {
+                const c = data.body[data.pos];
+                const isNewLine = c === '\n';
+                const isSpace = isNewLine || c === ' ' || c === '\t' || c === '\r';
+
+                if (isNewLine) {
+                    data.line += 1;
+                    isEndOfLineComment = false;
+                }
+
+                if (startMark) {
+                    if (inQoute) {
+                        if (c === '\\') {
+                            str += c + data.body[data.pos + 1];
+                            data.pos += 1;
+                            continue;
+                        }
+                        if (c === '"') {
+                            if (str.length <= 0) {
+                                // check start on multi-line
+                                if (data.body[data.pos + 1] === '"') {
+                                    if (
+                                        data.body[data.pos + 2] !== '\n' &&
+                                        data.body[data.pos + 2] !== '\r'
+                                    ) {
+                                        throw new Error(
+                                            this._parse_error(
+                                                data.line,
+                                                `multi-line start identifier(""") must be followed by newline`
+                                            )
+                                        );
+                                    }
+                                    data.pos += 1;
+                                    continue;
+                                }
+                            } else {
+                                // check end on multi-line
+                                if (data.body[data.pos + 1] === '"') {
+                                    if (data.body[data.pos + 2] === '"') {
+                                        if (data.body[data.pos - 1] !== '\n') {
+                                            throw new Error(
+                                                this._parse_error(
+                                                    data.line,
+                                                    `multi-line end identifier(""") must be at the beginning of line`
+                                                )
+                                            );
+                                        }
+                                        data.pos += 2;
+                                    } else {
+                                        throw new Error(
+                                            this._parse_error(
+                                                data.line,
+                                                `multi-line string must be end with """`
+                                            )
+                                        );
+                                    }
+                                }
+                            }
+                            lastValue = new ValueString(str);
+                            parent.AppendValue(lastValue);
+                            lastValue.Comments.SetComments(commentCache);
+                            commentCache = [];
+                            str = '';
+                            inQoute = false;
+                            startMark = false;
+                            expectedEnd = true;
+                            continue;
+                        } else {
+                            str += c;
+                            continue;
+                        }
+                    } else {
+                        if (isSpace || c === ',' || c === ']') {
+                            if (MatchBoolean.test(str)) {
+                                lastValue = new ValueBoolean(str === 'true');
+                                parent.AppendValue(lastValue);
+                            } else if (MatchInt.test(str)) {
+                                lastValue = new ValueInt(parseInt(str));
+                                parent.AppendValue(lastValue);
+                            } else if (MatchDouble.test(str)) {
+                                lastValue = new ValueDouble(Number(str));
+                                parent.AppendValue(lastValue);
+                            } else if (MatchResource.test(str)) {
+                                const m = MatchResource.exec(str);
+                                let v = m ? m[1] : '';
+                                lastValue = new ValueResource(v);
+                                parent.AppendValue(lastValue);
+                            } else if (MatchDeferredResource.test(str)) {
+                                const m = MatchDeferredResource.exec(str);
+                                let v = m ? m[1] : '';
+                                lastValue = new ValueDeferredResource(v);
+                                parent.AppendValue(lastValue);
+                            } else {
+                                throw new Error(
+                                    this._parse_error(data.line, `Invalid value '${str}'`)
+                                );
+                            }
+                            lastValue.Comments.SetComments(commentCache);
+                            commentCache = [];
+                            str = '';
+                            inQoute = false;
+                            startMark = false;
+                            expectedEnd = c !== ',' && c !== ']';
+                            if (c === ']') {
+                                data.pos -= 1;
+                            }
+                            continue;
+                        }
+                        str += c;
+                        continue;
+                    }
+                }
+
+                if (c === '/') {
+                    if (data.body[data.pos + 1] === '/') {
+                        const nextIndex = data.body.indexOf('\n', data.pos + 2);
+                        if (isEndOfLineComment && lastValue) {
+                            lastValue.Comments.SetEndOfLineComment(
+                                data.body.slice(data.pos + 2, nextIndex).trimStart()
+                            );
+                            isEndOfLineComment = false;
+                        } else {
+                            commentCache.push(data.body.slice(data.pos + 2, nextIndex).trimStart());
+                        }
+                        data.pos = nextIndex;
+                        data.line += 1;
+                        continue;
+                    } else if (data.body[data.pos + 1] === '*') {
+                        const nextIndex = data.body.indexOf('*/', data.pos + 2);
+                        commentCache.push(data.body.slice(data.pos + 2, nextIndex).trim());
+                        data.pos = nextIndex + 1;
+                        data.line += data.body.slice(data.pos, nextIndex).match(/\n/g)?.length || 1;
+                        continue;
+                    }
+                }
+
+                if (expectedEnd) {
+                    if (isSpace) {
+                        continue;
+                    }
+                    if (c !== ',' && c !== ']') {
+                        throw new Error(this._parse_error(data.line, `Expected ',' or ']'`));
+                    }
+                    expectedEnd = false;
+                }
+                if (c === ',') {
+                    continue;
+                }
+
+                if (c === '{') {
+                    const child = new KeyValues3('', new ValueObject());
+                    data.pos += 1;
+                    data.tokenCounter += 1;
+                    this._parse(child, data);
+                    parent.value.Append(child.value);
+                    str = '';
+                    inQoute = false;
+                    startMark = false;
+                    continue;
+                }
+
+                if (c === '[') {
+                    const child = new KeyValues3('', new ValueArray());
+                    data.pos += 1;
+                    data.tokenCounter += 1;
+                    this._parse(child, data);
+                    parent.value.Append(child.value);
+                    str = '';
+                    inQoute = false;
+                    startMark = false;
+                    continue;
+                }
+
+                if (c === '}' || c === ']') {
+                    data.tokenCounter += 1;
+                    return;
+                }
+
+                if (isSpace) {
+                    continue;
+                }
+
+                startMark = true;
+                inQoute = c === '"';
+                str = inQoute ? '' : c;
+                isEndOfLineComment = true;
+            }
+        } else {
+            throw Error("Parent's value must be an object or array");
+        }
+    }
+
+    protected static _parse_error(line: number, msg: string) {
+        return `not readable as KeyValues3 text: Line ${line}: ${msg}`;
     }
 }

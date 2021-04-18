@@ -91,7 +91,7 @@ export class KeyValues3Comments {
                     text += lines
                         .map((v) => {
                             if (v.startsWith('*')) {
-                                v = '* ' + v.slice(1).trimStart();
+                                v = v.trimStart();
                             } else {
                                 v = '* ' + v.trimStart();
                             }

@@ -1,7 +1,14 @@
-import { KeyValues3 } from '../';
+import { join } from 'path';
+import {
+    KeyValues3,
+    LoadKeyValues3,
+    SaveKeyValues3,
+    LoadKeyValues3Sync,
+    SaveKeyValues3Sync,
+} from '../';
 
 describe('KeyValues3', () => {
-    test('Check KeyValues3 Value', () => {
+    test('Check KeyValues3 Methods', () => {
         const root = KeyValues3.CreateRoot();
         expect(root.IsRoot()).toBe(true);
         expect(root.GetHeader()).toBe(KeyValues3.CommonHeader);
@@ -136,7 +143,7 @@ Second line of a multi-line string literal.
 {
     a = "b"
     b = 3
-    c = 3.5
+    c = 3.500000
     d = true
     e = resource:"x"
     f = deferred_resource:"x"
@@ -144,7 +151,7 @@ Second line of a multi-line string literal.
     [
         "text",
         1,
-        2.3,
+        2.300000,
         false,
         [
             "1",
@@ -187,33 +194,35 @@ Second line of a multi-line string literal.
 """
     }
 }`);
+    });
 
-        const root2 = KeyValues3.CreateRoot();
-        const a2 = root2.CreateObjectValue('a', new KeyValues3.String('b'));
-        a2.GetValue().Comments.AppendComment('line 1');
-        a2.GetValue().Comments.AppendComment('line 2');
-        a2.GetValue().Comments.AppendComment('multi-line 1\nmulti-line 2');
-        a2.GetValue().Comments.AppendComment('*multi-line 1\n* multi-line 2\nml3');
-        a2.GetValue().Comments.SetEndOfLineComment('end a');
+    test('Check KeyValues3 Comments', () => {
+        const root = KeyValues3.CreateRoot();
+        const a = root.CreateObjectValue('a', new KeyValues3.String('b'));
+        a.GetValue().Comments.AppendComment('line 1');
+        a.GetValue().Comments.AppendComment('line 2');
+        a.GetValue().Comments.AppendComment('multi-line 1\nmulti-line 2');
+        a.GetValue().Comments.AppendComment('*multi-line 1\n* multi-line 2\n*    ml3');
+        a.GetValue().Comments.SetEndOfLineComment('end a');
         const pa = new KeyValues3.Resource('particles/a.vpcf');
         pa.Comments.AppendComment('line 1');
         pa.Comments.AppendComment('line 1 \n line 2');
         pa.Comments.SetEndOfLineComment('eeend');
-        const c2 = root2.CreateObjectValue(
+        const c = root.CreateObjectValue(
             'c',
             new KeyValues3.Object([
                 new KeyValues3('particles', new KeyValues3.Array([pa])),
-                a2,
+                a,
                 new KeyValues3('q', new KeyValues3.String('qq')),
             ])
         );
-        c2.GetValue().Comments.SetEndOfLineComment('end c');
+        c.GetValue().Comments.SetEndOfLineComment('end c');
         const q = new KeyValues3.String('qq');
         q.Comments.SetEndOfLineComment('qq');
-        const a3 = root2.CreateObjectValue('a', new KeyValues3.Array([q]));
+        const a3 = root.CreateObjectValue('a', new KeyValues3.Array([q]));
         a3.GetValue().Comments.SetEndOfLineComment('end');
         // console.log(root2.toString());
-        expect(root2.toString()).toBe(`${KeyValues3.CommonHeader}
+        expect(root.toString()).toBe(`${KeyValues3.CommonHeader}
 {
     // line 1
     // line 2
@@ -222,9 +231,9 @@ Second line of a multi-line string literal.
     multi-line 2
     */
     /*
-     * multi-line 1
+     *multi-line 1
      * multi-line 2
-     * ml3
+     *    ml3
      */
     a = "b" // end a
     c =
@@ -245,9 +254,9 @@ Second line of a multi-line string literal.
         multi-line 2
         */
         /*
-         * multi-line 1
+         *multi-line 1
          * multi-line 2
-         * ml3
+         *    ml3
          */
         a = "b" // end a
         q = "qq"
@@ -258,4 +267,62 @@ Second line of a multi-line string literal.
     ] // end
 }`);
     });
+
+    test('Check KeyValues3.txt', async () => {
+        const root = await LoadKeyValues3(join(__dirname, 'KeyValues3.txt'));
+        await SaveKeyValues3(join(__dirname, 'KeyValues3.save.txt'), root);
+
+        const root2 = LoadKeyValues3Sync(join(__dirname, 'KeyValues3.save.txt'));
+        SaveKeyValues3Sync(join(__dirname, 'KeyValues3.save.txt'), root2);
+
+        checkTxt(root);
+        checkTxt(root2);
+    });
+
+    function checkTxt(root: KeyValues3) {
+        expect(root.IsRoot()).toBe(true);
+        expect(root.GetHeader()).toBe(KeyValues3.CommonHeader);
+        expect(root.GetValue().IsObject()).toBe(true);
+        expect(root.FindKey('boolValue')?.GetValue().GetValue()).toBe(false);
+        expect(root.FindKey('intValue')?.GetValue().GetValue()).toBe(128);
+        expect(root.FindKey('doubleValue')?.GetValue().GetValue()).toBe(64);
+        expect(root.FindKey('intValue')?.GetValue().IsInt()).toBe(true);
+        expect(root.FindKey('doubleValue')?.GetValue().IsDouble()).toBe(true);
+        expect(root.FindKey('stringValue')?.GetValue().GetValue()).toBe(
+            `hello world \\n \\"ss\\" `
+        );
+        expect(root.FindKey('stringThatIsAResourceReference')?.GetValue().GetValue()).toBe(
+            'particles/items3_fx/star_emblem.vpcf'
+        );
+        expect(root.FindKey('multiLineStringValue')?.GetValue().GetValue()).toBe(`
+First line of a multi-line string literal.
+Second line of a multi-line string literal.
+`);
+        const ary = root.FindKey('arrayValue')?.GetValue();
+        expect(ary?.IsArray()).toBe(true);
+
+        if (ary?.IsArray()) {
+            expect(ary.GetValue()[0].GetValue()).toBe(1);
+            expect(ary.GetValue()[1].GetValue()).toBe(2);
+            expect(ary.GetValue()[2].IsObject()).toBe(true);
+            expect(ary.GetValue()[3].IsResource()).toBe(true);
+            expect(ary.GetValue()[3].GetValue()).toBe('particles/items3_fx/star_emblem.vpcf');
+        }
+
+        const obj = root.FindKey('objectValue')?.GetValue();
+        if (obj?.IsObject()) {
+            expect(obj.FindKey('n')?.GetValue().GetValue()).toBe(5);
+            expect(obj.FindKey('s')?.GetValue().GetValue()).toBe('foo');
+            expect(obj.FindKey('h')?.GetValue().IsArray()).toBe(true);
+        }
+
+        expect(
+            root
+                .FindKey('objectValue')
+                ?.FindKey('h')
+                ?.GetValue()
+                .GetValue()
+                .map((v: any) => v.GetValue())
+        ).toEqual(['a', 456]);
+    }
 });
