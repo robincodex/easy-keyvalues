@@ -1,5 +1,11 @@
 import { join } from 'path';
-import { LoadKeyValues, SaveKeyValues, KeyValues, LoadKeyValuesSync, SaveKeyValuesSync } from '../';
+import {
+    LoadKeyValues,
+    SaveKeyValues,
+    KeyValues,
+    LoadKeyValuesSync,
+    SaveKeyValuesSync,
+} from '../dist/node';
 
 function testKV(kv: KeyValues) {
     expect(kv.GetChildCount()).toBe(6);
