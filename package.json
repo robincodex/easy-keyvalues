@@ -10,6 +10,7 @@
     "scripts": {
         "watch": "tsc --watch -p ./",
         "test": "jest --verbose",
+        "test:badges": "jest --verbose && jest-coverage-badges",
         "test:kv3": "jest --coverage=false -- __tests__/KeyValues3.test.ts",
         "lint:prettier": "prettier --check .",
         "write-prettier": "prettier --write ."
@@ -28,6 +29,7 @@
         "@types/jest": "^26.0.22",
         "@types/node": "^14.14.37",
         "jest": "^26.6.3",
+        "jest-coverage-badges": "^1.1.2",
         "prettier": "^2.2.1",
         "ts-jest": "^26.5.4",
         "ts-node": "^9.1.1",

@@ -1,3 +1,5 @@
 test
 tsconfig.json
 tslint.json
+coverage
+__tests__

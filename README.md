@@ -3,6 +3,8 @@
 [![npm tag](https://img.shields.io/npm/v/easy-keyvalues/latest)](https://www.npmjs.com/package/easy-keyvalues)
 [![support tag](https://img.shields.io/badge/support-KeyValues-blue)](#keyvalues)
 [![support tag](https://img.shields.io/badge/support-KeyValues3-blue)](#keyvalues3)
+![coverage](./coverage/badge-statements.svg) ![coverage](./coverage/badge-branches.svg)
+![coverage](./coverage/badge-functions.svg) ![coverage](./coverage/badge-lines.svg)
 
 The reason for writing a library is that I want to edit KeyValues text, format the text when saving,
 and keep the comments, support `#base` on KeyValues, etc.
