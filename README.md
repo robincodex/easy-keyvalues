@@ -225,6 +225,10 @@ kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'i
 
 ### `#base`
 
+The purpose of this library is to edit the KV, so after loading `#base` it does not merge all the
+KeyValues nodes in `#base` into the parent node, but keeps the KeyValues node `#base`, which is the
+root node of the file, and its `children` are all the children of the root node.
+
 ```js
 import {
     KeyValues,

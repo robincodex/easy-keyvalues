@@ -220,6 +220,9 @@ kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'i
 
 ### `#base`
 
+这个库的目的是编辑 KV，所以加载`#base`之后不会将`#base`里面的所以 KeyValues 节点 合并到父节点，而是
+依然保留`#base`这个 KeyValues 节点，它就是文件的根节点， 它的`children` 就是根节点的所有子节点。
+
 ```js
 import {
     KeyValues,
