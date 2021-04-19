@@ -176,9 +176,38 @@ describe('KeyValues', () => {
         expect(kv.Delete('')).toBe(undefined);
 
         try {
-            KeyValues.CreateRoot().SetValue('').Format();
+            const root = KeyValues.CreateRoot();
+            // @ts-ignore
+            root.value = '';
+            // @ts-ignore
+            delete root.children;
+            root.Format();
         } catch (e) {
-            expect(e).toEqual(Error(`no children in root`));
+            expect(e).toEqual(Error(`The value of the root node kv must be an array`));
+        }
+        try {
+            KeyValues.CreateRoot().SetValue('');
+        } catch (e) {
+            expect(e).toEqual(Error(`The value of the root node kv must be an array`));
+        }
+
+        try {
+            const kv = new KeyValues('a', []);
+            kv.Append(kv);
+        } catch (e) {
+            expect(e).toEqual(Error(`Append(): Can not append self`));
+        }
+        try {
+            const kv = new KeyValues('a', []);
+            kv.Insert(kv, 0);
+        } catch (e) {
+            expect(e).toEqual(Error(`Insert(): Can not insert self`));
+        }
+        try {
+            const kv = new KeyValues('a', []);
+            kv.SetValue([kv]);
+        } catch (e) {
+            expect(e).toEqual(Error(`SetValue(): The value can not includes self`));
         }
     });
 });

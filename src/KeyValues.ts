@@ -1,6 +1,6 @@
 import { KeyValuesComments } from './Comments';
 
-const KeyValuesRootMark = '__KeyValues_Root__';
+const KeyValuesRootKey = '__KeyValues_Root__';
 
 export default class KeyValues {
     /**
@@ -25,8 +25,7 @@ export default class KeyValues {
     }
 
     /**
-     * The parent of this KeyValues,
-     * if parent is `undefined` then this KeyValues is root.
+     * The parent of this KeyValues
      */
     public GetParent() {
         return this.parent;
@@ -36,7 +35,7 @@ export default class KeyValues {
      * Return true that the KeyValues is root.
      */
     public IsRoot() {
-        return this.Key === KeyValuesRootMark;
+        return this.Key === KeyValuesRootKey;
     }
 
     /**
@@ -98,9 +97,15 @@ export default class KeyValues {
             this.children = v.map((c) => c.Free());
             delete this.value;
             for (const kv of this.children) {
+                if (kv === this) {
+                    throw new Error(`SetValue(): The value can not includes self`);
+                }
                 kv.parent = this;
             }
         } else {
+            if (this.IsRoot()) {
+                throw new Error('The value of the root node kv must be an array');
+            }
             this.value = v;
             delete this.children;
         }
@@ -113,6 +118,9 @@ export default class KeyValues {
      */
     public Append(child: KeyValues) {
         if (this.children) {
+            if (child === this) {
+                throw new Error(`Append(): Can not append self`);
+            }
             this.children.push(child.Free());
             child.parent = this;
         } else {
@@ -127,6 +135,9 @@ export default class KeyValues {
      */
     public Insert(child: KeyValues, index: number) {
         if (this.children) {
+            if (child === this) {
+                throw new Error(`Insert(): Can not insert self`);
+            }
             this.children.splice(index, 0, child.Free());
             child.parent = this;
         } else {
@@ -252,7 +263,7 @@ export default class KeyValues {
     public Format(tab: string = '', maxLength: number = -1): string {
         if (this.IsRoot()) {
             if (!this.children) {
-                throw new Error('no children in root');
+                throw new Error('The value of the root node kv must be an array');
             }
             return this.children.map((v) => v.Format()).join('\n');
         }
@@ -303,7 +314,7 @@ export default class KeyValues {
      * Create root node
      */
     public static CreateRoot() {
-        return new KeyValues(KeyValuesRootMark, []);
+        return new KeyValues(KeyValuesRootKey, []);
     }
 
     /**
