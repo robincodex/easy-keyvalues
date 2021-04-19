@@ -223,6 +223,45 @@ Example
 kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'item_0002')]
 ```
 
+### `#base`
+
+```js
+import {
+    KeyValues,
+    AutoLoadKeyValuesBase,
+    AutoLoadKeyValuesBaseSync,
+} from 'easy-keyvalues';
+
+AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
+AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
+```
+
+Example
+
+```js
+/*
+KeyValues.txt
+
+#base "npc/file01.txt"
+#base "npc/file02.txt"
+
+"DOTAAbilities"
+{
+    "ability01"
+    {
+        "BaseClass"         "ability_datadriven"
+        "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_POINT"
+    }
+}
+*/
+const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
+const baseList = await AutoLoadKeyValuesBase(root, __dirname);
+
+// Get path
+baseList[0].GetBaseFilePath(); // npc/file01.txt
+baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
+```
+
 # KeyValues3
 
 Compared to KeyValues, KeyValues3 has multiple data types, a format similar to JSON, and relatively

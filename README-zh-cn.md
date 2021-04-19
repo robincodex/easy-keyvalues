@@ -218,6 +218,45 @@ FindAllKeys(...keys: string[]): KeyValues[]
 kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'item_0002')]
 ```
 
+### `#base`
+
+```js
+import {
+    KeyValues,
+    AutoLoadKeyValuesBase,
+    AutoLoadKeyValuesBaseSync,
+} from 'easy-keyvalues';
+
+AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
+AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
+```
+
+范例
+
+```js
+/*
+KeyValues.txt
+
+#base "npc/file01.txt"
+#base "npc/file02.txt"
+
+"DOTAAbilities"
+{
+    "ability01"
+    {
+        "BaseClass"         "ability_datadriven"
+        "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_POINT"
+    }
+}
+*/
+const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
+const baseList = await AutoLoadKeyValuesBase(root, __dirname);
+
+// Get path
+baseList[0].GetBaseFilePath(); // npc/file01.txt
+baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
+```
+
 # KeyValues3
 
 相比于 KeyValues，KeyValues3 有了多种数据类型，格式与 JSON 相似，相对的，代码也比 KeyValues 复杂很多
