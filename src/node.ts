@@ -1,7 +1,8 @@
-import { readFile, writeFile } from 'fs/promises';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, promises } from 'fs';
 import KeyValues from './KeyValues';
 import KeyValues3 from './KeyValues3';
+
+const { readFile, writeFile } = promises;
 
 export { KeyValues, KeyValues3 };
 

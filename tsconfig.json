@@ -1,13 +1,14 @@
 {
     "compilerOptions": {
-        "module": "CommonJS",
+        "module": "ESNext",
         "removeComments": false,
         "declaration": true,
         "outDir": "dist",
         "sourceMap": true,
         "target": "ES2017",
         "strict": true,
-        "lib": ["ES2017"],
+        "lib": ["es2019"],
+        "moduleResolution": "Node",
         "types": ["@types/node"]
     },
     "include": ["src/**/*.ts"],

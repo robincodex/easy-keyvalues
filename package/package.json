@@ -1,0 +1,24 @@
+{
+    "name": "easy-keyvalues",
+    "version": "1.0.0",
+    "description": "Parse Valve KeyValues Format and easy to use in nodejs or browser.",
+    "main": "node.js",
+    "engines": {
+        "node": ">=14.0.0"
+    },
+    "engineStrict": true,
+    "scripts": {},
+    "author": "RobinCode",
+    "homepage": "https://github.com/RobinCodeX/easy-keyvalues",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/RobinCodeX/easy-keyvalues.git"
+    },
+    "keywords": [
+        "KeyValues",
+        "KeyValues3",
+        "Valve KeyValues",
+        "Source2 KeyValues3"
+    ],
+    "license": "MIT"
+}

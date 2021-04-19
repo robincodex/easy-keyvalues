@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "sourceMap": true,
+        "target": "ES5",
+        "strict": true,
+        "lib": ["es2019"],
+        "moduleResolution": "Node",
+        "downlevelIteration": true,
+        "types": []
+    },
+    "exclude": ["node_modules"],
+    "include": ["src/**/*.ts"]
+}

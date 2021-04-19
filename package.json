@@ -9,6 +9,7 @@
     "engineStrict": true,
     "scripts": {
         "watch": "tsc --watch -p ./",
+        "build": "rollup -c && tsc --emitDeclarationOnly --outDir package",
         "test": "jest --verbose",
         "test:badges": "jest --verbose && jest-coverage-badges",
         "test:kv3": "jest --coverage=false -- __tests__/KeyValues3.test.ts",
@@ -22,17 +23,26 @@
         "url": "git+https://github.com/RobinCodeX/easy-keyvalues.git"
     },
     "keywords": [
-        "Valve KeyValues"
+        "KeyValues",
+        "KeyValues3",
+        "Valve KeyValues",
+        "Source2 KeyValues3"
     ],
     "license": "MIT",
     "devDependencies": {
+        "@rollup/plugin-commonjs": "^18.0.0",
+        "@rollup/plugin-node-resolve": "^11.2.1",
+        "@rollup/plugin-typescript": "^8.2.1",
         "@types/jest": "^26.0.22",
         "@types/node": "^14.14.37",
+        "esbuild": "^0.11.12",
         "jest": "^26.6.3",
         "jest-coverage-badges": "^1.1.2",
         "prettier": "^2.2.1",
+        "rollup": "^2.45.2",
         "ts-jest": "^26.5.4",
         "ts-node": "^9.1.1",
+        "tslib": "^2.2.0",
         "typescript": "^4.2.4"
     }
 }
