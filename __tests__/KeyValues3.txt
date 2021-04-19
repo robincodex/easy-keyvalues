@@ -79,6 +79,9 @@ Second line of a multi-line string literal.
         }
         j = {a=123 b=["456","789", true, {b=456}]}
         i = [[123],[456,789,false]]
-        j = [[{a = 456}]]
+        j = [[{a = 456.0.5} .5, 2., 3.2.+5, 1-5.5]]
+        k = 0.
+        l = .5
+        m = .2-1
 	}
 }

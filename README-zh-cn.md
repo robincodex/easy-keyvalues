@@ -216,10 +216,16 @@ kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'i
 
 # KeyValues3
 
+相比于 KeyValues，KeyValues3 有了多种数据类型，格式与 JSON 相似，相对的，代码也比 KeyValues 复杂很多
+。
+
+参考 https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
+
 ## 功能
 
 -   保留注释
 -   支持 nodejs 和浏览器
+-   友好的数据类型推断
 
 ## 导入
 
@@ -276,3 +282,162 @@ const kv3 = LoadKeyValues3(`${KeyValues3.CommonHeader}
 `);
 console.log(kv3.toString());
 ```
+
+### 数据类型
+
+| KeyValues3 类型 | 对应的 Javascript 类型 | 描述                                      |
+| --------------- | ---------------------- | ----------------------------------------- |
+| String          | string                 | KV3 支持多行字符串，用`"""`作为开头和结尾 |
+| Boolean         | boolean                | true 或者 false                           |
+| Int             | number                 | 整数                                      |
+| Double          | number                 | 格式化为字符串的时候使用`toFixed(6)`      |
+| Resource        | string                 | 代表`resource:"{path}"`中`{path}`的值     |
+| Array           | Array                  | 数组，数据结构为`IKV3Value[]`             |
+| Object          | Object                 | 对象，数据结构为`KeyValues3[]`            |
+
+> 注意解析 Int 和 Double 的时候，如果包含小数部分才会解析为 Double，否则都视为 Int
+
+### 根节点
+
+KeyValues3 的根节点有点特殊，它包含一个文件头，并且其值固定为 Object，基本格式：
+
+```
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+}
+```
+
+-   静态属性`KeyValues3.CommonHeader`是默认的文件头
+
+-   静态方法`KeyValues3.CreateRoot(): KeyValues3`创建根节点
+
+-   方法 `GetHeader(): string | undefined`获取文件头
+
+-   方法 `IsRoot(): boolean`判断是否为根节点
+
+### 创建
+
+```js
+// 当 KeyValues 的值为 Object 的时候才能调用，否则会抛出错误
+// 创建 KeyValues3 到 Object
+// 返回创建的 KeyValues3
+CreateObjectValue(key: string, value: IKV3Value): KeyValues3
+```
+
+KeyValues3 的值都是个`class`，接口为`IKV3Value`，基类为`KV3BaseValue`
+
+```ts
+interface IKV3Value {
+    Comments: KeyValues3Comments;
+    GetValue(): any;
+    GetOwner(): KeyValues3 | undefined;
+    SetOwner(owner: KeyValues3 | undefined): void;
+    IsBoolean(): this is ValueBoolean;
+    IsInt(): this is ValueInt;
+    IsDouble(): this is ValueDouble;
+    IsString(): this is ValueString;
+    IsResource(): this is ValueResource;
+    IsDeferredResource(): this is ValueDeferredResource;
+    IsArray(): this is ValueArray;
+    IsObject(): this is ValueObject;
+    Format(): string;
+}
+```
+
+```js
+KeyValues3.String( initValue?: string )
+KeyValues3.Boolean( initValue?: boolean )
+KeyValues3.Int( initValue?: number )
+KeyValues3.Double( initValue?: number )
+KeyValues3.Resource( initValue?: string )
+KeyValues3.Array( initValue?: IKV3Value[] )
+KeyValues3.Object( initValue?: KeyValues3[] )
+```
+
+范例
+
+```js
+const root = KeyValues3.CreateRoot();
+root.CreateObjectValue('a', new KeyValues3.String('string'));
+root.CreateObjectValue('b', new KeyValues3.Boolean(false));
+root.CreateObjectValue('c', new KeyValues3.Int(0));
+root.CreateObjectValue('d', new KeyValues3.Double(0.0));
+root.CreateObjectValue('e', new KeyValues3.Resource('path/to/file.vpcf'));
+root.CreateObjectValue('f', new KeyValues3.Array([]));
+root.CreateObjectValue('g', new KeyValues3.Object([]));
+
+new KeyValues3.Array([
+    new KeyValues3.String('one'),
+    new KeyValues3.String('two'),
+    new KeyValues3.String('three'),
+]);
+
+const obj = new KeyValues3.Object([
+    new KeyValues3('a', new KeyValues3.String('one')),
+    new KeyValues3('b', new KeyValues3.Int(2)),
+]);
+obj.Create('c', new KeyValues3.Boolean(true));
+```
+
+### 添加 / 删除
+
+-   KeyValues3 Object
+
+```js
+// 追加到 Object 末尾
+Append(v: KeyValues3): this
+// 插入到 Object 指定位置
+Insert(v: KeyValues3, index: number): this
+// 删除子节点中的 KeyValues3，并返回删除的 KeyValues3
+Delete(v: string | KeyValues3): KeyValues3
+```
+
+-   KeyValues3 Array
+
+```js
+// 追加到 Array 末尾
+Append(v: IKV3Value): this
+// 插入到 Array 指定位置
+Insert(v: IKV3Value, index: number): this
+// 删除子节点中的 IKV3Value
+Delete(v: IKV3Value): this
+```
+
+### 查找
+
+-   KeyValues3 Object
+
+```js
+// 查找单个KeyValues3
+Find(
+    callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean
+): KeyValues3 | undefined
+
+// 查找单个KeyValues3
+FindKey(key: string): KeyValues3 | undefined
+
+// 查找多个KeyValues3
+FindAll(
+    callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean
+): KeyValues3[]
+
+// 查找多个KeyValues3
+FindAllKeys(...keys: string[]): KeyValues3[]
+```
+
+> 这些方法也存在 KeyValues3 方法中，当值为 Object 的时候可以调用
+
+### 格式化
+
+| KeyValues3 类型 | Javascript 的值                 | 格式化后                                    |
+| --------------- | ------------------------------- | ------------------------------------------- |
+| String          | `this is string`                | `"this is string"`                          |
+| String          | `this is string \n second line` | """<br>this is string<br>second line<br>""" |
+| Boolean         | true                            | true                                        |
+| Int             | 5                               | 5                                           |
+| Double          | 2.5                             | 2.500000                                    |
+| Resource        | `path/to/file.vpcf`             | `resource:"path/to/file.vpcf"`              |
+
+# License
+
+[MIT License](./LICENSE)

@@ -72,8 +72,8 @@ describe('KeyValues3', () => {
         h_obj.Append(h_fist);
         h_obj.Append(h_fist);
         h_obj.Append(h_fist);
-        expect(h.FindAllKey('a').length).toBe(3);
-        expect(h_obj.FindAllKey('a').length).toBe(3);
+        expect(h.FindAllKeys('a').length).toBe(3);
+        expect(h_obj.FindAllKeys('a').length).toBe(3);
         expect(h.Find(() => false)).toBe(undefined);
         h_obj.Delete('a');
         h_obj.Delete('a');
@@ -104,7 +104,7 @@ describe('KeyValues3', () => {
 
         expect(root.FindKey('e')?.GetValue().IsResource()).toBe(true);
 
-        expect(root.FindAllKey('e').length).toBe(1);
+        expect(root.FindAllKeys('e').length).toBe(1);
 
         g.AppendValue(new KeyValues3.String('text'))
             .Append(new KeyValues3.Int(1))

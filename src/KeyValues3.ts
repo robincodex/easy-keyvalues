@@ -1,17 +1,6 @@
 import { KeyValues3Comments } from './Comments';
 
-enum KeyValues3ValueType {
-    Boolean = 1,
-    Int,
-    Double,
-    String,
-    Resource,
-    DeferredResource,
-    Array,
-    Object,
-}
-
-interface IKV3Value {
+export interface IKV3Value {
     Comments: KeyValues3Comments;
     GetValue(): any;
     GetOwner(): KeyValues3 | undefined;
@@ -27,7 +16,7 @@ interface IKV3Value {
     Format(): string;
 }
 
-class BaseValue implements IKV3Value {
+export class KV3BaseValue implements IKV3Value {
     protected value: any;
     protected owner?: KeyValues3;
     public Comments = new KeyValues3Comments();
@@ -81,7 +70,7 @@ class BaseValue implements IKV3Value {
 /**
  * String
  */
-class ValueString extends BaseValue {
+class ValueString extends KV3BaseValue {
     protected value: string = '';
 
     constructor(initValue?: string) {
@@ -111,7 +100,7 @@ class ValueString extends BaseValue {
 /**
  * Boolean
  */
-class ValueBoolean extends BaseValue {
+class ValueBoolean extends KV3BaseValue {
     protected value: boolean = false;
 
     constructor(initValue?: boolean) {
@@ -134,7 +123,7 @@ class ValueBoolean extends BaseValue {
 /**
  * Int
  */
-class ValueInt extends BaseValue {
+class ValueInt extends KV3BaseValue {
     protected value: number = 0;
 
     constructor(initValue?: number) {
@@ -157,7 +146,7 @@ class ValueInt extends BaseValue {
 /**
  * Double
  */
-class ValueDouble extends BaseValue {
+class ValueDouble extends KV3BaseValue {
     protected value: number = 0;
 
     constructor(initValue?: number) {
@@ -184,7 +173,7 @@ class ValueDouble extends BaseValue {
 /**
  * resource:""
  */
-class ValueResource extends BaseValue {
+class ValueResource extends KV3BaseValue {
     protected value: string = '';
 
     constructor(initValue?: string) {
@@ -211,7 +200,7 @@ class ValueResource extends BaseValue {
 /**
  * deferred_resource:""
  */
-class ValueDeferredResource extends BaseValue {
+class ValueDeferredResource extends KV3BaseValue {
     protected value: string = '';
 
     constructor(initValue?: string) {
@@ -238,7 +227,7 @@ class ValueDeferredResource extends BaseValue {
 /**
  * Array
  */
-class ValueArray extends BaseValue {
+class ValueArray extends KV3BaseValue {
     protected value: IKV3Value[] = [];
 
     constructor(initValue?: IKV3Value[]) {
@@ -338,7 +327,7 @@ class ValueArray extends BaseValue {
 /**
  * Object
  */
-class ValueObject extends BaseValue {
+class ValueObject extends KV3BaseValue {
     protected value: KeyValues3[] = [];
 
     constructor(initValue?: KeyValues3[]) {
@@ -374,16 +363,16 @@ class ValueObject extends BaseValue {
     }
 
     public Delete(v: string | KeyValues3) {
-        let i = -1;
+        let kv: KeyValues3 | undefined;
         if (typeof v === 'string') {
-            i = this.value.findIndex((c) => c.Key === v);
+            kv = this.value.find((c) => c.Key === v);
         } else {
-            i = this.value.findIndex((c) => c === v);
+            kv = this.value.find((c) => c === v);
         }
-        if (i >= 0) {
-            this.value.splice(i, 1);
+        if (kv) {
+            this.value.splice(this.value.indexOf(kv), 1);
         }
-        return this;
+        return kv;
     }
 
     /**
@@ -424,8 +413,8 @@ class ValueObject extends BaseValue {
     /**
      * Find a KeyValues3
      */
-    public FindAllKey(key: string): KeyValues3[] {
-        return this.FindAll((kv) => kv.Key === key);
+    public FindAllKeys(...keys: string[]): KeyValues3[] {
+        return this.FindAll((kv) => keys.includes(kv.Key));
     }
 
     public Format(tab: string = ''): string {
@@ -439,6 +428,9 @@ class ValueObject extends BaseValue {
 const MatchKeyNoQuote = /^[\w\d_\.]+$/;
 const MatchInt = /^-?\d+$/;
 const MatchDouble = /^-?\d+.\d+$/;
+const MatchDouble2 = /^-?.\d+$/;
+const MatchDouble3 = /^-?\d+.$/;
+const MatchStrangeNumber = /^[\d\+-\.]+$/;
 const MatchBoolean = /^(true|false)$/;
 const MatchResource = /^resource:"(.*)"$/;
 const MatchDeferredResource = /^deferred_resource:"(.*)"$/;
@@ -529,8 +521,8 @@ export default class KeyValues3 {
         return this.value.FindAll(callback);
     }
 
-    public FindAllKey(key: string): KeyValues3[] {
-        return this.FindAll((kv) => kv.Key === key);
+    public FindAllKeys(...keys: string[]): KeyValues3[] {
+        return this.FindAll((kv) => keys.includes(kv.Key));
     }
 
     public Format(tab: string = ''): string {
@@ -722,7 +714,11 @@ export default class KeyValues3 {
                                         key,
                                         new ValueInt(parseInt(str))
                                     );
-                                } else if (MatchDouble.test(str)) {
+                                } else if (
+                                    MatchDouble.test(str) ||
+                                    MatchDouble2.test(str) ||
+                                    MatchDouble3.test(str)
+                                ) {
                                     lastKV = parent.CreateObjectValue(
                                         key,
                                         new ValueDouble(Number(str))
@@ -738,6 +734,8 @@ export default class KeyValues3 {
                                         key,
                                         new ValueDeferredResource(v)
                                     );
+                                } else if (MatchStrangeNumber.test(str)) {
+                                    lastKV = parent.CreateObjectValue(key, new ValueString(str));
                                 } else {
                                     throw new Error(
                                         this._parse_error(data.line, `Invalid value '${str}'`)
@@ -932,7 +930,11 @@ export default class KeyValues3 {
                             } else if (MatchInt.test(str)) {
                                 lastValue = new ValueInt(parseInt(str));
                                 parent.AppendValue(lastValue);
-                            } else if (MatchDouble.test(str)) {
+                            } else if (
+                                MatchDouble.test(str) ||
+                                MatchDouble2.test(str) ||
+                                MatchDouble3.test(str)
+                            ) {
                                 lastValue = new ValueDouble(Number(str));
                                 parent.AppendValue(lastValue);
                             } else if (MatchResource.test(str)) {
@@ -944,6 +946,9 @@ export default class KeyValues3 {
                                 const m = MatchDeferredResource.exec(str);
                                 let v = m ? m[1] : '';
                                 lastValue = new ValueDeferredResource(v);
+                                parent.AppendValue(lastValue);
+                            } else if (MatchStrangeNumber.test(str)) {
+                                lastValue = new ValueString(str);
                                 parent.AppendValue(lastValue);
                             } else {
                                 throw new Error(
