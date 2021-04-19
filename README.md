@@ -265,11 +265,11 @@ LoadKeyValues3(body: string): KeyValues3;
 -   Node.js
 
 ```ts
-// 解析KeyValues3
+// Parse KeyValues3
 const kv3 = await LoadKeyValues3('/path/to/file.txt');
 console.log(kv3.toString());
 
-// 解析utf16le格式的文本
+// Parse utf16le
 const kv3 = await LoadKeyValues3('/path/to/file.txt', 'utf16le');
 console.log(kv3.toString());
 ```
@@ -277,7 +277,7 @@ console.log(kv3.toString());
 -   Browser
 
 ```ts
-// 解析KeyValues3
+// Parse KeyValues3
 const kv3 = LoadKeyValues3(`${KeyValues3.CommonHeader}
 {
     "Version" = 1
