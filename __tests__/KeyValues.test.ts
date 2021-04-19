@@ -242,6 +242,11 @@ describe('KeyValues', () => {
         expect(list[0].GetBaseAbsoluteFilePath()).toBe(
             join(__dirname, 'npc/file01.txt').replace(/\\/g, '/')
         );
+        expect(list[0].toString()).toBe(`#base    "npc/file01.txt" // file01`);
+        expect(list[1].toString()).toBe(`#base    "npc/file02.txt" // file02`);
+
+        await SaveKeyValues(join(__dirname, 'KeyValues.base.save.txt'), root);
+        SaveKeyValuesSync(join(__dirname, 'KeyValues.base.save.txt'), root2);
 
         try {
             list[0].LoadBase(join(__dirname, 'npc/file01.txt'), []);

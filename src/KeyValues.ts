@@ -313,6 +313,13 @@ export default class KeyValues {
         }
 
         if (this.children) {
+            if (this.IsBase()) {
+                text += `${tab}${this.Key}    "${this.GetBaseFilePath()}"`;
+                if (this.Comments.HasEndOfLineComment()) {
+                    text += ` // ${this.Comments.GetEndOfLineComment()}`;
+                }
+                return text;
+            }
             const maxLength = Math.max(...this.children.map((v) => v.Key.length));
             text += `${tab}"${this.Key}"`;
             if (this.Comments.HasEndOfLineComment()) {

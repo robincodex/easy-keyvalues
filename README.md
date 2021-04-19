@@ -124,6 +124,52 @@ GetParent(): KeyValues | undefined
 The `KeyValues` returned after parsing by `KeyValues.Parse()` is a root node, whose method
 `IsRoot()` will return `true` and is forced to have `children`.
 
+### `#base`
+
+The purpose of this library is to edit the KV, so after loading `#base` it does not merge all the
+KeyValues nodes in `#base` into the parent node, but keeps the KeyValues node `#base`, which is the
+root node of the file, and its `children` are all the children of the root node.
+
+```js
+import {
+    KeyValues,
+    AutoLoadKeyValuesBase,
+    AutoLoadKeyValuesBaseSync,
+} from 'easy-keyvalues';
+
+AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
+AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
+```
+
+Example
+
+```js
+/*
+KeyValues.txt
+
+#base "npc/file01.txt"
+#base "npc/file02.txt"
+
+"DOTAAbilities"
+{
+    "ability01"
+    {
+        "BaseClass"         "ability_datadriven"
+        "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_POINT"
+    }
+}
+*/
+const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
+const baseList = await AutoLoadKeyValuesBase(root, __dirname);
+
+// Get path
+baseList[0].GetBaseFilePath(); // npc/file01.txt
+baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
+
+// Calling `SaveKeyValues` and `SaveKeyValuesSync` after loading `#base` will automatically save the `#base` file
+SaveKeyValuesSync(join(__dirname, 'KeyValues.txt'), root);
+```
+
 ### Create
 
 ```js
@@ -221,49 +267,6 @@ Example
 ```js
 // For example, the above Table
 kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'item_0002')]
-```
-
-### `#base`
-
-The purpose of this library is to edit the KV, so after loading `#base` it does not merge all the
-KeyValues nodes in `#base` into the parent node, but keeps the KeyValues node `#base`, which is the
-root node of the file, and its `children` are all the children of the root node.
-
-```js
-import {
-    KeyValues,
-    AutoLoadKeyValuesBase,
-    AutoLoadKeyValuesBaseSync,
-} from 'easy-keyvalues';
-
-AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
-AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
-```
-
-Example
-
-```js
-/*
-KeyValues.txt
-
-#base "npc/file01.txt"
-#base "npc/file02.txt"
-
-"DOTAAbilities"
-{
-    "ability01"
-    {
-        "BaseClass"         "ability_datadriven"
-        "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_POINT"
-    }
-}
-*/
-const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
-const baseList = await AutoLoadKeyValuesBase(root, __dirname);
-
-// Get path
-baseList[0].GetBaseFilePath(); // npc/file01.txt
-baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
 ```
 
 # KeyValues3

@@ -62,6 +62,16 @@ export async function SaveKeyValues(
     encoding: BufferEncoding = 'utf8'
 ) {
     await writeFile(file, kv.Format(), encoding);
+
+    // Save #base
+    const bases = kv.FindAllKeys('#base');
+    for (const b of bases) {
+        if (b.GetBaseFilePath() && b.GetBaseAbsoluteFilePath()) {
+            const root = KeyValues.CreateRoot();
+            root.SetValue(b.GetChildren().map((v) => v));
+            await writeFile(b.GetBaseAbsoluteFilePath(), root.Format(), encoding);
+        }
+    }
 }
 
 export async function SaveKeyValuesSync(
@@ -70,6 +80,16 @@ export async function SaveKeyValuesSync(
     encoding: BufferEncoding = 'utf8'
 ) {
     writeFileSync(file, kv.Format(), encoding);
+
+    // Save #base
+    const bases = kv.FindAllKeys('#base');
+    for (const b of bases) {
+        if (b.GetBaseFilePath() && b.GetBaseAbsoluteFilePath()) {
+            const root = KeyValues.CreateRoot();
+            root.SetValue(b.GetChildren().map((v) => v));
+            writeFileSync(b.GetBaseAbsoluteFilePath(), root.Format(), encoding);
+        }
+    }
 }
 
 export async function LoadKeyValues3(file: string, encoding: BufferEncoding = 'utf8') {

@@ -1,6 +1,6 @@
 
-#base "npc/file01.txt"
-#base "npc/file02.txt"
+#base "npc/file01.txt" // file01
+#base "npc/file02.txt" // file02
 
 "DOTAAbilities"
 {

@@ -119,6 +119,51 @@ GetParent(): KeyValues | undefined
 
 并且强制拥有`children`。
 
+### `#base`
+
+这个库的目的是编辑 KV，所以加载`#base`之后不会将`#base`里面的所以 KeyValues 节点 合并到父节点，而是
+依然保留`#base`这个 KeyValues 节点，它就是文件的根节点， 它的`children` 就是根节点的所有子节点。
+
+```js
+import {
+    KeyValues,
+    AutoLoadKeyValuesBase,
+    AutoLoadKeyValuesBaseSync,
+} from 'easy-keyvalues';
+
+AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
+AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
+```
+
+范例
+
+```js
+/*
+KeyValues.txt
+
+#base "npc/file01.txt"
+#base "npc/file02.txt"
+
+"DOTAAbilities"
+{
+    "ability01"
+    {
+        "BaseClass"         "ability_datadriven"
+        "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_POINT"
+    }
+}
+*/
+const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
+const baseList = await AutoLoadKeyValuesBase(root, __dirname);
+
+// Get path
+baseList[0].GetBaseFilePath(); // npc/file01.txt
+baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
+
+// 加载`#base`之后调用`SaveKeyValues`和`SaveKeyValuesSync`会自动保存`#base`的文件
+SaveKeyValuesSync(join(__dirname, 'KeyValues.txt'), root);
+```
+
 ### 创建
 
 ```js
@@ -216,48 +261,6 @@ FindAllKeys(...keys: string[]): KeyValues[]
 ```js
 // 例如上面的Table
 kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'item_0002')]
-```
-
-### `#base`
-
-这个库的目的是编辑 KV，所以加载`#base`之后不会将`#base`里面的所以 KeyValues 节点 合并到父节点，而是
-依然保留`#base`这个 KeyValues 节点，它就是文件的根节点， 它的`children` 就是根节点的所有子节点。
-
-```js
-import {
-    KeyValues,
-    AutoLoadKeyValuesBase,
-    AutoLoadKeyValuesBaseSync,
-} from 'easy-keyvalues';
-
-AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
-AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
-```
-
-范例
-
-```js
-/*
-KeyValues.txt
-
-#base "npc/file01.txt"
-#base "npc/file02.txt"
-
-"DOTAAbilities"
-{
-    "ability01"
-    {
-        "BaseClass"         "ability_datadriven"
-        "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_POINT"
-    }
-}
-*/
-const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
-const baseList = await AutoLoadKeyValuesBase(root, __dirname);
-
-// Get path
-baseList[0].GetBaseFilePath(); // npc/file01.txt
-baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
 ```
 
 # KeyValues3
