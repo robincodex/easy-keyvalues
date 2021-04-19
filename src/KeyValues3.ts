@@ -427,9 +427,9 @@ class ValueObject extends KV3BaseValue {
 
 const MatchKeyNoQuote = /^[\w\d_\.]+$/;
 const MatchInt = /^-?\d+$/;
-const MatchDouble = /^-?\d+.\d+$/;
-const MatchDouble2 = /^-?.\d+$/;
-const MatchDouble3 = /^-?\d+.$/;
+const MatchDouble = /^-?\d+(\.\d+)?$/;
+const MatchDouble2 = /^-?\.\d+$/;
+const MatchDouble3 = /^-?\d+\.$/;
 const MatchStrangeNumber = /^[\d\+-\.]+$/;
 const MatchBoolean = /^(true|false)$/;
 const MatchResource = /^resource:"(.*)"$/;
