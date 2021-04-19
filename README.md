@@ -50,7 +50,7 @@ import {
 LoadKeyValues(file: string, encoding?: BufferEncoding): Promise<KeyValues>;
 LoadKeyValuesSync(file: string, encoding?: BufferEncoding): KeyValues;
 SaveKeyValues(file: string, kv: KeyValues, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValuesSync(file: string, kv: KeyValues, encoding?: BufferEncoding): Promise<void>;
+SaveKeyValuesSync(file: string, kv: KeyValues, encoding?: BufferEncoding): void;
 ```
 
 -   Browser
@@ -298,7 +298,7 @@ import {
 LoadKeyValues3(file: string, encoding?: BufferEncoding): Promise<KeyValues3>;
 LoadKeyValues3Sync(file: string, encoding?: BufferEncoding): KeyValues3;
 SaveKeyValues3(file: string, kv: KeyValues3, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValues3Sync(file: string, kv: KeyValues3, encoding?: BufferEncoding): Promise<void>;
+SaveKeyValues3Sync(file: string, kv: KeyValues3, encoding?: BufferEncoding): void;
 ```
 
 -   Browser
@@ -340,15 +340,15 @@ console.log(kv3.toString());
 
 ### Data Types
 
-| KeyValues3 Type | Corresponding Javascript Type | Description                                                         |
-| --------------- | ----------------------------- | ------------------------------------------------------------------- |
-| String          | string                        | KV3 supports multi-line strings with `"""` as the beginning and end |
-| Boolean         | boolean                       | true or false                                                       |
-| Int             | number                        | integer                                                             |
-| Double          | number                        | When formatting as a string use`toFixed(6)`                         |
-| Resource        | string                        | Represents the value of `{path}` in `resource:"{path}"`             |
-| Array           | Array                         | Array，Type:`IKV3Value[]`                                           |
-| Object          | Object                        | Object，Type:`KeyValues3[]`                                         |
+| KeyValues3 Type | Javascript Type | Description                                                         |
+| --------------- | --------------- | ------------------------------------------------------------------- |
+| String          | string          | KV3 supports multi-line strings with `"""` as the beginning and end |
+| Boolean         | boolean         | true or false                                                       |
+| Int             | number          | integer                                                             |
+| Double          | number          | When formatting as a string use`toFixed(6)`                         |
+| Resource        | string          | Represents the value of `{path}` in `resource:"{path}"`             |
+| Array           | Array           | Array，Type:`IKV3Value[]`                                           |
+| Object          | Object          | Object，Type:`KeyValues3[]`                                         |
 
 > Note that when parsing Int and Double, they are only parsed as Double if they contain a fractional
 > part, otherwise they are treated as Int

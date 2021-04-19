@@ -44,7 +44,7 @@ import {
 LoadKeyValues(file: string, encoding?: BufferEncoding): Promise<KeyValues>;
 LoadKeyValuesSync(file: string, encoding?: BufferEncoding): KeyValues;
 SaveKeyValues(file: string, kv: KeyValues, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValuesSync(file: string, kv: KeyValues, encoding?: BufferEncoding): Promise<void>;
+SaveKeyValuesSync(file: string, kv: KeyValues, encoding?: BufferEncoding): void;
 ```
 
 -   浏览器
@@ -292,7 +292,7 @@ import {
 LoadKeyValues3(file: string, encoding?: BufferEncoding): Promise<KeyValues3>;
 LoadKeyValues3Sync(file: string, encoding?: BufferEncoding): KeyValues3;
 SaveKeyValues3(file: string, kv: KeyValues3, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValues3Sync(file: string, kv: KeyValues3, encoding?: BufferEncoding): Promise<void>;
+SaveKeyValues3Sync(file: string, kv: KeyValues3, encoding?: BufferEncoding): void;
 ```
 
 -   浏览器
