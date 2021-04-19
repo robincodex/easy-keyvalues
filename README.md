@@ -4,13 +4,15 @@
 [![support tag](https://img.shields.io/badge/support-KeyValues-blue)](#keyvalues)
 [![support tag](https://img.shields.io/badge/support-KeyValues3-blue)](#keyvalues3)
 
-![coverage](./coverage/badge-statements.svg) ![coverage](./coverage/badge-branches.svg)
-![coverage](./coverage/badge-functions.svg) ![coverage](./coverage/badge-lines.svg)
+![coverage](https://raw.githubusercontent.com/RobinCodeX/easy-keyvalues/master/coverage/badge-statements.svg)
+![coverage](https://raw.githubusercontent.com/RobinCodeX/easy-keyvalues/master/coverage/badge-branches.svg)
+![coverage](https://raw.githubusercontent.com/RobinCodeX/easy-keyvalues/master/coverage/badge-functions.svg)
+![coverage](https://raw.githubusercontent.com/RobinCodeX/easy-keyvalues/master/coverage/badge-lines.svg)
 
 The reason for writing a library is that I want to edit KeyValues text, format the text when saving,
 and keep the comments, support `#base` on KeyValues, etc.
 
-[简体中文](./README-zh-cn.md)
+[简体中文](https://github.com/RobinCodeX/easy-keyvalues/blob/master/README-zh-cn.md)
 
 > I completely rewrote the library to not be compatible with previous versions, so the version
 > starts from 1.0.0.
