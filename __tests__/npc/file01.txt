@@ -1,0 +1,9 @@
+
+"DOTAAbilities"
+{
+    "ability01"
+    {
+        "BaseClass"             		"ability_lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+    }
+}

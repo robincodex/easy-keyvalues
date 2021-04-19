@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync, promises } from 'fs';
+import { join } from 'path';
 import KeyValues from './KeyValues';
 import KeyValues3 from './KeyValues3';
 
@@ -14,6 +15,45 @@ export async function LoadKeyValues(file: string, encoding: BufferEncoding = 'ut
 export function LoadKeyValuesSync(file: string, encoding: BufferEncoding = 'utf8') {
     const body = readFileSync(file, encoding);
     return KeyValues.Parse(body);
+}
+
+/**
+ * Return all #base KeyValues
+ * @param rootNode The KeyValues of root node
+ * @param rootDir root dir
+ */
+export async function AutoLoadKeyValuesBase(
+    rootNode: KeyValues,
+    rootDir: string
+): Promise<KeyValues[]> {
+    const result = rootNode.FindAllKeys('#base');
+    for (const kv of result) {
+        const filePath = join(rootDir, kv.GetValue());
+        const children = await LoadKeyValues(filePath, 'utf8');
+        kv.LoadBase(
+            filePath,
+            children.GetChildren().map((v) => v.Free())
+        );
+    }
+    return result;
+}
+
+/**
+ * Return all #base KeyValues
+ * @param rootNode The KeyValues of root node
+ * @param rootDir root dir
+ */
+export function AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[] {
+    const result = rootNode.FindAllKeys('#base');
+    for (const kv of result) {
+        const filePath = join(rootDir, kv.GetValue());
+        const children = LoadKeyValuesSync(filePath, 'utf8');
+        kv.LoadBase(
+            filePath,
+            children.GetChildren().map((v) => v.Free())
+        );
+    }
+    return result;
 }
 
 export async function SaveKeyValues(

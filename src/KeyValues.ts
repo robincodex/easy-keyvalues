@@ -45,6 +45,42 @@ export default class KeyValues {
         return this.Key === '#base';
     }
 
+    protected baseFilePath = '';
+    protected baseAbsoluteFilePath = '';
+
+    /**
+     * Return #base's value
+     */
+    public GetBaseFilePath() {
+        return this.baseFilePath;
+    }
+
+    /**
+     * Returns the absolute path of the loaded file
+     */
+    public GetBaseAbsoluteFilePath() {
+        return this.baseAbsoluteFilePath;
+    }
+
+    /**
+     * 加载时会删除属性`value`，属性`value`复制给`baseFilePath`
+     * @param filePath Absolute path
+     * @param children Loaded KeyValues
+     */
+    public LoadBase(filePath: string, children: KeyValues[]) {
+        filePath = filePath.replace(/\\/g, '/');
+        if (!this.value) {
+            throw new Error(`#base does not have a value, maybe it's already loaded`);
+        }
+        if (!filePath.endsWith(this.value)) {
+            throw new Error(`FilePath:"${filePath}" is not ends with ${this.value}`);
+        }
+        this.baseFilePath = this.value;
+        this.baseAbsoluteFilePath = filePath;
+        this.SetValue(children);
+        return this;
+    }
+
     /**
      * The children of this KeyValues,
      * if no children then return empty array.
@@ -404,7 +440,9 @@ export default class KeyValues {
                                 kv.Comments.SetEndOfLineComment(comment);
                             } else {
                                 const lastChild = parent.GetLastChild();
-                                lastChild?.Comments.SetEndOfLineComment(comment);
+                                if (lastChild) {
+                                    lastChild.Comments.SetEndOfLineComment(comment);
+                                }
                             }
                         } else {
                             kv.Comments.AppendComment(comment);

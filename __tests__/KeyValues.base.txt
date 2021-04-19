@@ -1,0 +1,12 @@
+
+#base "npc/file01.txt"
+#base "npc/file02.txt"
+
+"DOTAAbilities"
+{
+    "ability01"
+    {
+        "BaseClass"             		"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+    }
+}

@@ -724,12 +724,12 @@ export default class KeyValues3 {
                                         new ValueDouble(Number(str))
                                     );
                                 } else if (MatchResource.test(str)) {
-                                    const m = MatchResource.exec(str);
-                                    let v = m ? m[1] : '';
+                                    const m = MatchResource.exec(str) as RegExpExecArray;
+                                    let v = m[1] || '';
                                     lastKV = parent.CreateObjectValue(key, new ValueResource(v));
                                 } else if (MatchDeferredResource.test(str)) {
-                                    const m = MatchDeferredResource.exec(str);
-                                    let v = m ? m[1] : '';
+                                    const m = MatchDeferredResource.exec(str) as RegExpExecArray;
+                                    let v = m[1] || '';
                                     lastKV = parent.CreateObjectValue(
                                         key,
                                         new ValueDeferredResource(v)
@@ -776,9 +776,19 @@ export default class KeyValues3 {
                         continue;
                     } else if (data.body[data.pos + 1] === '*') {
                         const nextIndex = data.body.indexOf('*/', data.pos + 2);
-                        commentCache.push(data.body.slice(data.pos + 2, nextIndex).trim());
-                        data.pos = nextIndex + 1;
+                        const comment = data.body.slice(data.pos + 2, nextIndex).trim();
+                        if (comment.includes('\n')) {
+                            commentCache.push(comment);
+                        } else {
+                            if (isEndOfLineComment && lastKV) {
+                                lastKV.value.Comments.SetEndOfLineComment(comment);
+                                isEndOfLineComment = false;
+                            } else {
+                                commentCache.push(comment);
+                            }
+                        }
                         data.line += data.body.slice(data.pos, nextIndex).match(/\n/g)?.length || 1;
+                        data.pos = nextIndex + 1;
                         continue;
                     }
                 }
@@ -938,13 +948,13 @@ export default class KeyValues3 {
                                 lastValue = new ValueDouble(Number(str));
                                 parent.AppendValue(lastValue);
                             } else if (MatchResource.test(str)) {
-                                const m = MatchResource.exec(str);
-                                let v = m ? m[1] : '';
+                                const m = MatchResource.exec(str) as RegExpExecArray;
+                                let v = m[1] || '';
                                 lastValue = new ValueResource(v);
                                 parent.AppendValue(lastValue);
                             } else if (MatchDeferredResource.test(str)) {
-                                const m = MatchDeferredResource.exec(str);
-                                let v = m ? m[1] : '';
+                                const m = MatchDeferredResource.exec(str) as RegExpExecArray;
+                                let v = m[1] || '';
                                 lastValue = new ValueDeferredResource(v);
                                 parent.AppendValue(lastValue);
                             } else if (MatchStrangeNumber.test(str)) {
@@ -987,9 +997,19 @@ export default class KeyValues3 {
                         continue;
                     } else if (data.body[data.pos + 1] === '*') {
                         const nextIndex = data.body.indexOf('*/', data.pos + 2);
-                        commentCache.push(data.body.slice(data.pos + 2, nextIndex).trim());
-                        data.pos = nextIndex + 1;
+                        const comment = data.body.slice(data.pos + 2, nextIndex).trim();
+                        if (comment.includes('\n')) {
+                            commentCache.push(comment);
+                        } else {
+                            if (isEndOfLineComment && lastValue) {
+                                lastValue.Comments.SetEndOfLineComment(comment);
+                                isEndOfLineComment = false;
+                            } else {
+                                commentCache.push(comment);
+                            }
+                        }
                         data.line += data.body.slice(data.pos, nextIndex).match(/\n/g)?.length || 1;
+                        data.pos = nextIndex + 1;
                         continue;
                     }
                 }

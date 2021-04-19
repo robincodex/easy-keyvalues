@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { KV3BaseValue } from '../src/KeyValues3';
 import {
     KeyValues3,
     LoadKeyValues3,
@@ -14,6 +15,8 @@ describe('KeyValues3', () => {
         expect(root.GetHeader()).toBe(KeyValues3.CommonHeader);
         expect(root.GetValue().IsObject()).toBe(true);
         root.SetValue(new KeyValues3.Object());
+        const value = new KV3BaseValue();
+        expect(value.GetValue()).toBe(undefined);
 
         try {
             root.SetValue(new KeyValues3.String(''));
@@ -518,6 +521,18 @@ Second line of a multi-line string literal.
             expect(e).toEqual(
                 Error(`not readable as KeyValues3 text: Line 3: Expected ',' or ']'`)
             );
+        }
+
+        try {
+            // @ts-ignore
+            KeyValues3._parse(new KeyValues3('', new KeyValues3.String('')), {
+                body: '',
+                pos: 0,
+                tokenCounter: 0,
+                line: 0,
+            });
+        } catch (e) {
+            expect(e).toEqual(Error("Parent's value must be an object or array"));
         }
     });
 });

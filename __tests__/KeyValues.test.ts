@@ -5,6 +5,8 @@ import {
     KeyValues,
     LoadKeyValuesSync,
     SaveKeyValuesSync,
+    AutoLoadKeyValuesBase,
+    AutoLoadKeyValuesBaseSync,
 } from '../src/node';
 
 function testKV(kv: KeyValues) {
@@ -214,6 +216,50 @@ describe('KeyValues', () => {
             kv.SetValue([kv]);
         } catch (e) {
             expect(e).toEqual(Error(`SetValue(): The value can not includes self`));
+        }
+    });
+
+    test('Check KeyValues #base', async () => {
+        const root = await LoadKeyValues(join(__dirname, 'KeyValues.base.txt'));
+        await AutoLoadKeyValuesBase(root, __dirname);
+        expect(
+            root.FindKey('DOTAAbilities')?.FindKey('ability01')?.FindKey('BaseClass')?.GetValue()
+        ).toBe('ability_datadriven');
+        expect(
+            root
+                .FindRecursive((kv) => kv.Key === 'ability01')
+                ?.FindKey('BaseClass')
+                ?.GetValue()
+        ).toBe('ability_lua');
+        expect(
+            root.FindKey('DOTAAbilities')?.FindKey('ability02')?.FindKey('BaseClass')?.GetValue()
+        ).toBe(undefined);
+
+        const root2 = await LoadKeyValues(join(__dirname, 'KeyValues.base.txt'));
+        const list = AutoLoadKeyValuesBaseSync(root2, __dirname);
+        expect(list[0].GetBaseFilePath()).toBe('npc/file01.txt');
+        expect(list[1].GetBaseFilePath()).toBe('npc/file02.txt');
+        expect(list[0].GetBaseAbsoluteFilePath()).toBe(
+            join(__dirname, 'npc/file01.txt').replace(/\\/g, '/')
+        );
+
+        try {
+            list[0].LoadBase(join(__dirname, 'npc/file01.txt'), []);
+        } catch (e) {
+            expect(e).toEqual(Error(`#base does not have a value, maybe it's already loaded`));
+        }
+        try {
+            const root3 = await LoadKeyValues(join(__dirname, 'KeyValues.base.txt'));
+            root3.FindKey('#base')?.LoadBase(join(__dirname, 'npc/file02.txt'), []);
+        } catch (e) {
+            expect(e).toEqual(
+                Error(
+                    `FilePath:"${join(__dirname, 'npc/file02.txt').replace(
+                        /\\/g,
+                        '/'
+                    )}" is not ends with npc/file01.txt`
+                )
+            );
         }
     });
 });
