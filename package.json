@@ -8,7 +8,7 @@
     },
     "engineStrict": true,
     "scripts": {
-        "watch": "tsc --watch -p ./",
+        "watch": "rollup -c -w",
         "build": "rollup -c && tsc --emitDeclarationOnly --outDir package",
         "test": "jest --verbose",
         "test:badges": "jest --verbose && jest-coverage-badges",
