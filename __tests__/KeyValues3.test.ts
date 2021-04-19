@@ -5,7 +5,7 @@ import {
     SaveKeyValues3,
     LoadKeyValues3Sync,
     SaveKeyValues3Sync,
-} from '../dist/node';
+} from '../src/node';
 
 describe('KeyValues3', () => {
     test('Check KeyValues3 Methods', () => {

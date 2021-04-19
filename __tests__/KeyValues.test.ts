@@ -5,7 +5,7 @@ import {
     KeyValues,
     LoadKeyValuesSync,
     SaveKeyValuesSync,
-} from '../dist/node';
+} from '../src/node';
 
 function testKV(kv: KeyValues) {
     expect(kv.GetChildCount()).toBe(6);
