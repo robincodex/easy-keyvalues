@@ -107,6 +107,7 @@ describe('KeyValues', () => {
         expect(root.toString()).toBe(`"a"    "b"\n#base    "file.kv"`);
         expect(root.GetParent()).toBe(undefined);
         expect(root.GetFirstChild()?.Key).toBe('a');
+        expect(root.GetFirstChild()?.GetParent()).toBe(root);
 
         root.CreateChild('c', [new KeyValues('d', 'a')])
             .Append(new KeyValues('d', 'a'))
@@ -125,7 +126,8 @@ describe('KeyValues', () => {
 }`
         );
 
-        expect(root.Delete('c')?.toString()).toBe(`"c"
+        const c = root.Delete('c');
+        expect(c?.toString()).toBe(`"c"
 {
     "d"
     {
@@ -134,6 +136,7 @@ describe('KeyValues', () => {
     "d"    "a"
     "d"    "a"
 }`);
+        expect(c?.GetParent()).toBe(undefined);
     });
 
     test('Check Comment', async () => {

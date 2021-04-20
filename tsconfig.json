@@ -1,15 +1,11 @@
 {
     "compilerOptions": {
         "module": "ESNext",
-        "removeComments": false,
-        "declaration": true,
-        "outDir": "dist",
-        "sourceMap": true,
         "target": "ES2017",
         "strict": true,
         "lib": ["es2019"],
         "moduleResolution": "Node",
-        "types": ["@types/node"]
+        "types": ["node"]
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules"]
