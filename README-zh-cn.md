@@ -1,6 +1,7 @@
 # easy-keyvalues
 
 [![CI](https://github.com/RobinCodeX/easy-keyvalues/actions/workflows/main.yml/badge.svg)](https://github.com/RobinCodeX/easy-keyvalues/actions/workflows/main.yml)
+[![CodeQL](https://github.com/RobinCodeX/easy-keyvalues/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/RobinCodeX/easy-keyvalues/actions/workflows/codeql-analysis.yml)
 [![npm tag](https://img.shields.io/npm/v/easy-keyvalues/latest)](https://www.npmjs.com/package/easy-keyvalues)
 [![support tag](https://img.shields.io/badge/support-KeyValues-blue)](#keyvalues)
 [![support tag](https://img.shields.io/badge/support-KeyValues3-blue)](#keyvalues3)
