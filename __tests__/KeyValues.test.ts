@@ -23,16 +23,16 @@ function testKV(kv: KeyValues) {
 
     expect(kv.Find((kv) => kv.Key === 'Ha')?.Key).toBe('Ha');
     expect(kv.Find((kv) => kv.Key === '')?.Key).toBe(undefined);
-    expect(kv.FindRecursive((kv) => kv.Key === '')?.Key).toBe(undefined);
+    expect(kv.FindTraverse((kv) => kv.Key === '')?.Key).toBe(undefined);
 
     const findAll = kv.FindKey('Ha')?.FindAll((kv) => kv.Key === 'test');
     expect(findAll?.length).toBe(3);
     expect(findAll?.map((v) => v.Key)).toEqual(['test', 'test', 'test']);
     expect(findAll?.map((v) => v.GetValue())).toEqual(['123', '345', '789']);
 
-    expect(kv.FindRecursive((kv) => kv.Key === 'BaseClass')?.GetValue()).toBe('ability_datadriven');
+    expect(kv.FindTraverse((kv) => kv.Key === 'BaseClass')?.GetValue()).toBe('ability_datadriven');
 
-    expect(kv.FindRecursive((kv) => kv.Key === 'k3')?.GetValue()).toBe('v3');
+    expect(kv.FindTraverse((kv) => kv.Key === 'k3')?.GetValue()).toBe('v3');
 
     expect(kv.FindKey('DOTAAbilities')?.FindKey('BaseClass')?.GetValue()).toBe('ability_lua');
 
@@ -181,7 +181,7 @@ describe('KeyValues', () => {
         }
         expect(kv.Find((v) => true)).toBe(undefined);
         expect(kv.FindKey('')).toBe(undefined);
-        expect(kv.FindRecursive((v) => true)).toBe(undefined);
+        expect(kv.FindTraverse((v) => true)).toBe(undefined);
         expect(kv.FindAll((v) => true)).toEqual([]);
         expect(kv.FindAllKeys('')).toEqual([]);
         expect(kv.Delete('')).toBe(undefined);
@@ -230,7 +230,7 @@ describe('KeyValues', () => {
         ).toBe('ability_datadriven');
         expect(
             root
-                .FindRecursive((kv) => kv.Key === 'ability01')
+                .FindTraverse((kv) => kv.Key === 'ability01')
                 ?.FindKey('BaseClass')
                 ?.GetValue()
         ).toBe('ability_lua');

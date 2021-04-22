@@ -56,7 +56,7 @@ import {
     LoadKeyValues,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues(url: string): Promise<KeyValues>;
+LoadKeyValues(url: string, config?: AxiosRequestConfig): Promise<KeyValues>;
 ```
 
 ## 使用
@@ -250,6 +250,11 @@ FindKey(key: string): KeyValues | undefined
 
 // 查找多个 KeyValues
 FindAllKeys(...keys: string[]): KeyValues[]
+
+// 遍历整个树
+FindTraverse(
+    callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
+): KeyValues | undefined
 ```
 
 范例
@@ -299,7 +304,7 @@ import {
     LoadKeyValues3,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues3(url: string): Promise<KeyValues3>;
+LoadKeyValues3(url: string, config?: AxiosRequestConfig): Promise<KeyValues3>;
 ```
 
 ## 使用

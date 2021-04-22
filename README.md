@@ -62,7 +62,7 @@ import {
     LoadKeyValues,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues(url: string): Promise<KeyValues>;
+LoadKeyValues(url: string, config?: AxiosRequestConfig): Promise<KeyValues>;
 ```
 
 ## Usages
@@ -256,6 +256,11 @@ FindKey(key: string): KeyValues | undefined
 
 // Find multiple KeyValues
 FindAllKeys(...keys: string[]): KeyValues[]
+
+// Traversing the KeyValues tree
+FindTraverse(
+    callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
+): KeyValues | undefined
 ```
 
 Example
@@ -305,7 +310,7 @@ import {
     LoadKeyValues3,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues3(url: string): Promise<KeyValues3>;
+LoadKeyValues3(url: string, config?: AxiosRequestConfig): Promise<KeyValues3>;
 ```
 
 ## Usages

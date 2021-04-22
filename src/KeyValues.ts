@@ -233,19 +233,19 @@ export default class KeyValues {
     /**
      * Find a KeyValues from children and children's children...
      */
-    public FindRecursive(
+    public FindTraverse(
         callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
     ): KeyValues | undefined {
         if (!this.children) {
             return;
         }
-        return KeyValues.FindRecursive(this, callback);
+        return KeyValues.FindTraverse(this, callback);
     }
 
     /**
      * Find a KeyValues from children and children's children...
      */
-    protected static FindRecursive(
+    protected static FindTraverse(
         root: KeyValues,
         callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
     ): KeyValues | undefined {
@@ -254,7 +254,7 @@ export default class KeyValues {
                 if (callback(kv, i, root) === true) {
                     return kv;
                 }
-                const result = KeyValues.FindRecursive(kv, callback);
+                const result = KeyValues.FindTraverse(kv, callback);
                 if (result) {
                     return result;
                 }

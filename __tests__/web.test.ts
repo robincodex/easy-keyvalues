@@ -40,16 +40,22 @@ describe('Browser', () => {
 
     test('Check KeyValues', async () => {
         const root = await LoadKeyValues(getPath('/kv'), {
-            responseType: 'text',
             proxy: false,
         });
         expect(root.IsRoot()).toBe(true);
     });
+    test('Check KeyValues no config', async () => {
+        const root = await LoadKeyValues(getPath('/kv'));
+        expect(root.IsRoot()).toBe(true);
+    });
     test('Check KeyValues3', async () => {
         const root = await LoadKeyValues3(getPath('/kv3'), {
-            responseType: 'text',
             proxy: false,
         });
+        expect(root.IsRoot()).toBe(true);
+    });
+    test('Check KeyValues3 no config', async () => {
+        const root = await LoadKeyValues3(getPath('/kv3'));
         expect(root.IsRoot()).toBe(true);
     });
 });
