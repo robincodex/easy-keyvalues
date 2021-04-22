@@ -62,7 +62,7 @@ import {
     LoadKeyValues,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues(body: string): KeyValues;
+LoadKeyValues(url: string): Promise<KeyValues>;
 ```
 
 ## Usages
@@ -83,12 +83,7 @@ console.log(kv.toString());
 
 ```ts
 // Parse KeyValues text
-const kv = LoadKeyValues(`
-"DOTAAbilities"
-{
-    "Version"   "1"
-}
-`);
+const kv = await LoadKeyValues('http://localhost/file.txt');
 console.log(kv.toString());
 
 // Parse KeyValues text for utf16le
@@ -310,7 +305,7 @@ import {
     LoadKeyValues3,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues3(body: string): KeyValues3;
+LoadKeyValues3(url: string): Promise<KeyValues3>;
 ```
 
 ## Usages
@@ -331,11 +326,7 @@ console.log(kv3.toString());
 
 ```ts
 // Parse KeyValues3
-const kv3 = LoadKeyValues3(`${KeyValues3.CommonHeader}
-{
-    "Version" = 1
-}
-`);
+const kv3 = await LoadKeyValues3('http://localhost/file.txt');
 console.log(kv3.toString());
 ```
 

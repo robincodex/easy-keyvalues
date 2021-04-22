@@ -56,7 +56,7 @@ import {
     LoadKeyValues,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues(body: string): KeyValues;
+LoadKeyValues(url: string): Promise<KeyValues>;
 ```
 
 ## 使用
@@ -77,12 +77,7 @@ console.log(kv.toString());
 
 ```ts
 // 解析KeyValues
-const kv = LoadKeyValues(`
-"DOTAAbilities"
-{
-    "Version"   "1"
-}
-`);
+const kv = await LoadKeyValues('http://localhost/file.txt');
 console.log(kv.toString());
 
 // 解析utf16le格式的文本
@@ -304,7 +299,7 @@ import {
     LoadKeyValues3,
 } from 'easy-keyvalues/web';
 
-LoadKeyValues3(body: string): KeyValues3;
+LoadKeyValues3(url: string): Promise<KeyValues3>;
 ```
 
 ## 使用
@@ -325,11 +320,7 @@ console.log(kv3.toString());
 
 ```ts
 // 解析KeyValues3
-const kv3 = LoadKeyValues3(`${KeyValues3.CommonHeader}
-{
-    "Version" = 1
-}
-`);
+const kv3 = await LoadKeyValues3('http://localhost/file.txt');
 console.log(kv3.toString());
 ```
 
