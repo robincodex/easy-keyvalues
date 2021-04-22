@@ -9,7 +9,7 @@
     "engineStrict": true,
     "scripts": {
         "watch": "rollup -c -w",
-        "build": "rollup -c && tsc --emitDeclarationOnly --outDir package",
+        "build": "rollup -c && tsc --emitDeclarationOnly",
         "test": "jest --verbose",
         "test:badges": "jest --verbose && jest-coverage-badges",
         "test:kv3": "jest --coverage=false -- __tests__/KeyValues3.test.ts",
@@ -29,6 +29,9 @@
         "Source2 KeyValues3"
     ],
     "license": "MIT",
+    "dependencies": {
+        "axios": "^0.21.1"
+    },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^18.0.0",
         "@rollup/plugin-node-resolve": "^11.2.1",

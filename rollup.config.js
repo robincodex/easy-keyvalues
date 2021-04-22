@@ -24,7 +24,9 @@ module.exports = [
             file: 'package/web.js',
             sourcemap: true,
             format: 'umd',
+            globals: { axios: 'axios' },
         },
+        external: ['axios'],
         plugins: [
             rollupTypescript({
                 exclude: ['src/node.ts'],

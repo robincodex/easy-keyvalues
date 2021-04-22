@@ -5,7 +5,9 @@
         "strict": true,
         "lib": ["es2019"],
         "moduleResolution": "Node",
-        "types": ["node"]
+        "types": ["node"],
+        "declaration": true,
+        "outDir": "package"
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules"]

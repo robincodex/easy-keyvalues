@@ -20,5 +20,8 @@
         "Valve KeyValues",
         "Source2 KeyValues3"
     ],
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^0.21.1"
+    }
 }
