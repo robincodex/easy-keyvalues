@@ -271,7 +271,7 @@ describe('KeyValues', () => {
         }
     });
 
-    test('Check KeyValues.toJSON', async () => {
+    test('Check KeyValues.toObject', async () => {
         const kv = KeyValues.Parse(`a 123\nb {c 123}`);
         const obj = kv.toObject<{ a: string; b: { c: string } }>();
         expect(obj['a']).toBe('123');
@@ -282,5 +282,11 @@ describe('KeyValues', () => {
         expect(obj2['DOTAAbilities']['building_system_active_preview']['MaxLevel']).toBe('1');
         expect(typeof obj2['Ha']['t1']['ggg']).toBe('object');
         expect(typeof obj2['test']).toBe('object');
+
+        try {
+            new KeyValues('a', '123').toObject();
+        } catch (e) {
+            expect(e).toEqual(Error(`Not found children in this KeyValues`));
+        }
     });
 });

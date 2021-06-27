@@ -16,7 +16,7 @@ describe('KeyValues3', () => {
         expect(root.GetValue().IsObject()).toBe(true);
         root.SetValue(new KeyValues3.Object());
         const value = new KV3BaseValue();
-        expect(value.GetValue()).toBe(undefined);
+        expect(value.Value()).toBe(undefined);
 
         try {
             root.SetValue(new KeyValues3.String(''));
@@ -32,28 +32,28 @@ describe('KeyValues3', () => {
 
         const a = root.CreateObjectValue('a', new KeyValues3.String('b'));
         expect(a.GetValue().IsString()).toBe(true);
-        expect(a.GetValue().GetValue()).toBe('b');
+        expect(a.GetValue().Value()).toBe('b');
         expect(a.GetValue().GetOwner() === a).toBe(true);
 
         const b = root.CreateObjectValue('b', new KeyValues3.Int(3.5));
         expect(b.GetValue().IsInt()).toBe(true);
-        expect(b.GetValue().GetValue()).toBe(3);
+        expect(b.GetValue().Value()).toBe(3);
 
         const c = root.CreateObjectValue('c', new KeyValues3.Double(3.5));
         expect(c.GetValue().IsDouble()).toBe(true);
-        expect(c.GetValue().GetValue()).toBe(3.5);
+        expect(c.GetValue().Value()).toBe(3.5);
 
         const d = root.CreateObjectValue('d', new KeyValues3.Boolean(true));
         expect(d.GetValue().IsBoolean()).toBe(true);
-        expect(d.GetValue().GetValue()).toBe(true);
+        expect(d.GetValue().Value()).toBe(true);
 
         const e = root.CreateObjectValue('e', new KeyValues3.Resource('x'));
         expect(e.GetValue().IsResource()).toBe(true);
-        expect(e.GetValue().GetValue()).toBe('x');
+        expect(e.GetValue().Value()).toBe('x');
 
         const f = root.CreateObjectValue('f', new KeyValues3.DeferredResource('x'));
         expect(f.GetValue().IsDeferredResource()).toBe(true);
-        expect(f.GetValue().GetValue()).toBe('x');
+        expect(f.GetValue().Value()).toBe('x');
 
         const g_ary = new KeyValues3.Array([]);
         const g = root.CreateObjectValue('g', g_ary);
@@ -61,7 +61,7 @@ describe('KeyValues3', () => {
         g_ary.Insert(g_first, 0);
         g_ary.Delete(g_first);
         expect(g.GetValue().IsArray()).toBe(true);
-        expect(g.GetValue().GetValue()).toEqual([]);
+        expect(g.GetValue().Value()).toEqual([]);
 
         const h_obj = new KeyValues3.Object([]);
         const h = root.CreateObjectValue('h', h_obj);
@@ -71,7 +71,7 @@ describe('KeyValues3', () => {
         h_obj.Insert(h_fist, 0);
         h_obj.Delete('a');
         expect(h.GetValue().IsObject()).toBe(true);
-        expect(h.GetValue().GetValue()).toEqual([]);
+        expect(h.GetValue().Value()).toEqual([]);
         h_obj.Append(h_fist);
         h_obj.Append(h_fist);
         h_obj.Append(h_fist);
@@ -329,18 +329,16 @@ Second line of a multi-line string literal.
         expect(root.IsRoot()).toBe(true);
         expect(root.GetHeader()).toBe(KeyValues3.CommonHeader);
         expect(root.GetValue().IsObject()).toBe(true);
-        expect(root.FindKey('boolValue')?.GetValue().GetValue()).toBe(false);
-        expect(root.FindKey('intValue')?.GetValue().GetValue()).toBe(128);
-        expect(root.FindKey('doubleValue')?.GetValue().GetValue()).toBe(64);
+        expect(root.FindKey('boolValue')?.GetValue().Value()).toBe(false);
+        expect(root.FindKey('intValue')?.GetValue().Value()).toBe(128);
+        expect(root.FindKey('doubleValue')?.GetValue().Value()).toBe(64);
         expect(root.FindKey('intValue')?.GetValue().IsInt()).toBe(true);
         expect(root.FindKey('doubleValue')?.GetValue().IsDouble()).toBe(true);
-        expect(root.FindKey('stringValue')?.GetValue().GetValue()).toBe(
-            `hello world \\n \\"ss\\" `
-        );
-        expect(root.FindKey('stringThatIsAResourceReference')?.GetValue().GetValue()).toBe(
+        expect(root.FindKey('stringValue')?.GetValue().Value()).toBe(`hello world \\n \\"ss\\" `);
+        expect(root.FindKey('stringThatIsAResourceReference')?.GetValue().Value()).toBe(
             'particles/items3_fx/star_emblem.vpcf'
         );
-        expect(root.FindKey('multiLineStringValue')?.GetValue().GetValue()).toBe(`
+        expect(root.FindKey('multiLineStringValue')?.GetValue().Value()).toBe(`
 First line of a multi-line string literal.
 Second line of a multi-line string literal.
 `);
@@ -348,17 +346,17 @@ Second line of a multi-line string literal.
         expect(ary?.IsArray()).toBe(true);
 
         if (ary?.IsArray()) {
-            expect(ary.GetValue()[0].GetValue()).toBe(1);
-            expect(ary.GetValue()[1].GetValue()).toBe(2);
-            expect(ary.GetValue()[2].IsObject()).toBe(true);
-            expect(ary.GetValue()[3].IsResource()).toBe(true);
-            expect(ary.GetValue()[3].GetValue()).toBe('particles/items3_fx/star_emblem.vpcf');
+            expect(ary.Value()[0].Value()).toBe(1);
+            expect(ary.Value()[1].Value()).toBe(2);
+            expect(ary.Value()[2].IsObject()).toBe(true);
+            expect(ary.Value()[3].IsResource()).toBe(true);
+            expect(ary.Value()[3].Value()).toBe('particles/items3_fx/star_emblem.vpcf');
         }
 
         const obj = root.FindKey('objectValue')?.GetValue();
         if (obj?.IsObject()) {
-            expect(obj.FindKey('n')?.GetValue().GetValue()).toBe(5);
-            expect(obj.FindKey('s')?.GetValue().GetValue()).toBe('foo');
+            expect(obj.FindKey('n')?.GetValue().Value()).toBe(5);
+            expect(obj.FindKey('s')?.GetValue().Value()).toBe('foo');
             expect(obj.FindKey('h')?.GetValue().IsArray()).toBe(true);
         }
 
@@ -367,8 +365,8 @@ Second line of a multi-line string literal.
                 .FindKey('objectValue')
                 ?.FindKey('h')
                 ?.GetValue()
-                .GetValue()
-                .map((v: any) => v.GetValue())
+                .Value()
+                .map((v: any) => v.Value())
         ).toEqual(['a', 456]);
     }
 
@@ -533,6 +531,25 @@ Second line of a multi-line string literal.
             });
         } catch (e) {
             expect(e).toEqual(Error("Parent's value must be an object or array"));
+        }
+    });
+
+    test('Check KeyValues3.toObject', async () => {
+        const root = await LoadKeyValues3(join(__dirname, 'KeyValues3.txt'));
+        const obj = root.toObject();
+        expect(obj['boolValue']).toBe(false);
+        expect(obj['intValue']).toBe(128);
+        expect(obj['doubleValue']).toBe(64);
+        expect(obj['stringValue']).toBe('hello world \\n \\"ss\\" ');
+        expect(obj['stringThatIsAResourceReference']).toBe('particles/items3_fx/star_emblem.vpcf');
+        expect(obj['arrayValue'][2]['b']).toBe('456');
+        expect(obj['array.Value'][1]).toBe(2.5);
+        expect(obj['objectValue']['j'][0][0]['a']).toBe('456.0.5');
+
+        try {
+            new KeyValues3('a', new KeyValues3.Int(1)).toObject();
+        } catch (e) {
+            expect(e).toEqual(Error(`This KeyValues3 is not object or array`));
         }
     });
 });

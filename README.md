@@ -491,6 +491,15 @@ FindAllKeys(...keys: string[]): KeyValues3[]
 > These methods are also present in the KeyValues3 method and can be called when the value is an
 > Object
 
+### Convert to Javascript Object
+
+Easy to convert to JSON.
+
+```js
+// Return an object or array
+kv3.toObject();
+```
+
 ### Format
 
 | KeyValues3 Type | Javascript Value                | Format after                                |

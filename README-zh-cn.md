@@ -482,6 +482,15 @@ FindAllKeys(...keys: string[]): KeyValues3[]
 
 > 这些方法也存在 KeyValues3 方法中，当值为 Object 的时候可以调用
 
+### 转换成 Javascript 的 Object
+
+方便转化成 JSON。
+
+```js
+// 返回一个Object或者Array
+kv3.toObject();
+```
+
 ### 格式化
 
 | KeyValues3 类型 | Javascript 的值                 | 格式化后                                    |

@@ -2,7 +2,7 @@ import { KeyValues3Comments } from './Comments';
 
 export interface IKV3Value {
     Comments: KeyValues3Comments;
-    GetValue(): any;
+    Value(): any;
     GetOwner(): KeyValues3 | undefined;
     SetOwner(owner: KeyValues3 | undefined): void;
     IsBoolean(): this is ValueBoolean;
@@ -25,7 +25,7 @@ export class KV3BaseValue implements IKV3Value {
         this.owner = owner;
     }
 
-    public GetValue() {
+    public Value() {
         return this.value;
     }
 
@@ -80,7 +80,7 @@ class ValueString extends KV3BaseValue {
         }
     }
 
-    public GetValue() {
+    public Value() {
         return this.value;
     }
 
@@ -110,7 +110,7 @@ class ValueBoolean extends KV3BaseValue {
         }
     }
 
-    public GetValue() {
+    public Value() {
         return this.value;
     }
 
@@ -133,7 +133,7 @@ class ValueInt extends KV3BaseValue {
         }
     }
 
-    public GetValue() {
+    public Value() {
         return this.value;
     }
 
@@ -156,7 +156,7 @@ class ValueDouble extends KV3BaseValue {
         }
     }
 
-    public GetValue() {
+    public Value() {
         return this.value;
     }
 
@@ -183,7 +183,7 @@ class ValueResource extends KV3BaseValue {
         }
     }
 
-    public GetValue() {
+    public Value() {
         return this.value;
     }
 
@@ -210,7 +210,7 @@ class ValueDeferredResource extends KV3BaseValue {
         }
     }
 
-    public GetValue() {
+    public Value() {
         return this.value;
     }
 
@@ -237,7 +237,7 @@ class ValueArray extends KV3BaseValue {
         }
     }
 
-    public GetValue(): Readonly<IKV3Value[]> {
+    public Value(): Readonly<IKV3Value[]> {
         return this.value;
     }
 
@@ -322,6 +322,23 @@ class ValueArray extends KV3BaseValue {
 
         return text;
     }
+
+    /**
+     * Convert to javascript array
+     */
+    public toArray(): any {
+        const result: any = [];
+        for (const v of this.value) {
+            if (v.IsObject()) {
+                result.push(v.toObject());
+            } else if (v.IsArray()) {
+                result.push(v.toArray());
+            } else {
+                result.push(v.Value());
+            }
+        }
+        return result;
+    }
 }
 
 /**
@@ -337,7 +354,7 @@ class ValueObject extends KV3BaseValue {
         }
     }
 
-    public GetValue(): Readonly<KeyValues3[]> {
+    public Value(): Readonly<KeyValues3[]> {
         return this.value;
     }
 
@@ -422,6 +439,21 @@ class ValueObject extends KV3BaseValue {
         text += this.value.map((v) => '\n' + v.Format(tab + '    ')).join('');
         text += `\n${tab}}`;
         return text;
+    }
+
+    /**
+     * Convert to javascript object
+     */
+    public toObject(): any {
+        const result: any = {};
+        for (const kv of this.value) {
+            if (kv.GetValue().IsArray() || kv.GetValue().IsObject()) {
+                result[kv.Key] = kv.toObject();
+            } else {
+                result[kv.Key] = kv.GetValue().Value();
+            }
+        }
+        return result;
     }
 }
 
@@ -569,6 +601,21 @@ export default class KeyValues3 {
         return this.Format();
     }
 
+    /**
+     * Convert KeyValues3 to object and exclude comments.
+     */
+    public toObject<T = any>(): T {
+        if (this.value.IsArray()) {
+            return this.value.toArray();
+        } else if (this.value.IsObject()) {
+            return this.value.toObject();
+        }
+        throw Error('This KeyValues3 is not object or array');
+    }
+
+    /**
+     * Parse text of KeyValues3
+     */
     public static Parse(body: string): KeyValues3 {
         let root = this.CreateRoot();
         const firstLineIndex = body.indexOf('\n');
