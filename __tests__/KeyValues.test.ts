@@ -270,4 +270,17 @@ describe('KeyValues', () => {
             );
         }
     });
+
+    test('Check KeyValues.toJSON', async () => {
+        const kv = KeyValues.Parse(`a 123\nb {c 123}`);
+        const obj = kv.toObject<{ a: string; b: { c: string } }>();
+        expect(obj['a']).toBe('123');
+        expect(obj['b']['c']).toBe('123');
+
+        const kv2 = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
+        const obj2 = kv2.toObject();
+        expect(obj2['DOTAAbilities']['building_system_active_preview']['MaxLevel']).toBe('1');
+        expect(typeof obj2['Ha']['t1']['ggg']).toBe('object');
+        expect(typeof obj2['test']).toBe('object');
+    });
 });

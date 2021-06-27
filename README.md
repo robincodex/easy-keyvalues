@@ -270,6 +270,15 @@ Example
 kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'item_0002')]
 ```
 
+### Convert to Javascript Object
+
+Easy to convert to JSON.
+
+```js
+// Return an object
+kv.toObject();
+```
+
 # KeyValues3
 
 Compared to KeyValues, KeyValues3 has multiple data types, a format similar to JSON, and relatively

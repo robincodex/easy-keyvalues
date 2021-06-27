@@ -491,4 +491,24 @@ export default class KeyValues {
             isEndOfLineComment = true;
         }
     }
+
+    /**
+     * Convert KeyValues to object and exclude comments.
+     */
+    public toObject<T = any>(): T {
+        const obj: any = {};
+        if (!this.HasChildren()) {
+            throw Error('Not found children in this KeyValues');
+        }
+
+        for (const kv of this.children!) {
+            if (!kv.HasChildren()) {
+                obj[kv.Key] = kv.GetValue();
+            } else {
+                obj[kv.Key] = kv.toObject();
+            }
+        }
+
+        return obj;
+    }
 }

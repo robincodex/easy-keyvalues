@@ -264,6 +264,15 @@ FindTraverse(
 kv.FindAllKeys('Item'); // [KeyValues('Item', 'item_0001'), KeyValues('Item', 'item_0002')]
 ```
 
+### 转换成 Javascript 的 Object
+
+方便转化成 JSON。
+
+```js
+// 返回一个Object
+kv.toObject();
+```
+
 # KeyValues3
 
 相比于 KeyValues，KeyValues3 有了多种数据类型，格式与 JSON 相似，相对的，代码也比 KeyValues 复杂很多
