@@ -14,6 +14,7 @@ export interface IKV3Value {
     IsArray(): this is ValueArray;
     IsObject(): this is ValueObject;
     Format(): string;
+    Clone(): IKV3Value;
 }
 
 export class KV3BaseValue implements IKV3Value {
@@ -65,6 +66,12 @@ export class KV3BaseValue implements IKV3Value {
     public Format(): string {
         return String(this.value);
     }
+
+    public Clone() {
+        const v = new KV3BaseValue(this.owner);
+        v.value = this.value;
+        return v;
+    }
 }
 
 /**
@@ -95,6 +102,12 @@ class ValueString extends KV3BaseValue {
         }
         return `"${this.value}"`;
     }
+
+    public Clone() {
+        const v = new ValueString(this.value);
+        v.SetOwner(this.owner);
+        return v;
+    }
 }
 
 /**
@@ -118,6 +131,12 @@ class ValueBoolean extends KV3BaseValue {
         this.value = v === true;
         return this;
     }
+
+    public Clone() {
+        const v = new ValueBoolean(this.value);
+        v.SetOwner(this.owner);
+        return v;
+    }
 }
 
 /**
@@ -140,6 +159,12 @@ class ValueInt extends KV3BaseValue {
     public SetValue(v: number) {
         this.value = Math.floor(v);
         return this;
+    }
+
+    public Clone() {
+        const v = new ValueInt(this.value);
+        v.SetOwner(this.owner);
+        return v;
     }
 }
 
@@ -168,6 +193,12 @@ class ValueDouble extends KV3BaseValue {
     public Format(): string {
         return this.value.toFixed(6);
     }
+
+    public Clone() {
+        const v = new ValueDouble(this.value);
+        v.SetOwner(this.owner);
+        return v;
+    }
 }
 
 /**
@@ -195,6 +226,12 @@ class ValueResource extends KV3BaseValue {
     public Format(): string {
         return `resource:"${this.value}"`;
     }
+
+    public Clone() {
+        const v = new ValueResource(this.value);
+        v.SetOwner(this.owner);
+        return v;
+    }
 }
 
 /**
@@ -221,6 +258,12 @@ class ValueDeferredResource extends KV3BaseValue {
 
     public Format(): string {
         return `deferred_resource:"${this.value}"`;
+    }
+
+    public Clone() {
+        const v = new ValueDeferredResource(this.value);
+        v.SetOwner(this.owner);
+        return v;
     }
 }
 
@@ -343,6 +386,12 @@ class ValueArray extends KV3BaseValue {
         }
         return result;
     }
+
+    public Clone() {
+        const v = new ValueArray(this.value.map((v) => v.Clone()));
+        v.SetOwner(this.owner);
+        return v;
+    }
 }
 
 /**
@@ -462,6 +511,12 @@ class ValueObject extends KV3BaseValue {
             }
         }
         return result;
+    }
+
+    public Clone() {
+        const v = new ValueObject(this.value.map((v) => v.Clone()));
+        v.SetOwner(this.owner);
+        return v;
     }
 }
 
@@ -631,6 +686,8 @@ export default class KeyValues3 {
 
     /**
      * Convert KeyValues3 to object and exclude comments.
+     * If the value of KeyValues3 is not object or array, then return object,
+     * which has only the key and value of KeyValues3
      */
     public toObject<T = any>(): T {
         if (this.value.IsArray()) {
@@ -638,7 +695,19 @@ export default class KeyValues3 {
         } else if (this.value.IsObject()) {
             return this.value.toObject();
         }
-        throw Error('This KeyValues3 is not object or array');
+        return { [this.Key]: this.value.Value() } as any;
+    }
+
+    /**
+     * Deep clone KeyValues3
+     */
+    public Clone(): KeyValues3 {
+        if (this.IsRoot()) {
+            const root = KeyValues3.CreateRoot();
+            root.SetValue(this.value.Clone());
+            return root;
+        }
+        return new KeyValues3(this.Key, this.value.Clone());
     }
 
     /**

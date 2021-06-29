@@ -559,10 +559,38 @@ Second line of a multi-line string literal.
         expect(obj['array.Value'][1]).toBe(2.5);
         expect(obj['objectValue']['j'][0][0]['a']).toBe('456.0.5');
 
-        try {
-            new KeyValues3('a', new KeyValues3.Int(1)).toObject();
-        } catch (e) {
-            expect(e).toEqual(Error(`This KeyValues3 is not object or array`));
-        }
+        const obj2 = new KeyValues3('a', new KeyValues3.Int(1)).toObject();
+        expect(obj2['a']).toBe(1);
+    });
+
+    test('Check KeyValues3.Clone', async () => {
+        const root = KeyValues3.CreateRoot();
+        root.CreateObjectValue('a', new KeyValues3.String('b'));
+        root.CreateObjectValue('b', new KeyValues3.Boolean(false));
+        root.CreateObjectValue('c', new KeyValues3.Int(1));
+        root.CreateObjectValue('d', new KeyValues3.Double(2));
+        root.CreateObjectValue('e', new KeyValues3.Resource('path.vpcf'));
+        root.CreateObjectValue('f', new KeyValues3.DeferredResource('path.vpcf'));
+        root.CreateObjectValue('g', new KeyValues3.Array([new KeyValues3.String('b')]));
+        root.CreateObjectValue('h', new KeyValues3.Object([]));
+
+        const cloneRoot = root.Clone();
+        expect(cloneRoot !== root).toBe(true);
+        expect(cloneRoot.GetValue() !== root.GetValue()).toBe(true);
+        expect(cloneRoot.GetObject().FindKey('h') !== root.GetObject().FindKey('h')).toBe(true);
+
+        cloneRoot.GetObject().Get(0)?.SetValue(new KeyValues3.String('c'));
+        expect(cloneRoot.GetObject().Get(0)?.GetValue().Value()).toBe('c');
+        expect(root.GetObject().Get(0)?.GetValue().Value()).toBe('b');
+
+        cloneRoot.GetObject().FindKey('g')?.AppendValue(new KeyValues3.String('c'));
+        expect(root.GetObject().FindKey('g')?.GetValue().Value().length).toBe(1);
+        expect(cloneRoot.GetObject().FindKey('g')?.GetValue().Value().length).toBe(2);
+
+        cloneRoot.GetObject().FindKey('h')?.CreateObjectValue('test', new KeyValues3.String('1'));
+        expect(root.GetObject().FindKey('h')?.GetValue().Value().length).toBe(0);
+        expect(cloneRoot.GetObject().FindKey('h')?.GetValue().Value().length).toBe(1);
+
+        new KV3BaseValue().Clone();
     });
 });

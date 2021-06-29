@@ -354,6 +354,19 @@ export default class KeyValues {
     }
 
     /**
+     * Deep clone KeyValues
+     */
+    public Clone(): KeyValues {
+        if (!this.children) {
+            return new KeyValues(this.Key, this.value);
+        }
+        return new KeyValues(
+            this.Key,
+            this.children.map((v) => v.Clone())
+        );
+    }
+
+    /**
      * Create root node
      */
     public static CreateRoot() {

@@ -126,6 +126,16 @@ describe('KeyValues', () => {
 }`
         );
 
+        const cloneRoot = root.Clone();
+        expect(cloneRoot === root).toBe(false);
+        expect(cloneRoot.toString()).toBe(root.toString());
+
+        cloneRoot.GetFirstChild()!.Key = 'b';
+        cloneRoot.FindKey('c')?.FindKey('d')?.Append(new KeyValues('c', 'c'));
+        expect(root.GetFirstChild()!.Key).toBe('a');
+        expect(cloneRoot.FindKey('c')?.FindKey('d')?.FindKey('c')?.GetValue()).toBe('c');
+        expect(root.FindKey('c')?.FindKey('d')?.FindKey('c')).toBe(undefined);
+
         const c = root.Delete('c');
         expect(c?.toString()).toBe(`"c"
 {
