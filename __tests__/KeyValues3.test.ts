@@ -34,6 +34,18 @@ describe('KeyValues3', () => {
         expect(a.GetValue().IsString()).toBe(true);
         expect(a.GetValue().Value()).toBe('b');
         expect(a.GetValue().GetOwner() === a).toBe(true);
+        expect(root.GetObject().Get(0)).toBe(a);
+
+        try {
+            a.GetObject();
+        } catch (e) {
+            expect(e).toEqual(Error('The value is not object'));
+        }
+        try {
+            a.GetArray();
+        } catch (e) {
+            expect(e).toEqual(Error('The value is not array'));
+        }
 
         const b = root.CreateObjectValue('b', new KeyValues3.Int(3.5));
         expect(b.GetValue().IsInt()).toBe(true);
@@ -58,17 +70,18 @@ describe('KeyValues3', () => {
         const g_ary = new KeyValues3.Array([]);
         const g = root.CreateObjectValue('g', g_ary);
         const g_first = new KeyValues3.String('gg');
-        g_ary.Insert(g_first, 0);
+        g_ary.Insert(0, g_first);
         g_ary.Delete(g_first);
         expect(g.GetValue().IsArray()).toBe(true);
         expect(g.GetValue().Value()).toEqual([]);
+        expect(g.GetArray().Get(0)).toBe(undefined);
 
         const h_obj = new KeyValues3.Object([]);
         const h = root.CreateObjectValue('h', h_obj);
         const h_fist = new KeyValues3('a', new KeyValues3.String('s'));
-        h_obj.Insert(h_fist, 0);
+        h_obj.Insert(0, h_fist);
         h_obj.Delete(h_fist);
-        h_obj.Insert(h_fist, 0);
+        h_obj.Insert(0, h_fist);
         h_obj.Delete('a');
         expect(h.GetValue().IsObject()).toBe(true);
         expect(h.GetValue().Value()).toEqual([]);

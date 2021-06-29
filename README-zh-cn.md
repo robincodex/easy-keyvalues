@@ -440,9 +440,9 @@ obj.Create('c', new KeyValues3.Boolean(true));
 
 ```js
 // 追加到 Object 末尾
-Append(v: KeyValues3): this
+Append(...values: KeyValues3[]): this
 // 插入到 Object 指定位置
-Insert(v: KeyValues3, index: number): this
+Insert(index: number, ...values: KeyValues3[]): this
 // 删除子节点中的 KeyValues3，并返回删除的 KeyValues3
 Delete(v: string | KeyValues3): KeyValues3
 ```
@@ -451,9 +451,9 @@ Delete(v: string | KeyValues3): KeyValues3
 
 ```js
 // 追加到 Array 末尾
-Append(v: IKV3Value): this
+Append(...values: IKV3Value[]): this
 // 插入到 Array 指定位置
-Insert(v: IKV3Value, index: number): this
+Insert(index: number, ...values: IKV3Value[]): this
 // 删除子节点中的 IKV3Value
 Delete(v: IKV3Value): this
 ```

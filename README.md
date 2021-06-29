@@ -448,9 +448,9 @@ obj.Create('c', new KeyValues3.Boolean(true));
 
 ```js
 // Append to the end of Object
-Append(v: KeyValues3): this
+Append(...values: KeyValues3[]): this
 // Insert into Object at the specified location
-Insert(v: KeyValues3, index: number): this
+Insert(index: number, ...values: KeyValues3[]): this
 // Deletes KeyValues3 from the child node and returns the deleted KeyValues3
 Delete(v: string | KeyValues3): KeyValues3
 ```
@@ -459,9 +459,9 @@ Delete(v: string | KeyValues3): KeyValues3
 
 ```js
 // Append to the end of Array
-Append(v: IKV3Value): this
+Append(...values: IKV3Value[]): this
 // Insert into Array at the specified location
-Insert(v: IKV3Value, index: number): this
+Insert(index: number, ...values: IKV3Value[]): this
 // Delete the IKV3Value in the child node
 Delete(v: IKV3Value): this
 ```

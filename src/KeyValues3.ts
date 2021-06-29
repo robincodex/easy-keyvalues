@@ -246,13 +246,13 @@ class ValueArray extends KV3BaseValue {
         return this;
     }
 
-    public Append(v: IKV3Value) {
-        this.value.push(v);
+    public Append(...kv: IKV3Value[]) {
+        this.value.push(...kv);
         return this;
     }
 
-    public Insert(v: IKV3Value, index: number) {
-        this.value.splice(index, 0, v);
+    public Insert(index: number, ...kv: IKV3Value[]) {
+        this.value.splice(index, 0, ...kv);
         return this;
     }
 
@@ -262,6 +262,10 @@ class ValueArray extends KV3BaseValue {
             this.value.splice(i, 1);
         }
         return this;
+    }
+
+    public Get(index: number): IKV3Value | undefined {
+        return this.value[index];
     }
 
     public Format(tab: string = ''): string {
@@ -369,13 +373,13 @@ class ValueObject extends KV3BaseValue {
         return kv;
     }
 
-    public Append(v: KeyValues3) {
-        this.value.push(v);
+    public Append(...kv: KeyValues3[]) {
+        this.value.push(...kv);
         return this;
     }
 
-    public Insert(v: KeyValues3, index: number) {
-        this.value.splice(index, 0, v);
+    public Insert(index: number, ...kv: KeyValues3[]) {
+        this.value.splice(index, 0, ...kv);
         return this;
     }
 
@@ -390,6 +394,10 @@ class ValueObject extends KV3BaseValue {
             this.value.splice(this.value.indexOf(kv), 1);
         }
         return kv;
+    }
+
+    public Get(index: number): KeyValues3 | undefined {
+        return this.value[index];
     }
 
     /**
@@ -510,6 +518,26 @@ export default class KeyValues3 {
         return this.value;
     }
 
+    /**
+     * Return when value is ValueObject, otherwise throw an error.
+     */
+    public GetObject(): ValueObject {
+        if (!this.value.IsObject()) {
+            throw Error('The value is not object');
+        }
+        return this.value;
+    }
+
+    /**
+     * Return when value is ValueArray, otherwise throw an error.
+     */
+    public GetArray(): ValueArray {
+        if (!this.value.IsArray()) {
+            throw Error('The value is not array');
+        }
+        return this.value;
+    }
+
     public SetValue(v: IKV3Value) {
         if (this.IsRoot() && !v.IsObject()) {
             throw Error('The root node of KeyValues3 must be an object');
@@ -524,11 +552,11 @@ export default class KeyValues3 {
         return this.value.Create(key, value);
     }
 
-    public AppendValue(value: IKV3Value) {
+    public AppendValue(...values: IKV3Value[]) {
         if (!this.value.IsArray()) {
             throw Error('The KeyValues3 is not an array');
         }
-        return this.value.Append(value);
+        return this.value.Append(...values);
     }
 
     public Find(
