@@ -534,14 +534,30 @@ const MatchDeferredResource = /^deferred_resource:"(.*)"$/;
  * https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
  */
 export default class KeyValues3 {
-    public static String = ValueString;
-    public static Boolean = ValueBoolean;
-    public static Int = ValueInt;
-    public static Double = ValueDouble;
-    public static Resource = ValueResource;
-    public static DeferredResource = ValueDeferredResource;
-    public static Array = ValueArray;
-    public static Object = ValueObject;
+    public static String(value?: string) {
+        return new ValueString(value);
+    }
+    public static Boolean(value?: boolean) {
+        return new ValueBoolean(value);
+    }
+    public static Int(value?: number) {
+        return new ValueInt(value);
+    }
+    public static Double(value?: number) {
+        return new ValueDouble(value);
+    }
+    public static Resource(value?: string) {
+        return new ValueResource(value);
+    }
+    public static DeferredResource(value?: string) {
+        return new ValueDeferredResource(value);
+    }
+    public static Array(value?: IKV3Value[]) {
+        return new ValueArray(value);
+    }
+    public static Object(value?: KeyValues3[]) {
+        return new ValueObject(value);
+    }
 
     protected value: IKV3Value;
 

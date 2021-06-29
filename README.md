@@ -421,25 +421,21 @@ Example
 
 ```js
 const root = KeyValues3.CreateRoot();
-root.CreateObjectValue('a', new KeyValues3.String('string'));
-root.CreateObjectValue('b', new KeyValues3.Boolean(false));
-root.CreateObjectValue('c', new KeyValues3.Int(0));
-root.CreateObjectValue('d', new KeyValues3.Double(0.0));
-root.CreateObjectValue('e', new KeyValues3.Resource('path/to/file.vpcf'));
-root.CreateObjectValue('f', new KeyValues3.Array([]));
-root.CreateObjectValue('g', new KeyValues3.Object([]));
+root.CreateObjectValue('a', KeyValues3.String('string'));
+root.CreateObjectValue('b', KeyValues3.Boolean(false));
+root.CreateObjectValue('c', KeyValues3.Int(0));
+root.CreateObjectValue('d', KeyValues3.Double(0.0));
+root.CreateObjectValue('e', KeyValues3.Resource('path/to/file.vpcf'));
+root.CreateObjectValue('f', KeyValues3.Array([]));
+root.CreateObjectValue('g', KeyValues3.Object([]));
 
-new KeyValues3.Array([
-    new KeyValues3.String('one'),
-    new KeyValues3.String('two'),
-    new KeyValues3.String('three'),
-]);
+KeyValues3.Array([KeyValues3.String('one'), KeyValues3.String('two'), KeyValues3.String('three')]);
 
-const obj = new KeyValues3.Object([
-    new KeyValues3('a', new KeyValues3.String('one')),
-    new KeyValues3('b', new KeyValues3.Int(2)),
+const obj = KeyValues3.Object([
+    new KeyValues3('a', KeyValues3.String('one')),
+    new KeyValues3('b', KeyValues3.Int(2)),
 ]);
-obj.Create('c', new KeyValues3.Boolean(true));
+obj.Create('c', KeyValues3.Boolean(true));
 ```
 
 ### Add / Delete

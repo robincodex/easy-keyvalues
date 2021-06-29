@@ -14,23 +14,23 @@ describe('KeyValues3', () => {
         expect(root.IsRoot()).toBe(true);
         expect(root.GetHeader()).toBe(KeyValues3.CommonHeader);
         expect(root.GetValue().IsObject()).toBe(true);
-        root.SetValue(new KeyValues3.Object());
+        root.SetValue(KeyValues3.Object());
         const value = new KV3BaseValue();
         expect(value.Value()).toBe(undefined);
 
         try {
-            root.SetValue(new KeyValues3.String(''));
+            root.SetValue(KeyValues3.String(''));
         } catch (e) {
             expect(e).toEqual(Error('The root node of KeyValues3 must be an object'));
         }
 
         try {
-            root.AppendValue(new KeyValues3.String(''));
+            root.AppendValue(KeyValues3.String(''));
         } catch (e) {
             expect(e).toEqual(Error('The KeyValues3 is not an array'));
         }
 
-        const a = root.CreateObjectValue('a', new KeyValues3.String('b'));
+        const a = root.CreateObjectValue('a', KeyValues3.String('b'));
         expect(a.GetValue().IsString()).toBe(true);
         expect(a.GetValue().Value()).toBe('b');
         expect(a.GetValue().GetOwner() === a).toBe(true);
@@ -47,38 +47,38 @@ describe('KeyValues3', () => {
             expect(e).toEqual(Error('The value is not array'));
         }
 
-        const b = root.CreateObjectValue('b', new KeyValues3.Int(3.5));
+        const b = root.CreateObjectValue('b', KeyValues3.Int(3.5));
         expect(b.GetValue().IsInt()).toBe(true);
         expect(b.GetValue().Value()).toBe(3);
 
-        const c = root.CreateObjectValue('c', new KeyValues3.Double(3.5));
+        const c = root.CreateObjectValue('c', KeyValues3.Double(3.5));
         expect(c.GetValue().IsDouble()).toBe(true);
         expect(c.GetValue().Value()).toBe(3.5);
 
-        const d = root.CreateObjectValue('d', new KeyValues3.Boolean(true));
+        const d = root.CreateObjectValue('d', KeyValues3.Boolean(true));
         expect(d.GetValue().IsBoolean()).toBe(true);
         expect(d.GetValue().Value()).toBe(true);
 
-        const e = root.CreateObjectValue('e', new KeyValues3.Resource('x'));
+        const e = root.CreateObjectValue('e', KeyValues3.Resource('x'));
         expect(e.GetValue().IsResource()).toBe(true);
         expect(e.GetValue().Value()).toBe('x');
 
-        const f = root.CreateObjectValue('f', new KeyValues3.DeferredResource('x'));
+        const f = root.CreateObjectValue('f', KeyValues3.DeferredResource('x'));
         expect(f.GetValue().IsDeferredResource()).toBe(true);
         expect(f.GetValue().Value()).toBe('x');
 
-        const g_ary = new KeyValues3.Array([]);
+        const g_ary = KeyValues3.Array([]);
         const g = root.CreateObjectValue('g', g_ary);
-        const g_first = new KeyValues3.String('gg');
+        const g_first = KeyValues3.String('gg');
         g_ary.Insert(0, g_first);
         g_ary.Delete(g_first);
         expect(g.GetValue().IsArray()).toBe(true);
         expect(g.GetValue().Value()).toEqual([]);
         expect(g.GetArray().Get(0)).toBe(undefined);
 
-        const h_obj = new KeyValues3.Object([]);
+        const h_obj = KeyValues3.Object([]);
         const h = root.CreateObjectValue('h', h_obj);
-        const h_fist = new KeyValues3('a', new KeyValues3.String('s'));
+        const h_fist = new KeyValues3('a', KeyValues3.String('s'));
         h_obj.Insert(0, h_fist);
         h_obj.Delete(h_fist);
         h_obj.Insert(0, h_fist);
@@ -96,7 +96,7 @@ describe('KeyValues3', () => {
         h_obj.Delete('a');
 
         try {
-            a.CreateObjectValue('a', new KeyValues3.String('b'));
+            a.CreateObjectValue('a', KeyValues3.String('b'));
         } catch (e) {
             expect(e).toEqual(Error('The KeyValues3 is not an object'));
         }
@@ -122,58 +122,58 @@ describe('KeyValues3', () => {
 
         expect(root.FindAllKeys('e').length).toBe(1);
 
-        g.AppendValue(new KeyValues3.String('text'))
-            .Append(new KeyValues3.Int(1))
-            .Append(new KeyValues3.Double(2.3))
-            .Append(new KeyValues3.Boolean())
+        g.AppendValue(KeyValues3.String('text'))
+            .Append(KeyValues3.Int(1))
+            .Append(KeyValues3.Double(2.3))
+            .Append(KeyValues3.Boolean())
             .Append(
-                new KeyValues3.Array([
-                    new KeyValues3.String('1'),
-                    new KeyValues3.String('2'),
-                    new KeyValues3.Object([
-                        new KeyValues3('c1', new KeyValues3.String('1')),
-                        new KeyValues3('c2', new KeyValues3.String('2')),
+                KeyValues3.Array([
+                    KeyValues3.String('1'),
+                    KeyValues3.String('2'),
+                    KeyValues3.Object([
+                        new KeyValues3('c1', KeyValues3.String('1')),
+                        new KeyValues3('c2', KeyValues3.String('2')),
                         new KeyValues3(
                             'c3',
-                            new KeyValues3.Array([
-                                new KeyValues3.Int(255),
-                                new KeyValues3.Int(255),
-                                new KeyValues3.Int(255),
+                            KeyValues3.Array([
+                                KeyValues3.Int(255),
+                                KeyValues3.Int(255),
+                                KeyValues3.Int(255),
                             ])
                         ),
                     ]),
                 ])
             )
             .Append(
-                new KeyValues3.Object([
-                    new KeyValues3('c1', new KeyValues3.String('1')),
-                    new KeyValues3('c2', new KeyValues3.String('2')),
-                    new KeyValues3('c3', new KeyValues3.Array([new KeyValues3.String('1')])),
+                KeyValues3.Object([
+                    new KeyValues3('c1', KeyValues3.String('1')),
+                    new KeyValues3('c2', KeyValues3.String('2')),
+                    new KeyValues3('c3', KeyValues3.Array([KeyValues3.String('1')])),
                 ])
             );
 
         h.CreateObjectValue(
             'child',
-            new KeyValues3.Object([
-                new KeyValues3('@Start', new KeyValues3.String('1')),
-                new KeyValues3('c1', new KeyValues3.String('1')),
-                new KeyValues3('c2', new KeyValues3.String('2')),
+            KeyValues3.Object([
+                new KeyValues3('@Start', KeyValues3.String('1')),
+                new KeyValues3('c1', KeyValues3.String('1')),
+                new KeyValues3('c2', KeyValues3.String('2')),
                 new KeyValues3(
                     'c3',
-                    new KeyValues3.Array([
-                        new KeyValues3.Resource(
+                    KeyValues3.Array([
+                        KeyValues3.Resource(
                             'particles/avalon_assets/environment/battle_ring/battle_ring_d.vpcf'
                         ),
                     ])
                 ),
                 new KeyValues3(
                     'c3',
-                    new KeyValues3.Array([
-                        new KeyValues3.Resource('particles/a.vpcf'),
-                        new KeyValues3.Resource('particles/b.vpcf'),
-                        new KeyValues3.Resource('particles/c.vpcf'),
-                        new KeyValues3.Resource('particles/d.vpcf'),
-                        new KeyValues3.Resource('particles/e.vpcf'),
+                    KeyValues3.Array([
+                        KeyValues3.Resource('particles/a.vpcf'),
+                        KeyValues3.Resource('particles/b.vpcf'),
+                        KeyValues3.Resource('particles/c.vpcf'),
+                        KeyValues3.Resource('particles/d.vpcf'),
+                        KeyValues3.Resource('particles/e.vpcf'),
                     ])
                 ),
             ])
@@ -181,7 +181,7 @@ describe('KeyValues3', () => {
 
         h.CreateObjectValue(
             'multi.line',
-            new KeyValues3.String(`
+            KeyValues3.String(`
 First line of a multi-line string literal.
 Second line of a multi-line string literal.
 `)
@@ -247,7 +247,7 @@ Second line of a multi-line string literal.
 
     test('Check KeyValues3 Comments', () => {
         const root = KeyValues3.CreateRoot();
-        const a = root.CreateObjectValue('a', new KeyValues3.String('b'));
+        const a = root.CreateObjectValue('a', KeyValues3.String('b'));
         a.GetValue().Comments.AppendComment('line 1');
         expect(a.GetValue().Comments.GetComments()).toEqual(['line 1']);
 
@@ -255,22 +255,22 @@ Second line of a multi-line string literal.
         a.GetValue().Comments.AppendComment('multi-line 1\nmulti-line 2');
         a.GetValue().Comments.AppendComment('*multi-line 1\n* multi-line 2\n*    ml3\nm4');
         a.GetValue().Comments.SetEndOfLineComment('end a');
-        const pa = new KeyValues3.Resource('particles/a.vpcf');
+        const pa = KeyValues3.Resource('particles/a.vpcf');
         pa.Comments.AppendComment('line 1');
         pa.Comments.AppendComment('line 1 \n line 2');
         pa.Comments.SetEndOfLineComment('eeend');
         const c = root.CreateObjectValue(
             'c',
-            new KeyValues3.Object([
-                new KeyValues3('particles', new KeyValues3.Array([pa])),
+            KeyValues3.Object([
+                new KeyValues3('particles', KeyValues3.Array([pa])),
                 a,
-                new KeyValues3('q', new KeyValues3.String('qq')),
+                new KeyValues3('q', KeyValues3.String('qq')),
             ])
         );
         c.GetValue().Comments.SetEndOfLineComment('end c');
-        const q = new KeyValues3.String('qq');
+        const q = KeyValues3.String('qq');
         q.Comments.SetEndOfLineComment('qq');
-        const a3 = root.CreateObjectValue('a', new KeyValues3.Array([q]));
+        const a3 = root.CreateObjectValue('a', KeyValues3.Array([q]));
         a3.GetValue().Comments.SetEndOfLineComment('end');
         // console.log(root2.toString());
         expect(root.toString()).toBe(`${KeyValues3.CommonHeader}
@@ -536,7 +536,7 @@ Second line of a multi-line string literal.
 
         try {
             // @ts-ignore
-            KeyValues3._parse(new KeyValues3('', new KeyValues3.String('')), {
+            KeyValues3._parse(new KeyValues3('', KeyValues3.String('')), {
                 body: '',
                 pos: 0,
                 tokenCounter: 0,
@@ -559,35 +559,35 @@ Second line of a multi-line string literal.
         expect(obj['array.Value'][1]).toBe(2.5);
         expect(obj['objectValue']['j'][0][0]['a']).toBe('456.0.5');
 
-        const obj2 = new KeyValues3('a', new KeyValues3.Int(1)).toObject();
+        const obj2 = new KeyValues3('a', KeyValues3.Int(1)).toObject();
         expect(obj2['a']).toBe(1);
     });
 
     test('Check KeyValues3.Clone', async () => {
         const root = KeyValues3.CreateRoot();
-        root.CreateObjectValue('a', new KeyValues3.String('b'));
-        root.CreateObjectValue('b', new KeyValues3.Boolean(false));
-        root.CreateObjectValue('c', new KeyValues3.Int(1));
-        root.CreateObjectValue('d', new KeyValues3.Double(2));
-        root.CreateObjectValue('e', new KeyValues3.Resource('path.vpcf'));
-        root.CreateObjectValue('f', new KeyValues3.DeferredResource('path.vpcf'));
-        root.CreateObjectValue('g', new KeyValues3.Array([new KeyValues3.String('b')]));
-        root.CreateObjectValue('h', new KeyValues3.Object([]));
+        root.CreateObjectValue('a', KeyValues3.String('b'));
+        root.CreateObjectValue('b', KeyValues3.Boolean(false));
+        root.CreateObjectValue('c', KeyValues3.Int(1));
+        root.CreateObjectValue('d', KeyValues3.Double(2));
+        root.CreateObjectValue('e', KeyValues3.Resource('path.vpcf'));
+        root.CreateObjectValue('f', KeyValues3.DeferredResource('path.vpcf'));
+        root.CreateObjectValue('g', KeyValues3.Array([KeyValues3.String('b')]));
+        root.CreateObjectValue('h', KeyValues3.Object([]));
 
         const cloneRoot = root.Clone();
         expect(cloneRoot !== root).toBe(true);
         expect(cloneRoot.GetValue() !== root.GetValue()).toBe(true);
         expect(cloneRoot.GetObject().FindKey('h') !== root.GetObject().FindKey('h')).toBe(true);
 
-        cloneRoot.GetObject().Get(0)?.SetValue(new KeyValues3.String('c'));
+        cloneRoot.GetObject().Get(0)?.SetValue(KeyValues3.String('c'));
         expect(cloneRoot.GetObject().Get(0)?.GetValue().Value()).toBe('c');
         expect(root.GetObject().Get(0)?.GetValue().Value()).toBe('b');
 
-        cloneRoot.GetObject().FindKey('g')?.AppendValue(new KeyValues3.String('c'));
+        cloneRoot.GetObject().FindKey('g')?.AppendValue(KeyValues3.String('c'));
         expect(root.GetObject().FindKey('g')?.GetValue().Value().length).toBe(1);
         expect(cloneRoot.GetObject().FindKey('g')?.GetValue().Value().length).toBe(2);
 
-        cloneRoot.GetObject().FindKey('h')?.CreateObjectValue('test', new KeyValues3.String('1'));
+        cloneRoot.GetObject().FindKey('h')?.CreateObjectValue('test', KeyValues3.String('1'));
         expect(root.GetObject().FindKey('h')?.GetValue().Value().length).toBe(0);
         expect(cloneRoot.GetObject().FindKey('h')?.GetValue().Value().length).toBe(1);
 
