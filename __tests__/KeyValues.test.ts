@@ -1,3 +1,4 @@
+import { readFile, readFileSync } from 'fs';
 import { join } from 'path';
 import {
     LoadKeyValues,
@@ -8,6 +9,7 @@ import {
     AutoLoadKeyValuesBase,
     AutoLoadKeyValuesBaseSync,
 } from '../src/node';
+import * as iconv from 'iconv-lite';
 
 function testKV(kv: KeyValues) {
     expect(kv.GetChildCount()).toBe(6);
@@ -68,6 +70,15 @@ describe('KeyValues', () => {
         const kv = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
         testKV(kv);
         await SaveKeyValues(join(__dirname, 'KeyValues.save.txt'), kv);
+    });
+
+    test('Check chat_english.txt', async () => {
+        const buf = readFileSync(join(__dirname, 'chat_english.txt'));
+        const text = iconv.decode(buf, 'utf8');
+        const kv = KeyValues.Parse(text);
+        const tokens = kv.FindKey('lang')?.FindKey('Tokens');
+        expect(!tokens).toBe(false);
+        expect(tokens?.GetChildCount()).toBe(11);
     });
 
     test('Check KeyValues.save.txt', async () => {

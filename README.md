@@ -27,6 +27,18 @@ or
 yarn add easy-keyvalues
 ```
 
+## UTF-8 BOM
+
+This library will get errors when encountering `UTF-8 BOM` files, because the first char code of
+`UTF-8 BOM` files will be 65279, which causes parsing errors. So you need to use a library such as
+[iconv-lite](https://github.com/ashtuchkin/iconv-lite) to remove the `BOM` in advance.
+
+```js
+const buf = readFileSync(join(__dirname, 'chat_english.txt'));
+const text = iconvLite.decode(buf, 'utf8');
+const kv = KeyValues.Parse(text);
+```
+
 # KeyValues
 
 ## Features

@@ -21,6 +21,17 @@ or
 yarn add easy-keyvalues
 ```
 
+## UTF-8 BOM
+
+这个库遇到`UTF-8 BOM`的文件会出错，原因是`UTF-8 BOM`的文件的第一个字符会是`65279`，导致解析错误，  
+所以需要提前使用如 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 这样的库去掉 `BOM`。
+
+```js
+const buf = readFileSync(join(__dirname, 'chat_english.txt'));
+const text = iconvLite.decode(buf, 'utf8');
+const kv = KeyValues.Parse(text);
+```
+
 # KeyValues
 
 ## 功能
