@@ -81,6 +81,22 @@ describe('KeyValues', () => {
         expect(tokens?.GetChildCount()).toBe(11);
     });
 
+    test('Check gameui_english.txt', async () => {
+        const buf = readFileSync(join(__dirname, 'gameui_english.txt'));
+        const text = iconv.decode(buf, 'utf8');
+        const kv = KeyValues.Parse(text);
+        const tokens = kv.FindKey('lang')?.FindKey('Tokens');
+        expect(!tokens).toBe(false);
+        expect(tokens?.GetChildCount()).toBe(688);
+        expect(tokens?.FindKey('GameUI_JoystickMoveLookSticks')?.Flags).toBe('$WIN32');
+        expect(
+            tokens
+                ?.FindAllKeys('GameUI_JoystickMoveLookSticks')
+                ?.map((v) => v.Flags)
+                .join(',')
+        ).toBe('$WIN32,$X360');
+    });
+
     test('Check KeyValues.save.txt', async () => {
         const kv = LoadKeyValuesSync(join(__dirname, 'KeyValues.save.txt'));
         testKV(kv);

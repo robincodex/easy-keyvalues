@@ -19,6 +19,10 @@ export default class KeyValues {
      * Comment
      */
     public Comments = new KeyValuesComments();
+    /**
+     * The KeyValues flags, such as [$WIN32] [$X360]
+     */
+    public Flags: string = '';
 
     constructor(public Key: string, defaultValue?: string | KeyValues[]) {
         this.SetValue(defaultValue || '');
@@ -389,6 +393,8 @@ export default class KeyValues {
         let inQoute = false;
         let str = '';
         let isEndOfLineComment = false;
+        let lastKV: KeyValues | undefined;
+        let matchFlag = false;
         for (; data.pos < data.body.length; data.pos++) {
             const c = data.body[data.pos];
             const isNewLine = c === '\n';
@@ -397,6 +403,18 @@ export default class KeyValues {
             if (isNewLine) {
                 data.line += 1;
                 isEndOfLineComment = false;
+            }
+
+            // Merge flags text
+            if (lastKV && matchFlag) {
+                if (c === ']') {
+                    lastKV.Flags = str;
+                    matchFlag = false;
+                    str = '';
+                    continue;
+                }
+                str += c;
+                continue;
             }
 
             // If leftMark is true then merge char to str
@@ -411,6 +429,7 @@ export default class KeyValues {
                         } else {
                             kv.SetValue(str);
                             parent.Append(kv);
+                            lastKV = kv;
                             kv = new KeyValues('');
                         }
                         leftMark = false;
@@ -435,6 +454,7 @@ export default class KeyValues {
                     } else {
                         kv.SetValue(str);
                         parent.Append(kv);
+                        lastKV = kv;
                         kv = new KeyValues('');
                     }
                     leftMark = false;
@@ -480,6 +500,7 @@ export default class KeyValues {
                 kv.SetValue([]);
                 parent.Append(kv);
                 this._parse(data, kv);
+                lastKV = kv;
                 kv = new KeyValues('');
                 key = false;
                 continue;
@@ -493,6 +514,13 @@ export default class KeyValues {
 
             // If space
             if (isSpace) {
+                continue;
+            }
+
+            // Match flag
+            if (lastKV && c === '[') {
+                str = '';
+                matchFlag = true;
                 continue;
             }
 
