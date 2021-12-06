@@ -34,4 +34,19 @@ module.exports = [
             }),
         ],
     },
+    {
+        input: 'src/es.ts',
+        output: {
+            name: 'es.js',
+            file: 'package/es.js',
+            sourcemap: true,
+            format: 'es',
+        },
+        plugins: [
+            rollupTypescript({
+                exclude: ['src/node.ts'],
+                tsconfig: join(__dirname, 'tsconfig.json'),
+            }),
+        ],
+    },
 ];
