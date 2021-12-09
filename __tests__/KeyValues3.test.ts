@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { KV3BaseValue } from '../src/KeyValues3';
+import { KV3BaseValue, SetKeyValues3IDEnabled } from '../src/KeyValues3';
 import {
     KeyValues3,
     LoadKeyValues3,
@@ -592,5 +592,58 @@ Second line of a multi-line string literal.
         expect(cloneRoot.GetObject().FindKey('h')?.GetValue().Value().length).toBe(1);
 
         new KV3BaseValue().Clone();
+    });
+
+    test('Check KeyValues3.ID', async () => {
+        SetKeyValues3IDEnabled(false);
+        const noIDRoot = KeyValues3.CreateRoot();
+        expect(noIDRoot.ID).toBe('');
+
+        SetKeyValues3IDEnabled(true);
+        const root = KeyValues3.CreateRoot();
+        expect(root.ID).toHaveLength(21);
+
+        const a = root.CreateObjectValue('a', KeyValues3.String('a'));
+        const b = root.CreateObjectValue('b', KeyValues3.String('b'));
+        const c = root.CreateObjectValue('c', KeyValues3.String('c'));
+        const d = root.CreateObjectValue('d', KeyValues3.String('d'));
+        expect(root.FindID(a.ID)).toBe(a);
+        expect(root.FindID(b.ID)).toBe(b);
+        expect(root.FindID(c.ID)).toBe(c);
+        expect(root.FindID(d.ID)).toBe(d);
+
+        const a2 = new KeyValues3('a2', KeyValues3.String('a2'));
+        const b2 = new KeyValues3('b2', KeyValues3.String('b2'));
+        const d2 = new KeyValues3('d2', KeyValues3.String('d2'));
+        const c2 = new KeyValues3('c2', KeyValues3.Object([d2]));
+        const b3 = new KeyValues3('b3', KeyValues3.String('b3'));
+        const c3 = new KeyValues3('c3', KeyValues3.String('c3'));
+        const a3 = new KeyValues3(
+            'a3',
+            KeyValues3.Array([KeyValues3.Object([b3]), KeyValues3.Array([KeyValues3.Object([c3])])])
+        );
+        const e = root.CreateObjectValue('e', KeyValues3.Object([a2, b2, c2, a3]));
+        expect(root.FindID(e.ID)).toBe(e);
+        expect(root.FindID(a2.ID)).toBeUndefined();
+        expect(root.FindID(b2.ID)).toBeUndefined();
+        expect(root.FindID(c2.ID)).toBeUndefined();
+        expect(root.FindID(d2.ID)).toBeUndefined();
+        expect(root.FindID(a3.ID)).toBeUndefined();
+        expect(root.FindID(b3.ID)).toBeUndefined();
+        expect(root.FindID(c3.ID)).toBeUndefined();
+        expect(e.FindID(a2.ID)).toBe(a2);
+        expect(e.FindID(b2.ID)).toBe(b2);
+        expect(e.FindID(c2.ID)).toBe(c2);
+        expect(e.FindID(d2.ID)).toBeUndefined();
+        expect(e.FindID(a3.ID)).toBe(a3);
+        expect(e.FindID(b3.ID)).toBeUndefined();
+        expect(e.FindID(c3.ID)).toBeUndefined();
+        expect(root.FindIDTraverse(a2.ID)).toBe(a2);
+        expect(root.FindIDTraverse(b2.ID)).toBe(b2);
+        expect(root.FindIDTraverse(c2.ID)).toBe(c2);
+        expect(root.FindIDTraverse(d2.ID)).toBe(d2);
+        expect(root.FindIDTraverse(b3.ID)).toBe(b3);
+        expect(root.FindIDTraverse(c3.ID)).toBe(c3);
+        expect(a3.GetArray().FindIDTraverse(a2.ID)).toBeUndefined();
     });
 });

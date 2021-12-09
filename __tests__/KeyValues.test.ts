@@ -10,6 +10,7 @@ import {
     AutoLoadKeyValuesBaseSync,
 } from '../src/node';
 import * as iconv from 'iconv-lite';
+import { SetKeyValuesIDEnabled } from '../src/KeyValues';
 
 function testKV(kv: KeyValues) {
     expect(kv.GetChildCount()).toBe(6);
@@ -325,5 +326,34 @@ describe('KeyValues', () => {
         } catch (e) {
             expect(e).toEqual(Error(`Not found children in this KeyValues`));
         }
+    });
+
+    test('Check KeyValues.ID', async () => {
+        SetKeyValuesIDEnabled(false);
+        const noRootID = KeyValues.CreateRoot();
+        expect(noRootID.ID).toBe('');
+
+        SetKeyValuesIDEnabled(true);
+        const root = KeyValues.CreateRoot();
+        expect(root.ID).toHaveLength(21);
+
+        const a = new KeyValues('a', 'a');
+        const b = new KeyValues('b', 'b');
+        const d = new KeyValues('d', 'd');
+        const e = new KeyValues('e', [d]);
+        const c = new KeyValues('a', [e]);
+        root.Append(a);
+        root.Append(b);
+        root.Append(c);
+        expect(root.FindID(a.ID)).toBe(a);
+        expect(root.FindID(b.ID)).toBe(b);
+        expect(root.FindID(c.ID)).toBe(c);
+        expect(root.FindID(d.ID)).toBeUndefined();
+        expect(root.FindID(e.ID)).toBeUndefined();
+        expect(root.FindIDTraverse(a.ID)).toBe(a);
+        expect(root.FindIDTraverse(b.ID)).toBe(b);
+        expect(root.FindIDTraverse(c.ID)).toBe(c);
+        expect(root.FindIDTraverse(d.ID)).toBe(d);
+        expect(root.FindIDTraverse(e.ID)).toBe(e);
     });
 });

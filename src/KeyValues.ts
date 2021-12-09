@@ -1,6 +1,17 @@
+import { nanoid } from 'nanoid';
 import { KeyValuesComments } from './Comments';
 
 const KeyValuesRootKey = '__KeyValues_Root__';
+
+let createID = () => '';
+
+export function SetKeyValuesIDEnabled(enable: boolean) {
+    if (enable) {
+        createID = () => nanoid();
+    } else {
+        createID = () => '';
+    }
+}
 
 export default class KeyValues {
     /**
@@ -23,6 +34,10 @@ export default class KeyValues {
      * The KeyValues flags, such as [$WIN32] [$X360]
      */
     public Flags: string = '';
+    /**
+     * Unique id of KeyValues
+     */
+    public readonly ID = createID();
 
     constructor(public Key: string, defaultValue?: string | KeyValues[]) {
         this.SetValue(defaultValue || '');
@@ -264,6 +279,20 @@ export default class KeyValues {
                 }
             }
         }
+    }
+
+    /**
+     * Find child from the current KeyValues
+     */
+    public FindID(id: string): KeyValues | undefined {
+        return this.Find((kv) => kv.ID === id);
+    }
+
+    /**
+     * Recursively iterate through all children to find the value that matches the ID
+     */
+    public FindIDTraverse(id: string): KeyValues | undefined {
+        return this.FindTraverse((kv) => kv.ID === id);
     }
 
     /**

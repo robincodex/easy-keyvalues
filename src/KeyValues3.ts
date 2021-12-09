@@ -1,4 +1,15 @@
 import { KeyValues3Comments } from './Comments';
+import { nanoid } from 'nanoid';
+
+let createID = () => '';
+
+export function SetKeyValues3IDEnabled(enable: boolean) {
+    if (enable) {
+        createID = () => nanoid();
+    } else {
+        createID = () => '';
+    }
+}
 
 export interface IKV3Value {
     Comments: KeyValues3Comments;
@@ -307,6 +318,20 @@ class ValueArray extends KV3BaseValue {
         return this;
     }
 
+    /**
+     * Recursively iterate through all children to find the value that matches the ID
+     */
+    public FindIDTraverse(id: string): KeyValues3 | undefined {
+        for (const v of this.value) {
+            if (v.IsObject() || v.IsArray()) {
+                const result = v.FindIDTraverse(id);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+    }
+
     public Get(index: number): IKV3Value | undefined {
         return this.value[index];
     }
@@ -491,6 +516,21 @@ class ValueObject extends KV3BaseValue {
         return this.FindAll((kv) => keys.includes(kv.Key));
     }
 
+    /**
+     * Recursively iterate through all children to find the value that matches the ID
+     */
+    public FindIDTraverse(id: string): KeyValues3 | undefined {
+        for (const kv of this.value) {
+            if (kv.ID === id) {
+                return kv;
+            }
+            const result = kv.FindIDTraverse(id);
+            if (result) {
+                return result;
+            }
+        }
+    }
+
     public Format(tab: string = ''): string {
         let text = `\n${tab}{`;
         text += this.value.map((v) => '\n' + v.Format(tab + '    ')).join('');
@@ -562,6 +602,11 @@ export default class KeyValues3 {
     protected value: IKV3Value;
 
     protected header?: string;
+
+    /**
+     * Unique id of KeyValues3
+     */
+    public readonly ID = createID();
 
     constructor(public Key: string, defaultValue: IKV3Value) {
         this.value = defaultValue;
@@ -654,6 +699,22 @@ export default class KeyValues3 {
 
     public FindAllKeys(...keys: string[]): KeyValues3[] {
         return this.FindAll((kv) => keys.includes(kv.Key));
+    }
+
+    /**
+     * Find child from the current KeyValues3
+     */
+    public FindID(id: string): KeyValues3 | undefined {
+        return this.Find((kv) => kv.ID === id);
+    }
+
+    /**
+     * Recursively iterate through all children to find the value that matches the ID
+     */
+    public FindIDTraverse(id: string): KeyValues3 | undefined {
+        if (this.value.IsObject() || this.value.IsArray()) {
+            return this.value.FindIDTraverse(id);
+        }
     }
 
     public Format(tab: string = ''): string {
