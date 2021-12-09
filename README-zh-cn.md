@@ -32,6 +32,25 @@ const text = iconvLite.decode(buf, 'utf8');
 const kv = KeyValues.Parse(text);
 ```
 
+## 关于 ID
+
+`KeyValues`和`KeyValues3`都支持 ID 属性，默认为空，ID 由 [nanoid](https://github.com/ai/nanoid) 生成
+而来，ID 存在的目的是为了支持类似于跨线程操作的情景，如果需要 ID 则要开启这个功能：
+
+```js
+// KeyValues
+SetKeyValuesIDEnabled(true);
+
+// KeyValues3
+SetKeyValues3IDEnabled(true);
+
+// Find child using ID
+kv.FindID('<nanoid>');
+kv.FindIDTraverse('<nanoid>');
+kv3.FindID('<nanoid>');
+kv3.FindIDTraverse('<nanoid>');
+```
+
 # KeyValues
 
 ## 功能

@@ -39,6 +39,26 @@ const text = iconvLite.decode(buf, 'utf8');
 const kv = KeyValues.Parse(text);
 ```
 
+## About ID
+
+Both `KeyValues` and `KeyValues3` support the ID property, which is empty by default. ID is
+generated from [nanoid](https://github.com/ai/nanoid). The ID exists to support scenarios like
+cross-threaded operations, and is turned on if it is needed:
+
+```js
+// KeyValues
+SetKeyValuesIDEnabled(true);
+
+// KeyValues3
+SetKeyValues3IDEnabled(true);
+
+// Find child using ID
+kv.FindID('<nanoid>');
+kv.FindIDTraverse('<nanoid>');
+kv3.FindID('<nanoid>');
+kv3.FindIDTraverse('<nanoid>');
+```
+
 # KeyValues
 
 ## Features
