@@ -5,15 +5,15 @@ const KeyValuesRootKey = '__KeyValues_Root__';
 
 let createID = () => '';
 
-export function SetKeyValuesIDEnabled(enable: boolean) {
-    if (enable) {
-        createID = () => nanoid();
-    } else {
-        createID = () => '';
-    }
-}
-
 export default class KeyValues {
+    public static SetIDEnabled(enable: boolean) {
+        if (enable) {
+            createID = () => nanoid();
+        } else {
+            createID = () => '';
+        }
+    }
+
     /**
      * The children of this KeyValues
      */

@@ -3,14 +3,6 @@ import { nanoid } from 'nanoid';
 
 let createID = () => '';
 
-export function SetKeyValues3IDEnabled(enable: boolean) {
-    if (enable) {
-        createID = () => nanoid();
-    } else {
-        createID = () => '';
-    }
-}
-
 export interface IKV3Value {
     Comments: KeyValues3Comments;
     Value(): any;
@@ -574,6 +566,13 @@ const MatchDeferredResource = /^deferred_resource:"(.*)"$/;
  * https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
  */
 export default class KeyValues3 {
+    public static SetIDEnabled(enable: boolean) {
+        if (enable) {
+            createID = () => nanoid();
+        } else {
+            createID = () => '';
+        }
+    }
     public static String(value?: string) {
         return new ValueString(value);
     }

@@ -10,7 +10,6 @@ import {
     AutoLoadKeyValuesBaseSync,
 } from '../src/node';
 import * as iconv from 'iconv-lite';
-import { SetKeyValuesIDEnabled } from '../src/KeyValues';
 
 function testKV(kv: KeyValues) {
     expect(kv.GetChildCount()).toBe(6);
@@ -329,11 +328,11 @@ describe('KeyValues', () => {
     });
 
     test('Check KeyValues.ID', async () => {
-        SetKeyValuesIDEnabled(false);
+        KeyValues.SetIDEnabled(false);
         const noRootID = KeyValues.CreateRoot();
         expect(noRootID.ID).toBe('');
 
-        SetKeyValuesIDEnabled(true);
+        KeyValues.SetIDEnabled(true);
         const root = KeyValues.CreateRoot();
         expect(root.ID).toHaveLength(21);
 

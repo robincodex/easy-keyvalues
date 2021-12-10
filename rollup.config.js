@@ -11,6 +11,7 @@ module.exports = [
             sourcemap: true,
             format: 'cjs',
         },
+        external: ['nanoid'],
         plugins: [
             rollupTypescript(require('./tsconfig.json').compilerOptions),
             commonjs({ extensions: ['.js', '.ts'] }),
@@ -24,9 +25,9 @@ module.exports = [
             file: 'package/web.js',
             sourcemap: true,
             format: 'umd',
-            globals: { axios: 'axios' },
+            globals: { axios: 'axios', nanoid: 'nanoid' },
         },
-        external: ['axios'],
+        external: ['axios', 'nanoid'],
         plugins: [
             rollupTypescript({
                 exclude: ['src/node.ts'],
@@ -42,6 +43,7 @@ module.exports = [
             sourcemap: true,
             format: 'es',
         },
+        external: ['nanoid'],
         plugins: [
             rollupTypescript({
                 exclude: ['src/node.ts'],

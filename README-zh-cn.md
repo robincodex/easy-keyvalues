@@ -39,10 +39,10 @@ const kv = KeyValues.Parse(text);
 
 ```js
 // KeyValues
-SetKeyValuesIDEnabled(true);
+KeyValues.SetIDEnabled(true);
 
 // KeyValues3
-SetKeyValues3IDEnabled(true);
+KeyValues3.SetIDEnabled(true);
 
 // Find child using ID
 kv.FindID('<nanoid>');

@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { KV3BaseValue, SetKeyValues3IDEnabled } from '../src/KeyValues3';
+import { KV3BaseValue } from '../src/KeyValues3';
 import {
     KeyValues3,
     LoadKeyValues3,
@@ -595,11 +595,11 @@ Second line of a multi-line string literal.
     });
 
     test('Check KeyValues3.ID', async () => {
-        SetKeyValues3IDEnabled(false);
+        KeyValues3.SetIDEnabled(false);
         const noIDRoot = KeyValues3.CreateRoot();
         expect(noIDRoot.ID).toBe('');
 
-        SetKeyValues3IDEnabled(true);
+        KeyValues3.SetIDEnabled(true);
         const root = KeyValues3.CreateRoot();
         expect(root.ID).toHaveLength(21);
 

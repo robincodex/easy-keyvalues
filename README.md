@@ -47,10 +47,10 @@ cross-threaded operations, and is turned on if it is needed:
 
 ```js
 // KeyValues
-SetKeyValuesIDEnabled(true);
+KeyValues.SetIDEnabled(true);
 
 // KeyValues3
-SetKeyValues3IDEnabled(true);
+KeyValues3.SetIDEnabled(true);
 
 // Find child using ID
 kv.FindID('<nanoid>');
