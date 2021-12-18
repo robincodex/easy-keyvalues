@@ -2,10 +2,11 @@ import { readFileSync, writeFileSync, promises } from 'fs';
 import { join } from 'path';
 import KeyValues from './KeyValues';
 import KeyValues3 from './KeyValues3';
+import { KeyValuesComments, KeyValues3Comments } from './Comments';
 
 const { readFile, writeFile } = promises;
 
-export { KeyValues, KeyValues3 };
+export { KeyValues, KeyValues3, KeyValuesComments, KeyValues3Comments };
 
 export async function LoadKeyValues(file: string, encoding: BufferEncoding = 'utf8') {
     const body = await readFile(file, encoding);
