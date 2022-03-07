@@ -3,8 +3,14 @@
         "module": "CommonJS",
         "target": "ES2017",
         "strict": true,
-        "lib": ["ES2017"]
+        "lib": [
+            "ES2017"
+        ]
     },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules"]
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }
