@@ -31,7 +31,7 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.26.0",
+        "axios": "^0.26.1",
         "nanoid": "^3.3.1"
     },
     "devDependencies": {
@@ -43,8 +43,8 @@
         "iconv-lite": "^0.6.3",
         "jest": "^27.5.1",
         "jest-coverage-badges": "^1.1.2",
-        "prettier": "^2.5.1",
-        "rollup": "2.70.0",
+        "prettier": "^2.6.0",
+        "rollup": "2.70.1",
         "ts-jest": "^27.1.3",
         "ts-node": "^10.7.0",
         "tslib": "^2.3.1",
