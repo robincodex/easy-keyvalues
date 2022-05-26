@@ -796,6 +796,7 @@ export default class KeyValues3 {
         if (!header.startsWith('<!--') || !header.endsWith('-->')) {
             throw Error('Invalid header');
         }
+        root.header = header;
         this._parse(root, {
             body,
             line: 2,

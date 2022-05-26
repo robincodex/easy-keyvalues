@@ -646,4 +646,11 @@ Second line of a multi-line string literal.
         expect(root.FindIDTraverse(c3.ID)).toBe(c3);
         expect(a3.GetArray().FindIDTraverse(a2.ID)).toBeUndefined();
     });
+
+    test('Check KeyValues3 Header', async () => {
+        const root = await LoadKeyValues3(join(__dirname, 'npc/particle.vpcf'));
+        expect(root.GetHeader()).toBe(
+            '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->'
+        );
+    });
 });
