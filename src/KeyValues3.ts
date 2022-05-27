@@ -78,6 +78,29 @@ export class KV3BaseValue implements IKV3Value {
 }
 
 /**
+ * Null
+ */
+class ValueNull extends KV3BaseValue {
+    constructor() {
+        super();
+    }
+
+    public Value() {
+        return null;
+    }
+
+    public Format(): string {
+        return `null`;
+    }
+
+    public Clone() {
+        const v = new ValueNull();
+        v.SetOwner(this.owner);
+        return v;
+    }
+}
+
+/**
  * String
  */
 class ValueString extends KV3BaseValue {
@@ -561,6 +584,7 @@ const MatchStrangeNumber = /^[\d\+-\.]+$/;
 const MatchBoolean = /^(true|false)$/;
 const MatchResource = /^resource:"(.*)"$/;
 const MatchDeferredResource = /^deferred_resource:"(.*)"$/;
+const MatchNull = /^null$/;
 
 /**
  * https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
@@ -596,6 +620,9 @@ export default class KeyValues3 {
     }
     public static Object(value?: KeyValues3[]) {
         return new ValueObject(value);
+    }
+    public static Null() {
+        return new ValueNull();
     }
 
     protected value: IKV3Value;
@@ -930,6 +957,8 @@ export default class KeyValues3 {
                                         key,
                                         new ValueBoolean(str === 'true')
                                     );
+                                } else if (MatchNull.test(str)) {
+                                    lastKV = parent.CreateObjectValue(key, new ValueNull());
                                 } else if (MatchInt.test(str)) {
                                     lastKV = parent.CreateObjectValue(
                                         key,
@@ -1157,6 +1186,9 @@ export default class KeyValues3 {
                         if (isSpace || c === ',' || c === ']') {
                             if (MatchBoolean.test(str)) {
                                 lastValue = new ValueBoolean(str === 'true');
+                                parent.AppendValue(lastValue);
+                            } else if (MatchNull.test(str)) {
+                                lastValue = new ValueNull();
                                 parent.AppendValue(lastValue);
                             } else if (MatchInt.test(str)) {
                                 lastValue = new ValueInt(parseInt(str));

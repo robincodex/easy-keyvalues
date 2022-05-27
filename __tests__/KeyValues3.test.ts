@@ -653,4 +653,19 @@ Second line of a multi-line string literal.
             '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->'
         );
     });
+
+    test('Check KeyValues3 Header', async () => {
+        const root = await LoadKeyValues3(join(__dirname, 'npc/particle.vpcf'));
+        expect(root.GetHeader()).toBe(
+            '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->'
+        );
+    });
+
+    test('Check KeyValues3 Null', async () => {
+        const root = await LoadKeyValues3(join(__dirname, 'npc/null.txt'));
+        const a = root.GetObject().FindKey('a')?.GetArray();
+        expect(a?.Value().map((v) => v.Value())).toStrictEqual([null, null, null]);
+        const b = root.GetObject().FindKey('b')?.GetValue();
+        expect(b?.Value()).toBe(null);
+    });
 });
