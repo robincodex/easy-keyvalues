@@ -2,6 +2,9 @@ import rollupTypescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import { join } from 'path';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import p from './package.json'
+
+const external = Object.keys(p.dependencies)
 
 module.exports = [
     {
@@ -11,7 +14,7 @@ module.exports = [
             sourcemap: true,
             format: 'cjs',
         },
-        external: ['nanoid'],
+        external,
         plugins: [
             rollupTypescript(require('./tsconfig.json').compilerOptions),
             commonjs({ extensions: ['.js', '.ts'] }),
@@ -27,7 +30,7 @@ module.exports = [
             format: 'umd',
             globals: { axios: 'axios', nanoid: 'nanoid' },
         },
-        external: ['axios', 'nanoid'],
+        external,
         plugins: [
             rollupTypescript({
                 exclude: ['src/node.ts'],
@@ -43,7 +46,7 @@ module.exports = [
             sourcemap: true,
             format: 'es',
         },
-        external: ['nanoid'],
+        external,
         plugins: [
             rollupTypescript({
                 exclude: ['src/node.ts'],
