@@ -9,7 +9,8 @@
 ![coverage](./coverage/badge-statements.svg) ![coverage](./coverage/badge-branches.svg)
 ![coverage](./coverage/badge-functions.svg) ![coverage](./coverage/badge-lines.svg)
 
-写个库的原因是我想编辑 KV 文本，保存的时候可以格式化文本，并且保留注释，支持 KV 的`#base`等。
+写个库的原因是我想编辑 KV 文本，保存的时候可以格式化文本，并且保留注释，支持自动载入 KV 的`#base`等
+。
 
 > 我完全重写了这个库，不与之前的版本兼容，所以版本从 1.0.0 开始。
 
@@ -23,32 +24,18 @@ yarn add easy-keyvalues
 
 ## UTF-8 BOM
 
-这个库遇到`UTF-8 BOM`的文件会出错，原因是`UTF-8 BOM`的文件的第一个字符会是`65279`，导致解析错误，  
-所以需要提前使用如 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 这样的库去掉 `BOM`。
+这个库遇到`UTF-8 BOM`的文件会出错，原因是`UTF-8 BOM`的文件的第一个字符会是`65279`，导致解析错误，
+
+该库已经对 nodejs 进行了适配，使用 [chardet](https://www.npmjs.com/package/chardet) 判断编码格式，在
+读写时使用 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 进行解码和编码。
+
+如果是自定义适配器，需要提前使用如 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 这样的库去
+掉 `BOM`。
 
 ```js
 const buf = readFileSync(join(__dirname, 'chat_english.txt'));
 const text = iconvLite.decode(buf, 'utf8');
 const kv = KeyValues.Parse(text);
-```
-
-## 关于 ID
-
-`KeyValues`和`KeyValues3`都支持 ID 属性，默认为空，ID 由 [nanoid](https://github.com/ai/nanoid) 生成
-而来，ID 存在的目的是为了支持类似于跨线程操作的情景，如果需要 ID 则要开启这个功能：
-
-```js
-// KeyValues
-KeyValues.SetIDEnabled(true);
-
-// KeyValues3
-KeyValues3.SetIDEnabled(true);
-
-// Find child using ID
-kv.FindID('<nanoid>');
-kv.FindIDTraverse('<nanoid>');
-kv3.FindID('<nanoid>');
-kv3.FindIDTraverse('<nanoid>');
 ```
 
 # KeyValues
@@ -57,7 +44,7 @@ kv3.FindIDTraverse('<nanoid>');
 
 -   保留注释
 -   支持 nodejs 和浏览器
--   支持`#base`
+-   支持自动载入`#base`
 
 ## 导入
 
@@ -66,27 +53,11 @@ kv3.FindIDTraverse('<nanoid>');
 ```ts
 import {
     KeyValues,
-    LoadKeyValues,
-    SaveKeyValues,
-    LoadKeyValuesSync,
-    SaveKeyValuesSync,
 } from 'easy-keyvalues';
 
-LoadKeyValues(file: string, encoding?: BufferEncoding): Promise<KeyValues>;
-LoadKeyValuesSync(file: string, encoding?: BufferEncoding): KeyValues;
-SaveKeyValues(file: string, kv: KeyValues, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValuesSync(file: string, kv: KeyValues, encoding?: BufferEncoding): void;
-```
-
--   浏览器
-
-```ts
-import {
-    KeyValues,
-    LoadKeyValues,
-} from 'easy-keyvalues/web';
-
-LoadKeyValues(url: string, config?: AxiosRequestConfig): Promise<KeyValues>;
+KeyValues.Load(file: string): Promise<KeyValues>;
+KeyValues.Save(): Promise<void>;
+KeyValues.Save(otherFile: string): Promise<void>;
 ```
 
 ## 使用
@@ -95,24 +66,7 @@ LoadKeyValues(url: string, config?: AxiosRequestConfig): Promise<KeyValues>;
 
 ```ts
 // 解析KeyValues
-const kv = await LoadKeyValues('/path/to/file.txt');
-console.log(kv.toString());
-
-// 解析utf16le格式的文本
-const kv = await LoadKeyValues('/path/to/file.txt', 'utf16le');
-console.log(kv.toString());
-```
-
--   浏览器
-
-```ts
-// 解析KeyValues
-const kv = await LoadKeyValues('http://localhost/file.txt');
-console.log(kv.toString());
-
-// 解析utf16le格式的文本
-// 推荐使用iconv-lite转化格式
-const kv = LoadKeyValues(iconvLite.decode('some text of utf16le', 'utf16le'));
+const kv = await KeyValues.Load('/path/to/file.txt');
 console.log(kv.toString());
 ```
 
@@ -150,17 +104,6 @@ GetParent(): KeyValues | undefined
 这个库的目的是编辑 KV，所以加载`#base`之后不会将`#base`里面的所以 KeyValues 节点 合并到父节点，而是
 依然保留`#base`这个 KeyValues 节点，它就是文件的根节点， 它的`children` 就是根节点的所有子节点。
 
-```js
-import {
-    KeyValues,
-    AutoLoadKeyValuesBase,
-    AutoLoadKeyValuesBaseSync,
-} from 'easy-keyvalues';
-
-AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
-AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
-```
-
 范例
 
 ```js
@@ -179,15 +122,17 @@ KeyValues.txt
     }
 }
 */
-const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
-const baseList = await AutoLoadKeyValuesBase(root, __dirname);
+const root = await KeyValues.Load(join(__dirname, 'KeyValues.txt'));
 
 // Get path
 baseList[0].GetBaseFilePath(); // npc/file01.txt
-baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
+baseList[0].filename; // {__dirname}/npc/file01.txt
 
-// 加载`#base`之后调用`SaveKeyValues`和`SaveKeyValuesSync`会自动保存`#base`的文件
-SaveKeyValuesSync(join(__dirname, 'KeyValues.txt'), root);
+// 调用`Save`会自动保存`#base`的文件
+KeyValues.Save();
+
+// 需要注意，如果指定了其它文件路径，base部分会根据相对路径一起创建。
+KeyValues.Save(join(__dirname, 'otherPath/KeyValues.txt'));
 ```
 
 ### 创建
@@ -318,53 +263,21 @@ kv.toObject();
 
 ## 导入
 
--   Node.js
-
 ```ts
 import {
     KeyValues3,
-    LoadKeyValues3,
-    SaveKeyValues3,
-    LoadKeyValues3Sync,
-    SaveKeyValues3Sync,
 } from 'easy-keyvalues';
 
-LoadKeyValues3(file: string, encoding?: BufferEncoding): Promise<KeyValues3>;
-LoadKeyValues3Sync(file: string, encoding?: BufferEncoding): KeyValues3;
-SaveKeyValues3(file: string, kv: KeyValues3, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValues3Sync(file: string, kv: KeyValues3, encoding?: BufferEncoding): void;
-```
-
--   浏览器
-
-```ts
-import {
-    KeyValues3,
-    LoadKeyValues3,
-} from 'easy-keyvalues/web';
-
-LoadKeyValues3(url: string, config?: AxiosRequestConfig): Promise<KeyValues3>;
+KeyValues3.Load(file: string): Promise<KeyValues3>;
+KeyValues3.Save(): Promise<void>;
+KeyValues3.Save(otherFile: string): Promise<void>;
 ```
 
 ## 使用
 
--   Node.js
-
 ```ts
 // 解析KeyValues3
-const kv3 = await LoadKeyValues3('/path/to/file.txt');
-console.log(kv3.toString());
-
-// 解析utf16le格式的文本
-const kv3 = await LoadKeyValues3('/path/to/file.txt', 'utf16le');
-console.log(kv3.toString());
-```
-
--   浏览器
-
-```ts
-// 解析KeyValues3
-const kv3 = await LoadKeyValues3('http://localhost/file.txt');
+const kv3 = await KeyValues3.Load('/path/to/file.txt');
 console.log(kv3.toString());
 ```
 
@@ -527,6 +440,17 @@ kv3.toObject();
 | Int             | 5                               | 5                                           |
 | Double          | 2.5                             | 2.500000                                    |
 | Resource        | `path/to/file.vpcf`             | `resource:"path/to/file.vpcf"`              |
+
+# 自定义适配器
+
+该库已经为 nodejs 进行了适配，由于浏览器环境复杂，不提供浏览器的适配器，你可以参
+考`src/node.ts`和`src/adapter.ts`进行适配。
+
+## 关于 ID
+
+`KeyValues`和`KeyValues3`都支持 ID 属性，ID 由适配器中的`createKeyValuesID()`提供，默认是返回空字符
+串，如果需要这个 ID，只需要改写`createKeyValuesID()`即可，ID 存在的目的是为了支持类似于跨线程操作的
+情景。
 
 # License
 

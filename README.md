@@ -12,7 +12,7 @@
 ![coverage](https://raw.githubusercontent.com/RobinCodeX/easy-keyvalues/master/coverage/badge-lines.svg)
 
 The reason for writing a library is that I want to edit KeyValues text, format the text when saving,
-and keep the comments, support `#base` on KeyValues, etc.
+and keep the comments, support auto load `#base` on KeyValues, etc.
 
 [简体中文](https://github.com/RobinCodeX/easy-keyvalues/blob/master/README-zh-cn.md)
 
@@ -33,30 +33,14 @@ This library will get errors when encountering `UTF-8 BOM` files, because the fi
 `UTF-8 BOM` files will be 65279, which causes parsing errors. So you need to use a library such as
 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) to remove the `BOM` in advance.
 
+The library has been adapted for nodejs, uses [chardet](https://www.npmjs.com/package/chardet) to
+determine the encoding format, and uses [iconv-lite](https://github.com/ashtuchkin/iconv-lite) for
+decoding and encoding when reading and writing.
+
 ```js
 const buf = readFileSync(join(__dirname, 'chat_english.txt'));
 const text = iconvLite.decode(buf, 'utf8');
 const kv = KeyValues.Parse(text);
-```
-
-## About ID
-
-Both `KeyValues` and `KeyValues3` support the ID property, which is empty by default. ID is
-generated from [nanoid](https://github.com/ai/nanoid). The ID exists to support scenarios like
-cross-threaded operations, and is turned on if it is needed:
-
-```js
-// KeyValues
-KeyValues.SetIDEnabled(true);
-
-// KeyValues3
-KeyValues3.SetIDEnabled(true);
-
-// Find child using ID
-kv.FindID('<nanoid>');
-kv.FindIDTraverse('<nanoid>');
-kv3.FindID('<nanoid>');
-kv3.FindIDTraverse('<nanoid>');
 ```
 
 # KeyValues
@@ -65,62 +49,25 @@ kv3.FindIDTraverse('<nanoid>');
 
 -   Retain comments
 -   Support Node.js and browser
--   Support `#base`
+-   Support auto load `#base`
 
 ## Import
 
--   Node.js
-
 ```ts
 import {
     KeyValues,
-    LoadKeyValues,
-    SaveKeyValues,
-    LoadKeyValuesSync,
-    SaveKeyValuesSync,
 } from 'easy-keyvalues';
 
-LoadKeyValues(file: string, encoding?: BufferEncoding): Promise<KeyValues>;
-LoadKeyValuesSync(file: string, encoding?: BufferEncoding): KeyValues;
-SaveKeyValues(file: string, kv: KeyValues, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValuesSync(file: string, kv: KeyValues, encoding?: BufferEncoding): void;
-```
-
--   Browser
-
-```ts
-import {
-    KeyValues,
-    LoadKeyValues,
-} from 'easy-keyvalues/web';
-
-LoadKeyValues(url: string, config?: AxiosRequestConfig): Promise<KeyValues>;
+KeyValues.Load(file: string): Promise<KeyValues>;
+KeyValues.Save(): Promise<void>;
+KeyValues.Save(otherFile: string): Promise<void>;
 ```
 
 ## Usages
 
--   Node.js
-
 ```ts
 // Parse KeyValues text
-const kv = await LoadKeyValues('/path/to/file.txt');
-console.log(kv.toString());
-
-// Parse KeyValues text for utf16le
-const kv = await LoadKeyValues('/path/to/file.txt', 'utf16le');
-console.log(kv.toString());
-```
-
--   Browser
-
-```ts
-// Parse KeyValues text
-const kv = await LoadKeyValues('http://localhost/file.txt');
-console.log(kv.toString());
-
-// Parse KeyValues text for utf16le
-// Suggest using iconv-lite decode text
-const kv = LoadKeyValues(iconvLite.decode('some text of utf16le', 'utf16le'));
+const kv = await KeyValues.Load('/path/to/file.txt');
 console.log(kv.toString());
 ```
 
@@ -158,17 +105,6 @@ The purpose of this library is to edit the KV, so after loading `#base` it does 
 KeyValues nodes in `#base` into the parent node, but keeps the KeyValues node `#base`, which is the
 root node of the file, and its `children` are all the children of the root node.
 
-```js
-import {
-    KeyValues,
-    AutoLoadKeyValuesBase,
-    AutoLoadKeyValuesBaseSync,
-} from 'easy-keyvalues';
-
-AutoLoadKeyValuesBase(rootNode: KeyValues,rootDir: string): Promise<KeyValues[]>
-AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[]
-```
-
 Example
 
 ```js
@@ -187,15 +123,17 @@ KeyValues.txt
     }
 }
 */
-const root = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
-const baseList = await AutoLoadKeyValuesBase(root, __dirname);
+const root = await KeyValues.Load(join(__dirname, 'KeyValues.txt'));
 
 // Get path
 baseList[0].GetBaseFilePath(); // npc/file01.txt
-baseList[0].GetBaseAbsoluteFilePath(); // join(__dirname, 'KeyValues.txt')
+baseList[0].filename; // {__dirname}/npc/file01.txt
 
-// Calling `SaveKeyValues` and `SaveKeyValuesSync` after loading `#base` will automatically save the `#base` file
-SaveKeyValuesSync(join(__dirname, 'KeyValues.txt'), root);
+// Calling `Save` will automatically save the `#base` file
+KeyValues.Save();
+
+// Note that if other file path are specified, the base kv will be created together with the relative paths.
+KeyValues.Save(join(__dirname, 'otherPath/KeyValues.txt'));
 ```
 
 ### Create
@@ -326,53 +264,21 @@ Reference https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValu
 
 ## Import
 
--   Node.js
-
 ```ts
 import {
     KeyValues3,
-    LoadKeyValues3,
-    SaveKeyValues3,
-    LoadKeyValues3Sync,
-    SaveKeyValues3Sync,
 } from 'easy-keyvalues';
 
-LoadKeyValues3(file: string, encoding?: BufferEncoding): Promise<KeyValues3>;
-LoadKeyValues3Sync(file: string, encoding?: BufferEncoding): KeyValues3;
-SaveKeyValues3(file: string, kv: KeyValues3, encoding?: BufferEncoding): Promise<void>;
-SaveKeyValues3Sync(file: string, kv: KeyValues3, encoding?: BufferEncoding): void;
-```
-
--   Browser
-
-```ts
-import {
-    KeyValues3,
-    LoadKeyValues3,
-} from 'easy-keyvalues/web';
-
-LoadKeyValues3(url: string, config?: AxiosRequestConfig): Promise<KeyValues3>;
+KeyValues3.Load(file: string): Promise<KeyValues3>;
+KeyValues3.Save(): Promise<void>;
+KeyValues3.Save(otherFile: string): Promise<void>;
 ```
 
 ## Usages
 
--   Node.js
-
 ```ts
 // Parse KeyValues3
-const kv3 = await LoadKeyValues3('/path/to/file.txt');
-console.log(kv3.toString());
-
-// Parse utf16le
-const kv3 = await LoadKeyValues3('/path/to/file.txt', 'utf16le');
-console.log(kv3.toString());
-```
-
--   Browser
-
-```ts
-// Parse KeyValues3
-const kv3 = await LoadKeyValues3('http://localhost/file.txt');
+const kv3 = await KeyValues3.Load('/path/to/file.txt');
 console.log(kv3.toString());
 ```
 
@@ -538,6 +444,17 @@ kv3.toObject();
 | Int             | 5                               | 5                                           |
 | Double          | 2.5                             | 2.500000                                    |
 | Resource        | `path/to/file.vpcf`             | `resource:"path/to/file.vpcf"`              |
+
+# Custom adapter
+
+The library is already adapted for nodejs, but due to the complexity of the browser environment, no
+browser adapters are provided, you can refer to `src/node.ts` and `src/adapter.ts` for adaptations.
+
+## About ID
+
+Both `KeyValues` and `KeyValues3` support the ID property, which is provided by
+`createKeyValuesID()` in the adapter and by default returns the empty character If you need this ID,
+just rewrite `createKeyValuesID()`. The ID exists to support cross-threaded operation like scenario.
 
 # License
 
