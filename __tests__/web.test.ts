@@ -1,62 +1,41 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { LoadKeyValues, LoadKeyValues3 } from '../src/web';
+import { KeyValues, KeyValues3, setKeyValuesAdapter } from '../src/web';
 import { createServer, Server } from 'http';
 import { URL } from 'url';
 import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
+import { readFile } from 'fs/promises';
 
 describe('Browser', () => {
-    let server: Server;
     beforeAll((done) => {
-        server = createServer((req, res) => {
-            const url = new URL(req.url || '', getPath(''));
-            res.setHeader('Content-Type', 'text/plain');
-            if (url.pathname === '/kv') {
-                const body = readFileSync(join(__dirname, 'KeyValues.txt'), 'utf8');
-                res.write(body);
-            } else if (url.pathname === '/kv3') {
-                const body = readFileSync(join(__dirname, 'KeyValues3.txt'), 'utf8');
-                res.write(body);
-            }
-            res.end();
+        setKeyValuesAdapter({
+            async readFile(path) {
+                if (path === 'http://localhost/kv') {
+                    return `"DOTAAbilities" {}`;
+                } else if (path === 'http://localhost/kv3') {
+                    return `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+                    {
+                    }`;
+                }
+                return '';
+            },
+            async writeFile(path, data) {},
+            createKeyValuesID() {
+                return '';
+            },
+            resolvePath(filename, basePath) {
+                return '';
+            },
         });
-        server.listen(0, '127.0.0.1', done);
+        done();
     });
-
-    afterAll((done) => {
-        server.close(done);
-    });
-
-    function getPath(pathname: string): string {
-        const addr = server.address();
-        if (!addr) {
-            throw Error('No address');
-        }
-        if (typeof addr === 'string') {
-            return addr;
-        } else {
-            return `http://${addr.address}:${addr.port}${pathname}`;
-        }
-    }
 
     test('Check KeyValues', async () => {
-        const root = await LoadKeyValues(getPath('/kv'), {
-            proxy: false,
-        });
-        expect(root.IsRoot()).toBe(true);
-    });
-    test('Check KeyValues no config', async () => {
-        const root = await LoadKeyValues(getPath('/kv'));
+        const root = await KeyValues.Load('http://localhost/kv');
         expect(root.IsRoot()).toBe(true);
     });
     test('Check KeyValues3', async () => {
-        const root = await LoadKeyValues3(getPath('/kv3'), {
-            proxy: false,
-        });
-        expect(root.IsRoot()).toBe(true);
-    });
-    test('Check KeyValues3 no config', async () => {
-        const root = await LoadKeyValues3(getPath('/kv3'));
+        const root = await KeyValues3.Load('http://localhost/kv3');
         expect(root.IsRoot()).toBe(true);
     });
 });
