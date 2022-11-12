@@ -1,0 +1,201 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`KeyValues3 Check KeyValues3 Methods 1`] = `
+"<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+    a = "b"
+    b = 3
+    c = 3.500000
+    d = true
+    e = resource:"x"
+    f = deferred_resource:"x"
+    g =
+    [
+        "text",
+        1,
+        2.300000,
+        false,
+        [
+            "1",
+            "2",
+            {
+                c1 = "1"
+                c2 = "2"
+                c3 = [ 255, 255, 255 ]
+            },
+        ],
+        {
+            c1 = "1"
+            c2 = "2"
+            c3 = [ "1" ]
+        },
+    ]
+    h =
+    {
+        child =
+        {
+            "@Start" = "1"
+            c1 = "1"
+            c2 = "2"
+            c3 =
+            [
+                resource:"particles/avalon_assets/environment/battle_ring/battle_ring_d.vpcf",
+            ]
+            c3 =
+            [
+                resource:"particles/a.vpcf",
+                resource:"particles/b.vpcf",
+                resource:"particles/c.vpcf",
+                resource:"particles/d.vpcf",
+                resource:"particles/e.vpcf",
+            ]
+        }
+        multi.line = """
+First line of a multi-line string literal.
+Second line of a multi-line string literal.
+"""
+    }
+    k = null
+}"
+`;
+
+exports[`KeyValues3 Check KeyValues3.txt 1`] = `
+"<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+    boolValue = false
+    intValue = 128
+    doubleValue = 64.000000
+    stringValue = "hello world \\n \\"ss\\" "
+    stringThatIsAResourceReference = resource:"particles/items3_fx/star_emblem.vpcf"
+    deferred_resource = deferred_resource:"particles/items3_fx/star_emblem.vpcf"
+    multiLineStringValue = """
+First line of a multi-line string literal.
+Second line of a multi-line string literal.
+"""
+    arrayValue =
+    [
+        1,
+        2,
+        {
+            a = 123
+            b = "456" // single line comment
+            c = -1.500000
+        },
+        resource:"particles/items3_fx/star_emblem.vpcf",
+        "b\\n",
+    ]
+    objectValue =
+    {
+        n = 5
+        // foo
+        // bar
+        s = "foo" // array
+        h = [ "a", 456 ]
+    }
+    // object
+    // single line comment
+    /*
+    multi
+    line
+    comment
+    */
+    "a\\\\05" = 789
+    bb = ""
+    cc =
+    [
+        123,
+        "",
+        {
+            a = ""
+        },
+        """
+First line of a multi-line string literal.
+Second line of a multi-line string literal.
+""",
+    ]
+    /*
+     * a one
+     *   b two
+     */
+    a.b = 123
+    array.Value =
+    [
+        // one
+        1, // 456
+        /*
+        two
+        three
+        */
+        2.500000,
+        "", // empty
+        {
+            a = 123
+            b = "456"
+            c = -1.500000
+            g =
+            {
+                a = 123
+                b =
+                [
+                    "456",
+                    "789",
+                    true,
+                    {
+                        b = 456
+                    },
+                ]
+            }
+            t = [ 3, 6 ]
+        },
+        deferred_resource:"particles/items3_fx/star_emblem.vpcf", // deferred_resource
+        // bar
+        deferred_resource:"",
+        resource:"",
+    ]
+    objectValue =
+    {
+        n = 5
+        s = "foo" // bar
+        h = [ "a", 456 ]
+        g =
+        {
+            b = 123
+        }
+        j =
+        {
+            a = 123
+            b =
+            [
+                "456",
+                "789",
+                true,
+                {
+                    b = 456
+                },
+            ]
+        }
+        i =
+        [
+            [ 123 ],
+            [ 456, 789, false ],
+        ]
+        j =
+        [
+            [
+                {
+                    a = "456.0.5"
+                },
+                0.500000,
+                2.000000,
+                "3.2.+5",
+                "1-5.5",
+            ],
+        ]
+        k = 0.000000
+        l = 0.500000
+        m = ".2-1"
+        r1 = deferred_resource:""
+        r2 = resource:""
+    }
+}"
+`;

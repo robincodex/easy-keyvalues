@@ -1,4 +1,9 @@
-"DOTAAbilities"
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`KeyValues Check KeyValues #base 1`] = `"#base    "npc/file01.txt" // file01"`;
+
+exports[`KeyValues Check KeyValues.txt 1`] = `
+""DOTAAbilities"
 {
     "building_system_active_preview"
     {
@@ -12,7 +17,7 @@
             "kkkkkkkkkkkkkk2"      "v2"
             "kkkkkkkk3"            "v3"
             "kkkkkkkk3"            "v3"
-            "kkkkkkkk3"            "v3 \"test\""
+            "kkkkkkkk3"            "v3 \\"test\\""
             "c2"
             {
                 "kkkkkkkkkkk1"    "v1"
@@ -78,11 +83,11 @@
     "children" // this is children
     {
         "c1"    "1" // comment05
-        "c2"    "2 \"two\""
+        "c2"    "2 \\"two\\""
         // comment07
         // comment08
         "c3"    "sss
-    <br/>this is child\n index 3
+    <br/>this is child\\n index 3
     88"
         "c4"
         {
@@ -93,4 +98,5 @@
     {
         "three"    "two"
     }
-}
+}"
+`;

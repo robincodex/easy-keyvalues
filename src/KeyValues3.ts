@@ -1,7 +1,10 @@
+import { getKeyValuesAdapter } from './adapter';
 import { KeyValues3Comments } from './Comments';
-import { nanoid } from 'nanoid';
 
-let createID = () => '';
+function createID() {
+    const adapter = getKeyValuesAdapter();
+    return adapter.createKeyValuesID();
+}
 
 export interface IKV3Value {
     Comments: KeyValues3Comments;
@@ -16,6 +19,7 @@ export interface IKV3Value {
     IsDeferredResource(): this is ValueDeferredResource;
     IsArray(): this is ValueArray;
     IsObject(): this is ValueObject;
+    IsNull(): this is ValueNull;
     Format(): string;
     Clone(): IKV3Value;
 }
@@ -64,6 +68,9 @@ export class KV3BaseValue implements IKV3Value {
     }
     public IsObject(): this is ValueObject {
         return this instanceof ValueObject;
+    }
+    public IsNull(): this is ValueNull {
+        return this instanceof ValueNull;
     }
 
     public Format(): string {
@@ -590,13 +597,6 @@ const MatchNull = /^null$/;
  * https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
  */
 export default class KeyValues3 {
-    public static SetIDEnabled(enable: boolean) {
-        if (enable) {
-            createID = () => nanoid();
-        } else {
-            createID = () => '';
-        }
-    }
     public static String(value?: string) {
         return new ValueString(value);
     }
@@ -623,6 +623,16 @@ export default class KeyValues3 {
     }
     public static Null() {
         return new ValueNull();
+    }
+
+    private __filename?: string;
+
+    public get filename() {
+        return this.__filename || '';
+    }
+
+    public set filename(s: string | undefined) {
+        this.__filename = s ? s.replace(/\\/g, '/') : s;
     }
 
     protected value: IKV3Value;
@@ -816,8 +826,9 @@ export default class KeyValues3 {
     /**
      * Parse text of KeyValues3
      */
-    public static Parse(body: string): KeyValues3 {
+    public static Parse(body: string, filename?: string): KeyValues3 {
         let root = this.CreateRoot();
+        root.filename = filename;
         const firstLineIndex = body.indexOf('\n');
         const header = body.slice(0, firstLineIndex).trim();
         if (!header.startsWith('<!--') || !header.endsWith('-->')) {
@@ -1327,5 +1338,26 @@ export default class KeyValues3 {
 
     protected static _parse_error(line: number, msg: string) {
         return `not readable as KeyValues3 text: Line ${line}: ${msg}`;
+    }
+
+    /**
+     * Load KeyValues3 from file
+     */
+    public static async Load(filename: string): Promise<KeyValues3> {
+        const adapter = getKeyValuesAdapter();
+        const text = await adapter.readFile(filename);
+        return this.Parse(text, filename);
+    }
+
+    /**
+     * Save KeyValues3 to file
+     */
+    public async Save(otherFilename?: string): Promise<void> {
+        const filename = otherFilename ?? this.filename;
+        if (!filename) {
+            throw new Error('Not found filename in KeyValues3');
+        }
+        const adapter = getKeyValuesAdapter();
+        await adapter.writeFile(filename, this.Format());
     }
 }

@@ -1,12 +1,8 @@
 import { join } from 'path';
 import { KV3BaseValue } from '../src/KeyValues3';
-import {
-    KeyValues3,
-    LoadKeyValues3,
-    SaveKeyValues3,
-    LoadKeyValues3Sync,
-    SaveKeyValues3Sync,
-} from '../src/node';
+import { KeyValues3, getKeyValuesAdapter } from '../src/node';
+import { describe, expect, test } from '@jest/globals';
+import crypto from 'crypto';
 
 describe('KeyValues3', () => {
     test('Check KeyValues3 Methods', () => {
@@ -18,34 +14,27 @@ describe('KeyValues3', () => {
         const value = new KV3BaseValue();
         expect(value.Value()).toBe(undefined);
 
-        try {
+        expect(() => {
             root.SetValue(KeyValues3.String(''));
-        } catch (e) {
-            expect(e).toEqual(Error('The root node of KeyValues3 must be an object'));
-        }
+        }).toThrow();
 
-        try {
+        expect(() => {
             root.AppendValue(KeyValues3.String(''));
-        } catch (e) {
-            expect(e).toEqual(Error('The KeyValues3 is not an array'));
-        }
+        }).toThrow();
 
         const a = root.CreateObjectValue('a', KeyValues3.String('b'));
         expect(a.GetValue().IsString()).toBe(true);
         expect(a.GetValue().Value()).toBe('b');
         expect(a.GetValue().GetOwner() === a).toBe(true);
-        expect(root.GetObject().Get(0)).toBe(a);
+        expect(root.GetObject().Get(0) === a).toBe(true);
 
-        try {
+        expect(() => {
             a.GetObject();
-        } catch (e) {
-            expect(e).toEqual(Error('The value is not object'));
-        }
-        try {
+        }).toThrow();
+
+        expect(() => {
             a.GetArray();
-        } catch (e) {
-            expect(e).toEqual(Error('The value is not array'));
-        }
+        }).toThrow();
 
         const b = root.CreateObjectValue('b', KeyValues3.Int(3.5));
         expect(b.GetValue().IsInt()).toBe(true);
@@ -73,7 +62,7 @@ describe('KeyValues3', () => {
         g_ary.Insert(0, g_first);
         g_ary.Delete(g_first);
         expect(g.GetValue().IsArray()).toBe(true);
-        expect(g.GetValue().Value()).toEqual([]);
+        expect(g.GetValue().Value().length).toBe(0);
         expect(g.GetArray().Get(0)).toBe(undefined);
 
         const h_obj = KeyValues3.Object([]);
@@ -84,7 +73,7 @@ describe('KeyValues3', () => {
         h_obj.Insert(0, h_fist);
         h_obj.Delete('a');
         expect(h.GetValue().IsObject()).toBe(true);
-        expect(h.GetValue().Value()).toEqual([]);
+        expect(h.GetValue().Value().length).toBe(0);
         h_obj.Append(h_fist);
         h_obj.Append(h_fist);
         h_obj.Append(h_fist);
@@ -95,21 +84,21 @@ describe('KeyValues3', () => {
         h_obj.Delete('a');
         h_obj.Delete('a');
 
-        try {
+        const k = root.CreateObjectValue('k', KeyValues3.Null().Clone());
+        expect(k.GetValue().IsNull()).toBe(true);
+        expect(k.GetValue().Value()).toBe(null);
+
+        expect(() => {
             a.CreateObjectValue('a', KeyValues3.String('b'));
-        } catch (e) {
-            expect(e).toEqual(Error('The KeyValues3 is not an object'));
-        }
-        try {
+        }).toThrow();
+
+        expect(() => {
             a.Find(() => true);
-        } catch (e) {
-            expect(e).toEqual(Error('The KeyValues3 is not an object'));
-        }
-        try {
+        }).toThrow();
+
+        expect(() => {
             a.FindAll(() => true);
-        } catch (e) {
-            expect(e).toEqual(Error('The KeyValues3 is not an object'));
-        }
+        }).toThrow();
 
         expect(
             root
@@ -187,62 +176,7 @@ Second line of a multi-line string literal.
 `)
         );
 
-        // console.log(root.Format());
-        expect(root.toString()).toBe(`${KeyValues3.CommonHeader}
-{
-    a = "b"
-    b = 3
-    c = 3.500000
-    d = true
-    e = resource:"x"
-    f = deferred_resource:"x"
-    g =
-    [
-        "text",
-        1,
-        2.300000,
-        false,
-        [
-            "1",
-            "2",
-            {
-                c1 = "1"
-                c2 = "2"
-                c3 = [ 255, 255, 255 ]
-            },
-        ],
-        {
-            c1 = "1"
-            c2 = "2"
-            c3 = [ "1" ]
-        },
-    ]
-    h =
-    {
-        child =
-        {
-            "@Start" = "1"
-            c1 = "1"
-            c2 = "2"
-            c3 =
-            [
-                resource:"particles/avalon_assets/environment/battle_ring/battle_ring_d.vpcf",
-            ]
-            c3 =
-            [
-                resource:"particles/a.vpcf",
-                resource:"particles/b.vpcf",
-                resource:"particles/c.vpcf",
-                resource:"particles/d.vpcf",
-                resource:"particles/e.vpcf",
-            ]
-        }
-        multi.line = """
-First line of a multi-line string literal.
-Second line of a multi-line string literal.
-"""
-    }
-}`);
+        expect(root.toString()).toMatchSnapshot();
     });
 
     test('Check KeyValues3 Comments', () => {
@@ -328,14 +262,11 @@ Second line of a multi-line string literal.
     });
 
     test('Check KeyValues3.txt', async () => {
-        const root = await LoadKeyValues3(join(__dirname, 'KeyValues3.txt'));
-        await SaveKeyValues3(join(__dirname, 'KeyValues3.save.txt'), root);
-
-        const root2 = LoadKeyValues3Sync(join(__dirname, 'KeyValues3.save.txt'));
-        SaveKeyValues3Sync(join(__dirname, 'KeyValues3.save.txt'), root2);
-
+        const root = await KeyValues3.Load(join(__dirname, 'KeyValues3.txt'));
+        expect(root.filename).toBe(join(__dirname, 'KeyValues3.txt').replace(/\\/g, '/'));
+        expect(root.toString()).toMatchSnapshot();
+        await root.Save(join(__dirname, 'KeyValues3.save.txt'));
         checkTxt(root);
-        checkTxt(root2);
     });
 
     function checkTxt(root: KeyValues3) {
@@ -384,11 +315,13 @@ Second line of a multi-line string literal.
     }
 
     test('Check KeyValues3 Parse Error', () => {
-        try {
+        expect(() => {
             KeyValues3.Parse(`{}`);
-        } catch (e) {
-            expect(e).toEqual(Error('Invalid header'));
-        }
+        }).toThrow();
+
+        expect(async () => {
+            await KeyValues3.CreateRoot().Save();
+        }).rejects.toThrow();
 
         try {
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n @a = 123 \n}`);
@@ -548,7 +481,7 @@ Second line of a multi-line string literal.
     });
 
     test('Check KeyValues3.toObject', async () => {
-        const root = await LoadKeyValues3(join(__dirname, 'KeyValues3.txt'));
+        const root = await KeyValues3.Load(join(__dirname, 'KeyValues3.txt'));
         const obj = root.toObject();
         expect(obj['boolValue']).toBe(false);
         expect(obj['intValue']).toBe(128);
@@ -595,22 +528,23 @@ Second line of a multi-line string literal.
     });
 
     test('Check KeyValues3.ID', async () => {
-        KeyValues3.SetIDEnabled(false);
         const noIDRoot = KeyValues3.CreateRoot();
         expect(noIDRoot.ID).toBe('');
 
-        KeyValues3.SetIDEnabled(true);
+        getKeyValuesAdapter().createKeyValuesID = () => {
+            return crypto.randomBytes(8).toString('hex');
+        };
         const root = KeyValues3.CreateRoot();
-        expect(root.ID).toHaveLength(21);
+        expect(root.ID).toHaveLength(16);
 
         const a = root.CreateObjectValue('a', KeyValues3.String('a'));
         const b = root.CreateObjectValue('b', KeyValues3.String('b'));
         const c = root.CreateObjectValue('c', KeyValues3.String('c'));
         const d = root.CreateObjectValue('d', KeyValues3.String('d'));
-        expect(root.FindID(a.ID)).toBe(a);
-        expect(root.FindID(b.ID)).toBe(b);
-        expect(root.FindID(c.ID)).toBe(c);
-        expect(root.FindID(d.ID)).toBe(d);
+        expect(root.FindID(a.ID) === a).toBe(true);
+        expect(root.FindID(b.ID) === b).toBe(true);
+        expect(root.FindID(c.ID) === c).toBe(true);
+        expect(root.FindID(d.ID) === d).toBe(true);
 
         const a2 = new KeyValues3('a2', KeyValues3.String('a2'));
         const b2 = new KeyValues3('b2', KeyValues3.String('b2'));
@@ -623,46 +557,46 @@ Second line of a multi-line string literal.
             KeyValues3.Array([KeyValues3.Object([b3]), KeyValues3.Array([KeyValues3.Object([c3])])])
         );
         const e = root.CreateObjectValue('e', KeyValues3.Object([a2, b2, c2, a3]));
-        expect(root.FindID(e.ID)).toBe(e);
-        expect(root.FindID(a2.ID)).toBeUndefined();
-        expect(root.FindID(b2.ID)).toBeUndefined();
-        expect(root.FindID(c2.ID)).toBeUndefined();
-        expect(root.FindID(d2.ID)).toBeUndefined();
-        expect(root.FindID(a3.ID)).toBeUndefined();
-        expect(root.FindID(b3.ID)).toBeUndefined();
-        expect(root.FindID(c3.ID)).toBeUndefined();
-        expect(e.FindID(a2.ID)).toBe(a2);
-        expect(e.FindID(b2.ID)).toBe(b2);
-        expect(e.FindID(c2.ID)).toBe(c2);
-        expect(e.FindID(d2.ID)).toBeUndefined();
-        expect(e.FindID(a3.ID)).toBe(a3);
-        expect(e.FindID(b3.ID)).toBeUndefined();
-        expect(e.FindID(c3.ID)).toBeUndefined();
-        expect(root.FindIDTraverse(a2.ID)).toBe(a2);
-        expect(root.FindIDTraverse(b2.ID)).toBe(b2);
-        expect(root.FindIDTraverse(c2.ID)).toBe(c2);
-        expect(root.FindIDTraverse(d2.ID)).toBe(d2);
-        expect(root.FindIDTraverse(b3.ID)).toBe(b3);
-        expect(root.FindIDTraverse(c3.ID)).toBe(c3);
-        expect(a3.GetArray().FindIDTraverse(a2.ID)).toBeUndefined();
+        expect(root.FindID(e.ID) === e).toBe(true);
+        expect(root.FindID(a2.ID) === undefined).toBe(true);
+        expect(root.FindID(b2.ID) === undefined).toBe(true);
+        expect(root.FindID(c2.ID) === undefined).toBe(true);
+        expect(root.FindID(d2.ID) === undefined).toBe(true);
+        expect(root.FindID(a3.ID) === undefined).toBe(true);
+        expect(root.FindID(b3.ID) === undefined).toBe(true);
+        expect(root.FindID(c3.ID) === undefined).toBe(true);
+        expect(e.FindID(a2.ID) === a2).toBe(true);
+        expect(e.FindID(b2.ID) === b2).toBe(true);
+        expect(e.FindID(c2.ID) === c2).toBe(true);
+        expect(e.FindID(d2.ID) === undefined).toBe(true);
+        expect(e.FindID(a3.ID) === a3).toBe(true);
+        expect(e.FindID(b3.ID) === undefined).toBe(true);
+        expect(e.FindID(c3.ID) === undefined).toBe(true);
+        expect(root.FindIDTraverse(a2.ID) === a2).toBe(true);
+        expect(root.FindIDTraverse(b2.ID) === b2).toBe(true);
+        expect(root.FindIDTraverse(c2.ID) === c2).toBe(true);
+        expect(root.FindIDTraverse(d2.ID) === d2).toBe(true);
+        expect(root.FindIDTraverse(b3.ID) === b3).toBe(true);
+        expect(root.FindIDTraverse(c3.ID) === c3).toBe(true);
+        expect(a3.GetArray().FindIDTraverse(a2.ID) === undefined).toBe(true);
     });
 
     test('Check KeyValues3 Header', async () => {
-        const root = await LoadKeyValues3(join(__dirname, 'npc/particle.vpcf'));
+        const root = await KeyValues3.Load(join(__dirname, 'npc/particle.vpcf'));
         expect(root.GetHeader()).toBe(
             '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->'
         );
     });
 
     test('Check KeyValues3 Header', async () => {
-        const root = await LoadKeyValues3(join(__dirname, 'npc/particle.vpcf'));
+        const root = await KeyValues3.Load(join(__dirname, 'npc/particle.vpcf'));
         expect(root.GetHeader()).toBe(
             '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->'
         );
     });
 
     test('Check KeyValues3 Null', async () => {
-        const root = await LoadKeyValues3(join(__dirname, 'npc/null.txt'));
+        const root = await KeyValues3.Load(join(__dirname, 'npc/null.txt'));
         const a = root.GetObject().FindKey('a')?.GetArray();
         expect(a?.Value().map((v) => v.Value())).toStrictEqual([null, null, null]);
         const b = root.GetObject().FindKey('b')?.GetValue();

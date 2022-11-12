@@ -1,120 +1,39 @@
 import { readFileSync, writeFileSync, promises } from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import KeyValues from './KeyValues';
 import KeyValues3 from './KeyValues3';
 import { KeyValuesComments, KeyValues3Comments } from './Comments';
+import { setKeyValuesAdapter } from './adapter';
+import * as iconv from 'iconv-lite';
+import chardet from 'chardet';
 
 const { readFile, writeFile } = promises;
 
+export * from './adapter';
+
 export { KeyValues, KeyValues3, KeyValuesComments, KeyValues3Comments };
 
-export async function LoadKeyValues(file: string, encoding: BufferEncoding = 'utf8') {
-    const body = await readFile(file, encoding);
-    return KeyValues.Parse(body);
-}
+const fileEncoding: Record<string, string> = {};
 
-export function LoadKeyValuesSync(file: string, encoding: BufferEncoding = 'utf8') {
-    const body = readFileSync(file, encoding);
-    return KeyValues.Parse(body);
-}
-
-/**
- * Return all #base KeyValues
- * @param rootNode The KeyValues of root node
- * @param rootDir root dir
- */
-export async function AutoLoadKeyValuesBase(
-    rootNode: KeyValues,
-    rootDir: string
-): Promise<KeyValues[]> {
-    const result = rootNode.FindAllKeys('#base');
-    for (const kv of result) {
-        const filePath = join(rootDir, kv.GetValue());
-        const children = await LoadKeyValues(filePath, 'utf8');
-        kv.LoadBase(
-            filePath,
-            children.GetChildren().map((v) => v.Free())
-        );
-    }
-    return result;
-}
-
-/**
- * Return all #base KeyValues
- * @param rootNode The KeyValues of root node
- * @param rootDir root dir
- */
-export function AutoLoadKeyValuesBaseSync(rootNode: KeyValues, rootDir: string): KeyValues[] {
-    const result = rootNode.FindAllKeys('#base');
-    for (const kv of result) {
-        const filePath = join(rootDir, kv.GetValue());
-        const children = LoadKeyValuesSync(filePath, 'utf8');
-        kv.LoadBase(
-            filePath,
-            children.GetChildren().map((v) => v.Free())
-        );
-    }
-    return result;
-}
-
-export async function SaveKeyValues(
-    file: string,
-    kv: KeyValues,
-    encoding: BufferEncoding = 'utf8'
-) {
-    await writeFile(file, kv.Format(), encoding);
-
-    // Save #base
-    const bases = kv.FindAllKeys('#base');
-    for (const b of bases) {
-        if (b.GetBaseFilePath() && b.GetBaseAbsoluteFilePath()) {
-            const root = KeyValues.CreateRoot();
-            root.SetValue(b.GetChildren().map((v) => v));
-            await writeFile(b.GetBaseAbsoluteFilePath(), root.Format(), encoding);
+setKeyValuesAdapter({
+    async readFile(path) {
+        const buf = await readFile(path);
+        const encoding = chardet.detect(buf);
+        if (!encoding) {
+            throw new Error('Unable to detect encoding from ' + path);
         }
-    }
-}
-
-export async function SaveKeyValuesSync(
-    file: string,
-    kv: KeyValues,
-    encoding: BufferEncoding = 'utf8'
-) {
-    writeFileSync(file, kv.Format(), encoding);
-
-    // Save #base
-    const bases = kv.FindAllKeys('#base');
-    for (const b of bases) {
-        if (b.GetBaseFilePath() && b.GetBaseAbsoluteFilePath()) {
-            const root = KeyValues.CreateRoot();
-            root.SetValue(b.GetChildren().map((v) => v));
-            writeFileSync(b.GetBaseAbsoluteFilePath(), root.Format(), encoding);
-        }
-    }
-}
-
-export async function LoadKeyValues3(file: string, encoding: BufferEncoding = 'utf8') {
-    const body = await readFile(file, encoding);
-    return KeyValues3.Parse(body);
-}
-
-export function LoadKeyValues3Sync(file: string, encoding: BufferEncoding = 'utf8') {
-    const body = readFileSync(file, encoding);
-    return KeyValues3.Parse(body);
-}
-
-export async function SaveKeyValues3(
-    file: string,
-    kv: KeyValues3,
-    encoding: BufferEncoding = 'utf8'
-) {
-    await writeFile(file, kv.Format(), encoding);
-}
-
-export async function SaveKeyValues3Sync(
-    file: string,
-    kv: KeyValues3,
-    encoding: BufferEncoding = 'utf8'
-) {
-    writeFileSync(file, kv.Format(), encoding);
-}
+        fileEncoding[path] = encoding;
+        const result = iconv.decode(buf, encoding);
+        return result.toString();
+    },
+    async writeFile(path, data) {
+        const result = iconv.encode(data, fileEncoding[path] || 'utf8');
+        await writeFile(path, result);
+    },
+    resolvePath(filename, basePath) {
+        return resolve(filename, '../' + basePath);
+    },
+    createKeyValuesID() {
+        return '';
+    },
+});

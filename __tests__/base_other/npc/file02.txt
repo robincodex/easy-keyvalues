@@ -1,8 +1,6 @@
-#base    "npc/file01.txt" // file01
-#base    "npc/file02.txt" // file02
 "DOTAAbilities"
 {
-    "ability01"
+    "ability02"
     {
         "BaseClass"          "ability_datadriven"
         "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"

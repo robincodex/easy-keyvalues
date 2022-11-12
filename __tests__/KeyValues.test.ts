@@ -1,27 +1,12 @@
-import { readFile, readFileSync } from 'fs';
 import { join } from 'path';
-import {
-    LoadKeyValues,
-    SaveKeyValues,
-    KeyValues,
-    LoadKeyValuesSync,
-    SaveKeyValuesSync,
-    AutoLoadKeyValuesBase,
-    AutoLoadKeyValuesBaseSync,
-} from '../src/node';
-import * as iconv from 'iconv-lite';
+import { KeyValues, getKeyValuesAdapter } from '../src/node';
+import { describe, expect, test } from '@jest/globals';
+import crypto from 'crypto';
 
 function testKV(kv: KeyValues) {
-    expect(kv.GetChildCount()).toBe(6);
+    expect(kv.GetChildCount()).toBe(3);
 
-    expect(kv.GetChildren().map((v) => v.Key)).toEqual([
-        '#base',
-        '#base',
-        '#base',
-        'DOTAAbilities',
-        'Ha',
-        'test',
-    ]);
+    expect(kv.GetChildren().map((v) => v.Key)).toEqual(['DOTAAbilities', 'Ha', 'test']);
 
     expect(kv.Find((kv) => kv.Key === 'Ha')?.Key).toBe('Ha');
     expect(kv.Find((kv) => kv.Key === '')?.Key).toBe(undefined);
@@ -67,24 +52,20 @@ function testKV(kv: KeyValues) {
 
 describe('KeyValues', () => {
     test('Check KeyValues.txt', async () => {
-        const kv = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
+        const kv = await KeyValues.Load(join(__dirname, 'KeyValues.txt'));
         testKV(kv);
-        await SaveKeyValues(join(__dirname, 'KeyValues.save.txt'), kv);
+        expect(kv.toString()).toMatchSnapshot();
     });
 
     test('Check chat_english.txt', async () => {
-        const buf = readFileSync(join(__dirname, 'chat_english.txt'));
-        const text = iconv.decode(buf, 'utf8');
-        const kv = KeyValues.Parse(text);
+        const kv = await KeyValues.Load(join(__dirname, 'chat_english.txt'));
         const tokens = kv.FindKey('lang')?.FindKey('Tokens');
         expect(!tokens).toBe(false);
         expect(tokens?.GetChildCount()).toBe(11);
     });
 
     test('Check gameui_english.txt', async () => {
-        const buf = readFileSync(join(__dirname, 'gameui_english.txt'));
-        const text = iconv.decode(buf, 'utf8');
-        const kv = KeyValues.Parse(text);
+        const kv = await KeyValues.Load(join(__dirname, 'gameui_english.txt'));
         const tokens = kv.FindKey('lang')?.FindKey('Tokens');
         expect(!tokens).toBe(false);
         expect(tokens?.GetChildCount()).toBe(688);
@@ -98,33 +79,28 @@ describe('KeyValues', () => {
     });
 
     test('Check KeyValues.save.txt', async () => {
-        const kv = LoadKeyValuesSync(join(__dirname, 'KeyValues.save.txt'));
+        const kv = await KeyValues.Load(join(__dirname, 'KeyValues.save.txt'));
         testKV(kv);
-        SaveKeyValuesSync(join(__dirname, 'KeyValues.save.txt'), kv);
+        await kv.Save();
     });
 
     test('Check KeyValues Parse Error', async () => {
-        KeyValues.Parse(`a 123\nb {c 123}`);
-        try {
-            KeyValues.Parse(`a{} 123`);
-        } catch (e) {
-            expect(e).toEqual(Error(`Not readable in line 1`));
-        }
-        try {
-            KeyValues.Parse(`a[] 123`);
-        } catch (e) {
-            expect(e).toEqual(Error(`Not readable in line 1`));
-        }
-        try {
-            KeyValues.Parse(`a" 123`);
-        } catch (e) {
-            expect(e).toEqual(Error(`Not readable in line 1`));
-        }
-        try {
-            KeyValues.Parse(`/* a */`);
-        } catch (e) {
-            expect(e).toEqual(Error(`Line 1: not support multi-line comment`));
-        }
+        await KeyValues.Parse(`a 123\nb {c 123}`);
+        expect(async () => {
+            await KeyValues.Parse(`a{} 123`);
+        }).rejects.toThrow();
+
+        expect(async () => {
+            await KeyValues.Parse(`a[] 123`);
+        }).rejects.toThrow();
+
+        expect(async () => {
+            await KeyValues.Parse(`a" 123`);
+        }).rejects.toThrow();
+
+        expect(async () => {
+            await KeyValues.Parse(`/* a */`);
+        }).rejects.toThrow();
     });
 
     test('Create/Append/Insert/Delete KeyValues', async () => {
@@ -134,7 +110,7 @@ describe('KeyValues', () => {
         expect(root.toString()).toBe(`"a"    "b"\n#base    "file.kv"`);
         expect(root.GetParent()).toBe(undefined);
         expect(root.GetFirstChild()?.Key).toBe('a');
-        expect(root.GetFirstChild()?.GetParent()).toBe(root);
+        expect(root.GetFirstChild()?.GetParent() === root).toBe(true);
 
         root.CreateChild('c', [new KeyValues('d', 'a')])
             .Append(new KeyValues('d', 'a'))
@@ -161,7 +137,7 @@ describe('KeyValues', () => {
         cloneRoot.FindKey('c')?.FindKey('d')?.Append(new KeyValues('c', 'c'));
         expect(root.GetFirstChild()!.Key).toBe('a');
         expect(cloneRoot.FindKey('c')?.FindKey('d')?.FindKey('c')?.GetValue()).toBe('c');
-        expect(root.FindKey('c')?.FindKey('d')?.FindKey('c')).toBe(undefined);
+        expect(root.FindKey('c')?.FindKey('d')?.FindKey('c') === undefined).toBe(true);
 
         const c = root.Delete('c');
         expect(c?.toString()).toBe(`"c"
@@ -173,7 +149,7 @@ describe('KeyValues', () => {
     "d"    "a"
     "d"    "a"
 }`);
-        expect(c?.GetParent()).toBe(undefined);
+        expect(c?.GetParent() === undefined).toBe(true);
     });
 
     test('Check Comment', async () => {
@@ -183,138 +159,105 @@ describe('KeyValues', () => {
 // line2
 "d"    "a" // end`);
 
-        try {
+        expect(() => {
             testComment.Comments.AppendComment('a\nc');
-        } catch (e) {
-            expect(e).toEqual(Error('The comment only allowed one line'));
-        }
-        try {
+        }).toThrow();
+
+        expect(() => {
             testComment.Comments.SetEndOfLineComment('a\nc');
-        } catch (e) {
-            expect(e).toEqual(Error('The comment only allowed one line'));
-        }
-        try {
+        }).toThrow();
+
+        expect(() => {
             testComment.Comments.SetComments(['a\nc']);
-        } catch (e) {
-            expect(e).toEqual(Error('The comment only allowed one line'));
-        }
+        }).toThrow();
     });
 
     test('Check KeyValues Error', () => {
         const kv = new KeyValues('a', []);
         expect(kv.GetValue()).toBe('');
         kv.SetValue('');
-        expect(kv.GetChildren()).toEqual([]);
+        expect(kv.GetChildren().length).toBe(0);
 
-        try {
+        expect(() => {
             kv.Append(new KeyValues(''));
-        } catch (e) {
-            expect(e).toEqual(Error(`The KeyValues [Key = a] does not have children`));
-        }
-        try {
-            kv.Insert(new KeyValues(''), 0);
-        } catch (e) {
-            expect(e).toEqual(Error(`The KeyValues [Key = a] does not have children`));
-        }
-        expect(kv.Find((v) => true)).toBe(undefined);
-        expect(kv.FindKey('')).toBe(undefined);
-        expect(kv.FindTraverse((v) => true)).toBe(undefined);
-        expect(kv.FindAll((v) => true)).toEqual([]);
-        expect(kv.FindAllKeys('')).toEqual([]);
-        expect(kv.Delete('')).toBe(undefined);
+        }).toThrow();
 
-        try {
+        expect(() => {
+            kv.Insert(new KeyValues(''), 0);
+        }).toThrow();
+
+        expect(async () => {
+            await kv.Save();
+        }).rejects.toThrow();
+
+        expect(kv.Find((v) => true) === undefined).toBe(true);
+        expect(kv.FindKey('') === undefined).toBe(true);
+        expect(kv.FindTraverse((v) => true) === undefined).toBe(true);
+        expect(kv.FindAll((v) => true).length).toEqual(0);
+        expect(kv.FindAllKeys('').length).toEqual(0);
+        expect(kv.Delete('') === undefined).toBe(true);
+
+        expect(() => {
             const root = KeyValues.CreateRoot();
             // @ts-ignore
             root.value = '';
             // @ts-ignore
             delete root.children;
             root.Format();
-        } catch (e) {
-            expect(e).toEqual(Error(`The value of the root node kv must be an array`));
-        }
-        try {
-            KeyValues.CreateRoot().SetValue('');
-        } catch (e) {
-            expect(e).toEqual(Error(`The value of the root node kv must be an array`));
-        }
+        }).toThrow();
 
-        try {
+        expect(() => {
+            KeyValues.CreateRoot().SetValue('');
+        }).toThrow();
+
+        expect(() => {
             const kv = new KeyValues('a', []);
             kv.Append(kv);
-        } catch (e) {
-            expect(e).toEqual(Error(`Append(): Can not append self`));
-        }
-        try {
+        }).toThrow();
+
+        expect(() => {
             const kv = new KeyValues('a', []);
             kv.Insert(kv, 0);
-        } catch (e) {
-            expect(e).toEqual(Error(`Insert(): Can not insert self`));
-        }
-        try {
+        }).toThrow();
+
+        expect(() => {
             const kv = new KeyValues('a', []);
             kv.SetValue([kv]);
-        } catch (e) {
-            expect(e).toEqual(Error(`SetValue(): The value can not includes self`));
-        }
+        }).toThrow();
     });
 
     test('Check KeyValues #base', async () => {
-        const root = await LoadKeyValues(join(__dirname, 'KeyValues.base.txt'));
-        await AutoLoadKeyValuesBase(root, __dirname);
+        const root = await KeyValues.Load(join(__dirname, 'KeyValues.base.txt'));
         expect(
             root.FindKey('DOTAAbilities')?.FindKey('ability01')?.FindKey('BaseClass')?.GetValue()
         ).toBe('ability_datadriven');
         expect(
-            root
-                .FindTraverse((kv) => kv.Key === 'ability01')
-                ?.FindKey('BaseClass')
-                ?.GetValue()
-        ).toBe('ability_lua');
-        expect(
             root.FindKey('DOTAAbilities')?.FindKey('ability02')?.FindKey('BaseClass')?.GetValue()
         ).toBe(undefined);
 
-        const root2 = await LoadKeyValues(join(__dirname, 'KeyValues.base.txt'));
-        const list = AutoLoadKeyValuesBaseSync(root2, __dirname);
+        const root2 = await KeyValues.Load(join(__dirname, 'KeyValues.base.txt'));
+        const list = root2.GetBaseList();
         expect(list[0].GetBaseFilePath()).toBe('npc/file01.txt');
         expect(list[1].GetBaseFilePath()).toBe('npc/file02.txt');
-        expect(list[0].GetBaseAbsoluteFilePath()).toBe(
-            join(__dirname, 'npc/file01.txt').replace(/\\/g, '/')
-        );
+        expect(list[0].filename).toBe(join(__dirname, 'npc/file01.txt').replace(/\\/g, '/'));
         expect(list[0].toString()).toBe(`#base    "npc/file01.txt" // file01`);
         expect(list[1].toString()).toBe(`#base    "npc/file02.txt" // file02`);
 
-        await SaveKeyValues(join(__dirname, 'KeyValues.base.save.txt'), root);
-        SaveKeyValuesSync(join(__dirname, 'KeyValues.base.save.txt'), root2);
+        await root.Save();
+        await root.Save(join(__dirname, 'base_other/root.txt'));
 
-        try {
-            list[0].LoadBase(join(__dirname, 'npc/file01.txt'), []);
-        } catch (e) {
-            expect(e).toEqual(Error(`#base does not have a value, maybe it's already loaded`));
-        }
-        try {
-            const root3 = await LoadKeyValues(join(__dirname, 'KeyValues.base.txt'));
-            root3.FindKey('#base')?.LoadBase(join(__dirname, 'npc/file02.txt'), []);
-        } catch (e) {
-            expect(e).toEqual(
-                Error(
-                    `FilePath:"${join(__dirname, 'npc/file02.txt').replace(
-                        /\\/g,
-                        '/'
-                    )}" is not ends with npc/file01.txt`
-                )
-            );
-        }
+        const base = new KeyValues('#base', 'npc/file01.txt');
+        base.Comments.SetEndOfLineComment('file01');
+        expect(base.toString()).toMatchSnapshot();
     });
 
     test('Check KeyValues.toObject', async () => {
-        const kv = KeyValues.Parse(`a 123\nb {c 123}`);
+        const kv = await KeyValues.Parse(`a 123\nb {c 123}`);
         const obj = kv.toObject<{ a: string; b: { c: string } }>();
         expect(obj['a']).toBe('123');
         expect(obj['b']['c']).toBe('123');
 
-        const kv2 = await LoadKeyValues(join(__dirname, 'KeyValues.txt'));
+        const kv2 = await KeyValues.Load(join(__dirname, 'KeyValues.txt'));
         const obj2 = kv2.toObject();
         expect(obj2['DOTAAbilities']['building_system_active_preview']['MaxLevel']).toBe('1');
         expect(typeof obj2['Ha']['t1']['ggg']).toBe('object');
@@ -328,13 +271,14 @@ describe('KeyValues', () => {
     });
 
     test('Check KeyValues.ID', async () => {
-        KeyValues.SetIDEnabled(false);
         const noRootID = KeyValues.CreateRoot();
         expect(noRootID.ID).toBe('');
 
-        KeyValues.SetIDEnabled(true);
+        getKeyValuesAdapter().createKeyValuesID = () => {
+            return crypto.randomBytes(8).toString('hex');
+        };
         const root = KeyValues.CreateRoot();
-        expect(root.ID).toHaveLength(21);
+        expect(root.ID).toHaveLength(16);
 
         const a = new KeyValues('a', 'a');
         const b = new KeyValues('b', 'b');
@@ -344,15 +288,15 @@ describe('KeyValues', () => {
         root.Append(a);
         root.Append(b);
         root.Append(c);
-        expect(root.FindID(a.ID)).toBe(a);
-        expect(root.FindID(b.ID)).toBe(b);
-        expect(root.FindID(c.ID)).toBe(c);
-        expect(root.FindID(d.ID)).toBeUndefined();
-        expect(root.FindID(e.ID)).toBeUndefined();
-        expect(root.FindIDTraverse(a.ID)).toBe(a);
-        expect(root.FindIDTraverse(b.ID)).toBe(b);
-        expect(root.FindIDTraverse(c.ID)).toBe(c);
-        expect(root.FindIDTraverse(d.ID)).toBe(d);
-        expect(root.FindIDTraverse(e.ID)).toBe(e);
+        expect(root.FindID(a.ID) === a).toBe(true);
+        expect(root.FindID(b.ID) === b).toBe(true);
+        expect(root.FindID(c.ID) === c).toBe(true);
+        expect(root.FindID(d.ID) === undefined).toBe(true);
+        expect(root.FindID(e.ID) === undefined).toBe(true);
+        expect(root.FindIDTraverse(a.ID) === a).toBe(true);
+        expect(root.FindIDTraverse(b.ID) === b).toBe(true);
+        expect(root.FindIDTraverse(c.ID) === c).toBe(true);
+        expect(root.FindIDTraverse(d.ID) === d).toBe(true);
+        expect(root.FindIDTraverse(e.ID) === e).toBe(true);
     });
 });

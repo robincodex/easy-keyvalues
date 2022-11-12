@@ -1,17 +1,22 @@
-import { nanoid } from 'nanoid';
+import { getKeyValuesAdapter } from './adapter';
 import { KeyValuesComments } from './Comments';
 
 const KeyValuesRootKey = '__KeyValues_Root__';
 
-let createID = () => '';
+function createID() {
+    const adapter = getKeyValuesAdapter();
+    return adapter.createKeyValuesID();
+}
 
 export default class KeyValues {
-    public static SetIDEnabled(enable: boolean) {
-        if (enable) {
-            createID = () => nanoid();
-        } else {
-            createID = () => '';
-        }
+    private __filename?: string;
+
+    public get filename() {
+        return this.__filename || '';
+    }
+
+    public set filename(s: string | undefined) {
+        this.__filename = s ? s.replace(/\\/g, '/') : s;
     }
 
     /**
@@ -65,7 +70,6 @@ export default class KeyValues {
     }
 
     protected baseFilePath = '';
-    protected baseAbsoluteFilePath = '';
 
     /**
      * Return #base's value
@@ -75,29 +79,10 @@ export default class KeyValues {
     }
 
     /**
-     * Returns the absolute path of the loaded file
+     * KeyValues list of #base
      */
-    public GetBaseAbsoluteFilePath() {
-        return this.baseAbsoluteFilePath;
-    }
-
-    /**
-     * 加载时会删除属性`value`，属性`value`复制给`baseFilePath`
-     * @param filePath Absolute path
-     * @param children Loaded KeyValues
-     */
-    public LoadBase(filePath: string, children: KeyValues[]) {
-        filePath = filePath.replace(/\\/g, '/');
-        if (!this.value) {
-            throw new Error(`#base does not have a value, maybe it's already loaded`);
-        }
-        if (!filePath.endsWith(this.value)) {
-            throw new Error(`FilePath:"${filePath}" is not ends with ${this.value}`);
-        }
-        this.baseFilePath = this.value;
-        this.baseAbsoluteFilePath = filePath;
-        this.SetValue(children);
-        return this;
+    public GetBaseList() {
+        return this.FindAllKeys('#base');
     }
 
     /**
@@ -409,9 +394,27 @@ export default class KeyValues {
     /**
      * Parse string
      */
-    public static Parse(body: string): KeyValues {
+    public static async Parse(body: string, filename?: string): Promise<KeyValues> {
         let root = this.CreateRoot();
+        root.filename = filename;
         this._parse({ body, pos: 0, line: 1 }, root);
+
+        // Load #base
+        if (filename) {
+            const baseList = root.FindAllKeys('#base');
+            const adapter = getKeyValuesAdapter();
+            for (const base of baseList) {
+                const v = base.GetValue().trim();
+                if (v) {
+                    base.baseFilePath = v;
+                    const filePath = adapter.resolvePath(filename, v);
+                    const baseKV = await KeyValues.Load(filePath);
+                    base.filename = baseKV.filename;
+                    base.SetValue(baseKV.GetChildren().map((v) => v.Free()));
+                }
+            }
+        }
+
         return root;
     }
 
@@ -580,5 +583,41 @@ export default class KeyValues {
         }
 
         return obj;
+    }
+
+    /**
+     * Load KeyValues from file
+     */
+    public static async Load(filename: string): Promise<KeyValues> {
+        const adapter = getKeyValuesAdapter();
+        const text = await adapter.readFile(filename);
+        return await this.Parse(text, filename);
+    }
+
+    /**
+     * Save KeyValues to file
+     */
+    public async Save(otherFilename?: string): Promise<void> {
+        const filename = otherFilename ?? this.filename;
+        if (!filename) {
+            throw new Error('Not found filename in KeyValues');
+        }
+        const adapter = getKeyValuesAdapter();
+        await adapter.writeFile(filename, this.Format());
+
+        // Save #base
+        const baseList = this.FindAllKeys('#base');
+        for (const base of baseList) {
+            const content = base
+                .GetChildren()
+                .map((v) => v.Format())
+                .join('\n');
+            if (otherFilename) {
+                const filePath = adapter.resolvePath(filename, base.GetBaseFilePath());
+                await adapter.writeFile(filePath, content);
+            } else {
+                await adapter.writeFile(base.filename!, content);
+            }
+        }
     }
 }

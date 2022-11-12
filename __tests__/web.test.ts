@@ -3,6 +3,7 @@ import { join } from 'path';
 import { LoadKeyValues, LoadKeyValues3 } from '../src/web';
 import { createServer, Server } from 'http';
 import { URL } from 'url';
+import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
 
 describe('Browser', () => {
     let server: Server;
