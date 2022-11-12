@@ -2,9 +2,9 @@ import rollupTypescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import { join } from 'path';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import p from './package.json'
+import p from './package.json';
 
-const external = Object.keys(p.dependencies)
+const external = Object.keys(p.dependencies);
 
 module.exports = [
     {
