@@ -8,10 +8,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: yarn --frozen-lockfile
-      - run: yarn lint:prettier
-      - run: yarn test
+          registry-url: 'https://registry.npmjs.org'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:prettier
+      - run: pnpm test

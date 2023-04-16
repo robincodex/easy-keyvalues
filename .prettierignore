@@ -3,3 +3,4 @@ coverage
 dist
 .github
 package
+pnpm-lock.yaml
