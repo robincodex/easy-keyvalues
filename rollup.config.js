@@ -3,10 +3,12 @@ import commonjs from '@rollup/plugin-commonjs';
 import { join } from 'path';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import p from './package.json';
+import dts from 'rollup-plugin-dts';
 
 const external = Object.keys(p.dependencies);
 
 module.exports = [
+    // build node
     {
         input: 'src/node.ts',
         output: {
@@ -21,6 +23,22 @@ module.exports = [
             nodeResolve(),
         ],
     },
+    // build node.d.ts
+    {
+        input: 'src/node.ts',
+        output: {
+            file: 'package/node.d.ts',
+            format: 'esm',
+        },
+        external,
+        plugins: [
+            dts.default({
+                tsconfig: 'tsconfig.json',
+                compilerOptions: { removeComments: false, declaration: true },
+            }),
+        ],
+    },
+    // build web
     {
         input: 'src/web.ts',
         output: {
@@ -38,6 +56,22 @@ module.exports = [
             }),
         ],
     },
+    // build web.d.ts
+    {
+        input: 'src/web.ts',
+        output: {
+            file: 'package/web.d.ts',
+            format: 'esm',
+        },
+        external,
+        plugins: [
+            dts.default({
+                tsconfig: 'tsconfig.json',
+                compilerOptions: { removeComments: false, declaration: true },
+            }),
+        ],
+    },
+    // build es module
     {
         input: 'src/es.ts',
         output: {
@@ -51,6 +85,21 @@ module.exports = [
             rollupTypescript({
                 exclude: ['src/node.ts'],
                 tsconfig: join(__dirname, 'tsconfig.json'),
+            }),
+        ],
+    },
+    // build es.d.ts
+    {
+        input: 'src/es.ts',
+        output: {
+            file: 'package/es.d.ts',
+            format: 'esm',
+        },
+        external,
+        plugins: [
+            dts.default({
+                tsconfig: 'tsconfig.json',
+                compilerOptions: { removeComments: false, declaration: true },
             }),
         ],
     },
