@@ -104,7 +104,7 @@ describe('KeyValues3', () => {
             root
                 .Find((kv) => kv.Key === 'g')
                 ?.GetValue()
-                .IsArray()
+                .IsArray(),
         ).toBe(true);
 
         expect(root.FindKey('e')?.GetValue().IsFeature()).toBe(true);
@@ -128,17 +128,17 @@ describe('KeyValues3', () => {
                                 KeyValues3.Int(255),
                                 KeyValues3.Int(255),
                                 KeyValues3.Int(255),
-                            ])
+                            ]),
                         ),
                     ]),
-                ])
+                ]),
             )
             .Append(
                 KeyValues3.Object([
                     new KeyValues3('c1', KeyValues3.String('1')),
                     new KeyValues3('c2', KeyValues3.String('2')),
                     new KeyValues3('c3', KeyValues3.Array([KeyValues3.String('1')])),
-                ])
+                ]),
             );
 
         h.CreateObjectValue(
@@ -152,9 +152,9 @@ describe('KeyValues3', () => {
                     KeyValues3.Array([
                         KeyValues3.Feature(
                             'resource',
-                            'particles/avalon_assets/environment/battle_ring/battle_ring_d.vpcf'
+                            'particles/avalon_assets/environment/battle_ring/battle_ring_d.vpcf',
                         ),
-                    ])
+                    ]),
                 ),
                 new KeyValues3(
                     'c3',
@@ -164,9 +164,9 @@ describe('KeyValues3', () => {
                         KeyValues3.Feature('resource', 'particles/c.vpcf'),
                         KeyValues3.Feature('resource', 'particles/d.vpcf'),
                         KeyValues3.Feature('resource', 'particles/e.vpcf'),
-                    ])
+                    ]),
                 ),
-            ])
+            ]),
         );
 
         h.CreateObjectValue(
@@ -174,7 +174,7 @@ describe('KeyValues3', () => {
             KeyValues3.String(`
 First line of a multi-line string literal.
 Second line of a multi-line string literal.
-`)
+`),
         );
 
         expect(root.toString()).toMatchSnapshot();
@@ -200,7 +200,7 @@ Second line of a multi-line string literal.
                 new KeyValues3('particles', KeyValues3.Array([pa])),
                 a,
                 new KeyValues3('q', KeyValues3.String('qq')),
-            ])
+            ]),
         );
         c.GetValue().Comments.SetEndOfLineComment('end c');
         const q = KeyValues3.String('qq');
@@ -281,7 +281,7 @@ Second line of a multi-line string literal.
         expect(root.FindKey('doubleValue')?.GetValue().IsDouble()).toBe(true);
         expect(root.FindKey('stringValue')?.GetValue().Value()).toBe(`hello world \\n \\"ss\\" `);
         expect(root.FindKey('stringThatIsAResourceReference')?.GetValue().Value()).toBe(
-            'particles/items3_fx/star_emblem.vpcf'
+            'particles/items3_fx/star_emblem.vpcf',
         );
         expect(root.FindKey('multiLineStringValue')?.GetValue().Value()).toBe(`
 First line of a multi-line string literal.
@@ -315,7 +315,7 @@ Second line of a multi-line string literal.
                 ?.FindKey('h')
                 ?.GetValue()
                 .Value()
-                .map((v: any) => v.Value())
+                .map((v: any) => v.Value()),
         ).toEqual(['a', 456]);
     }
 
@@ -332,7 +332,7 @@ Second line of a multi-line string literal.
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n @a = 123 \n}`);
         } catch (e) {
             expect(e).toEqual(
-                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '@a'`)
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '@a'`),
             );
         }
 
@@ -340,7 +340,7 @@ Second line of a multi-line string literal.
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n $a = 123 \n}`);
         } catch (e) {
             expect(e).toEqual(
-                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '$a'`)
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '$a'`),
             );
         }
 
@@ -348,7 +348,7 @@ Second line of a multi-line string literal.
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n #a = 123 \n}`);
         } catch (e) {
             expect(e).toEqual(
-                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '#a'`)
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '#a'`),
             );
         }
 
@@ -357,8 +357,8 @@ Second line of a multi-line string literal.
         } catch (e) {
             expect(e).toEqual(
                 Error(
-                    `not readable as KeyValues3 text: Line 3: multi-line start identifier """ must be followed by newline`
-                )
+                    `not readable as KeyValues3 text: Line 3: multi-line start identifier """ must be followed by newline`,
+                ),
             );
         }
 
@@ -369,8 +369,8 @@ Second line of a multi-line string literal.
         } catch (e) {
             expect(e).toEqual(
                 Error(
-                    `not readable as KeyValues3 text: Line 5: multi-line end identifier """ must be at the beginning of line`
-                )
+                    `not readable as KeyValues3 text: Line 5: multi-line end identifier """ must be at the beginning of line`,
+                ),
             );
         }
 
@@ -384,8 +384,8 @@ Second line of a multi-line string literal.
         } catch (e) {
             expect(e).toEqual(
                 Error(
-                    `not readable as KeyValues3 text: Line 5: multi-line start identifier """ must be followed by newline`
-                )
+                    `not readable as KeyValues3 text: Line 5: multi-line start identifier """ must be followed by newline`,
+                ),
             );
         }
 
@@ -399,8 +399,8 @@ Second line of a multi-line string literal.
         } catch (e) {
             expect(e).toEqual(
                 Error(
-                    `not readable as KeyValues3 text: Line 7: multi-line end identifier """ must be at the beginning of line`
-                )
+                    `not readable as KeyValues3 text: Line 7: multi-line end identifier """ must be at the beginning of line`,
+                ),
             );
         }
 
@@ -411,8 +411,8 @@ Second line of a multi-line string literal.
         } catch (e) {
             expect(e).toEqual(
                 Error(
-                    `not readable as KeyValues3 text: Line 5: multi-line string must be end with """`
-                )
+                    `not readable as KeyValues3 text: Line 5: multi-line string must be end with """`,
+                ),
             );
         }
 
@@ -423,8 +423,8 @@ Second line of a multi-line string literal.
         } catch (e) {
             expect(e).toEqual(
                 Error(
-                    `not readable as KeyValues3 text: Line 5: multi-line string must be end with """`
-                )
+                    `not readable as KeyValues3 text: Line 5: multi-line string must be end with """`,
+                ),
             );
         }
 
@@ -432,7 +432,7 @@ Second line of a multi-line string literal.
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = custom:"" \n}`);
         } catch (e) {
             expect(e).toEqual(
-                Error(`not readable as KeyValues3 text: Line 3: Invalid value 'custom:""'`)
+                Error(`not readable as KeyValues3 text: Line 3: Invalid value 'custom:""'`),
             );
         }
 
@@ -452,7 +452,7 @@ Second line of a multi-line string literal.
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n = a \n}`);
         } catch (e) {
             expect(e).toEqual(
-                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '='`)
+                Error(`not readable as KeyValues3 text: Line 3: Invalid member name '='`),
             );
         }
 
@@ -460,7 +460,7 @@ Second line of a multi-line string literal.
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = [custom:""] \n}`);
         } catch (e) {
             expect(e).toEqual(
-                Error(`not readable as KeyValues3 text: Line 3: Invalid value 'custom:""'`)
+                Error(`not readable as KeyValues3 text: Line 3: Invalid value 'custom:""'`),
             );
         }
 
@@ -468,7 +468,7 @@ Second line of a multi-line string literal.
             KeyValues3.Parse(`${KeyValues3.CommonHeader}\n{\n a = ["b" "c"] \n}`);
         } catch (e) {
             expect(e).toEqual(
-                Error(`not readable as KeyValues3 text: Line 3: Expected ',' or ']'`)
+                Error(`not readable as KeyValues3 text: Line 3: Expected ',' or ']'`),
             );
         }
 
@@ -559,7 +559,10 @@ Second line of a multi-line string literal.
         const c3 = new KeyValues3('c3', KeyValues3.String('c3'));
         const a3 = new KeyValues3(
             'a3',
-            KeyValues3.Array([KeyValues3.Object([b3]), KeyValues3.Array([KeyValues3.Object([c3])])])
+            KeyValues3.Array([
+                KeyValues3.Object([b3]),
+                KeyValues3.Array([KeyValues3.Object([c3])]),
+            ]),
         );
         const e = root.CreateObjectValue('e', KeyValues3.Object([a2, b2, c2, a3]));
         expect(root.FindID(e.ID) === e).toBe(true);
@@ -589,14 +592,14 @@ Second line of a multi-line string literal.
     test('Check KeyValues3 Header', async () => {
         const root = await KeyValues3.Load(join(__dirname, 'npc/particle.vpcf'));
         expect(root.GetHeader()).toBe(
-            '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->'
+            '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->',
         );
     });
 
     test('Check KeyValues3 Header', async () => {
         const root = await KeyValues3.Load(join(__dirname, 'npc/particle.vpcf'));
         expect(root.GetHeader()).toBe(
-            '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->'
+            '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf36:version{d15c9157-10e0-47bc-9333-1ac81da07b8d} -->',
         );
     });
 

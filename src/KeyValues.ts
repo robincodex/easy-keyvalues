@@ -44,7 +44,10 @@ export default class KeyValues {
      */
     public readonly ID = createID();
 
-    constructor(public Key: string, defaultValue?: string | KeyValues[]) {
+    constructor(
+        public Key: string,
+        defaultValue?: string | KeyValues[],
+    ) {
         this.SetValue(defaultValue || '');
     }
 
@@ -190,7 +193,7 @@ export default class KeyValues {
      * Find a KeyValues from children
      */
     public Find(
-        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
+        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean,
     ): KeyValues | undefined {
         if (!this.children) {
             return;
@@ -206,7 +209,7 @@ export default class KeyValues {
      * Find all KeyValues from children
      */
     public FindAll(
-        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
+        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean,
     ): KeyValues[] {
         if (!this.children) {
             return [];
@@ -238,7 +241,7 @@ export default class KeyValues {
      * Find a KeyValues from children and children's children...
      */
     public FindTraverse(
-        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
+        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean,
     ): KeyValues | undefined {
         if (!this.children) {
             return;
@@ -251,7 +254,7 @@ export default class KeyValues {
      */
     protected static FindTraverse(
         root: KeyValues,
-        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean
+        callback: (kv: KeyValues, i: number, parent: KeyValues) => boolean,
     ): KeyValues | undefined {
         if (root.HasChildren()) {
             for (const [i, kv] of root.GetChildren().entries()) {
@@ -356,7 +359,7 @@ export default class KeyValues {
                 }
             } else {
                 text += `${tab}"${this.Key}"${' '.repeat(
-                    Math.max(0, maxLength - this.Key.length)
+                    Math.max(0, maxLength - this.Key.length),
                 )}`;
                 text += `    "${this.value}"`;
                 if (this.Comments.HasEndOfLineComment()) {
@@ -380,7 +383,7 @@ export default class KeyValues {
         }
         return new KeyValues(
             this.Key,
-            this.children.map((v) => v.Clone())
+            this.children.map((v) => v.Clone()),
         );
     }
 

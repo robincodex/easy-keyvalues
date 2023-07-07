@@ -1,7 +1,7 @@
 {
     "tabWidth": 4,
     "semi": true,
-    "proseWrap": "always",
+    "proseWrap": "preserve",
     "printWidth": 100,
     "singleQuote": true
 }

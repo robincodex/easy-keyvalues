@@ -1,5 +1,8 @@
 export class KeyValuesComments {
-    constructor(protected comments: string[] = [], protected endOfLineComment: string = '') {}
+    constructor(
+        protected comments: string[] = [],
+        protected endOfLineComment: string = '',
+    ) {}
 
     public GetComments(): string[] {
         return this.comments;
@@ -45,7 +48,10 @@ export class KeyValuesComments {
 }
 
 export class KeyValues3Comments {
-    constructor(protected comments: string[] = [], protected endOfLineComment: string = '') {}
+    constructor(
+        protected comments: string[] = [],
+        protected endOfLineComment: string = '',
+    ) {}
 
     public GetComments(): string[] {
         return this.comments;

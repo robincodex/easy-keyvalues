@@ -28,7 +28,7 @@ function testKV(kv: KeyValues) {
             .FindKey('DOTAAbilities')
             ?.FindKey('building_system_active_preview')
             ?.FindKey('AbilityTextureName')
-            ?.GetValue()
+            ?.GetValue(),
     ).toBe('abaddon/mistral_fiend_icons//abaddon_borrowed_time');
 
     expect(kv.FindKey('test')?.FindKey('children')?.FindKey('c2')?.GetValue()).toBe('2 \\"two\\"');
@@ -42,11 +42,11 @@ function testKV(kv: KeyValues) {
     ]);
 
     expect(kv.FindKey('test')?.FindKey('children')?.Comments?.GetEndOfLineComment()).toBe(
-        'this is children'
+        'this is children',
     );
 
     expect(kv.FindKey('test')?.FindKey('children')?.FindKey('c3')?.GetValue()).toBe(
-        'sss\n    <br/>this is child\\n index 3\n    88'
+        'sss\n    <br/>this is child\\n index 3\n    88',
     );
 }
 
@@ -74,7 +74,7 @@ describe('KeyValues', () => {
             tokens
                 ?.FindAllKeys('GameUI_JoystickMoveLookSticks')
                 ?.map((v) => v.Flags)
-                .join(',')
+                .join(','),
         ).toBe('$WIN32,$X360');
     });
 
@@ -126,7 +126,7 @@ describe('KeyValues', () => {
     }
     "d"    "a"
     "d"    "a"
-}`
+}`,
         );
 
         const cloneRoot = root.Clone();
@@ -229,10 +229,10 @@ describe('KeyValues', () => {
     test('Check KeyValues #base', async () => {
         const root = await KeyValues.Load(join(__dirname, 'KeyValues.base.txt'));
         expect(
-            root.FindKey('DOTAAbilities')?.FindKey('ability01')?.FindKey('BaseClass')?.GetValue()
+            root.FindKey('DOTAAbilities')?.FindKey('ability01')?.FindKey('BaseClass')?.GetValue(),
         ).toBe('ability_datadriven');
         expect(
-            root.FindKey('DOTAAbilities')?.FindKey('ability02')?.FindKey('BaseClass')?.GetValue()
+            root.FindKey('DOTAAbilities')?.FindKey('ability02')?.FindKey('BaseClass')?.GetValue(),
         ).toBe(undefined);
 
         const root2 = await KeyValues.Load(join(__dirname, 'KeyValues.base.txt'));

@@ -15,7 +15,7 @@
         "test:kv": "jest --coverage=false -- __tests__/KeyValues.test.ts",
         "test:kv3": "jest --coverage=false -- __tests__/KeyValues3.test.ts",
         "lint:prettier": "prettier --check .",
-        "write-prettier": "prettier --write ."
+        "write-prettier": "prettier . --write --config .prettierrc.json"
     },
     "author": "RobinCode",
     "homepage": "https://github.com/RobinCodeX/easy-keyvalues",

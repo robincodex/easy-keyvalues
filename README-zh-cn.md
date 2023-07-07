@@ -9,8 +9,8 @@
 ![coverage](./coverage/badge-statements.svg) ![coverage](./coverage/badge-branches.svg)
 ![coverage](./coverage/badge-functions.svg) ![coverage](./coverage/badge-lines.svg)
 
-写个库的原因是我想编辑 KV 文本，保存的时候可以格式化文本，并且保留注释，支持自动载入 KV 的`#base`等
-。
+写个库的原因是我想编辑 KV 文本，保存的时候可以格式化文本，并且保留注释，支持自动载入 KV
+的`#base`等。
 
 > 我完全重写了这个库，不与之前的版本兼容，所以版本从 1.0.0 开始。
 
@@ -250,8 +250,8 @@ kv.toObject();
 
 # KeyValues3
 
-相比于 KeyValues，KeyValues3 有了多种数据类型，格式与 JSON 相似，相对的，代码也比 KeyValues 复杂很多
-。
+相比于 KeyValues，KeyValues3 有了多种数据类型，格式与 JSON 相似，相对的，代码也比 KeyValues 复杂很
+多。
 
 参考 https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValues3
 

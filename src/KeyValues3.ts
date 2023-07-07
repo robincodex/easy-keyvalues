@@ -239,7 +239,10 @@ class ValueDouble extends KV3BaseValue {
 class ValueFeature extends KV3BaseValue {
     protected value: string = '';
 
-    constructor(public Feature = 'resource', initValue?: string) {
+    constructor(
+        public Feature = 'resource',
+        initValue?: string,
+    ) {
         super();
         if (initValue) {
             this.SetValue(initValue);
@@ -334,7 +337,7 @@ class ValueArray extends KV3BaseValue {
                     v.IsArray() ||
                     v.IsObject() ||
                     v.Comments.HasComments() ||
-                    v.Comments.HasEndOfLineComment()
+                    v.Comments.HasEndOfLineComment(),
             )
         ) {
             oneLine = false;
@@ -466,7 +469,7 @@ class ValueObject extends KV3BaseValue {
      * Find a KeyValues3
      */
     public Find(
-        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean
+        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean,
     ): KeyValues3 | undefined {
         for (const [i, kv] of this.value.entries()) {
             if (callback(kv, i, this) === true) {
@@ -486,7 +489,7 @@ class ValueObject extends KV3BaseValue {
      * Find a KeyValues3
      */
     public FindAll(
-        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean
+        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean,
     ): KeyValues3[] {
         const result: KeyValues3[] = [];
         for (const [i, kv] of this.value.entries()) {
@@ -606,7 +609,10 @@ export default class KeyValues3 {
      */
     public readonly ID = createID();
 
-    constructor(public Key: string, defaultValue: IKV3Value) {
+    constructor(
+        public Key: string,
+        defaultValue: IKV3Value,
+    ) {
         this.value = defaultValue;
         this.value.SetOwner(this);
     }
@@ -674,7 +680,7 @@ export default class KeyValues3 {
     }
 
     public Find(
-        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean
+        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean,
     ): KeyValues3 | undefined {
         if (!this.value.IsObject()) {
             throw Error('The KeyValues3 is not an object');
@@ -687,7 +693,7 @@ export default class KeyValues3 {
     }
 
     public FindAll(
-        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean
+        callback: (kv: KeyValues3, i: number, parent: ValueObject) => boolean,
     ): KeyValues3[] {
         if (!this.value.IsObject()) {
             throw Error('The KeyValues3 is not an object');
@@ -779,6 +785,8 @@ export default class KeyValues3 {
     public Clone(): KeyValues3 {
         if (this.IsRoot()) {
             const root = KeyValues3.CreateRoot();
+            root.header = this.header;
+            root.__filename = this.__filename;
             root.SetValue(this.value.Clone());
             return root;
         }
@@ -808,7 +816,7 @@ export default class KeyValues3 {
 
     protected static _parse(
         parent: KeyValues3,
-        data: { body: string; line: number; pos: number; tokenCounter: number }
+        data: { body: string; line: number; pos: number; tokenCounter: number },
     ) {
         if (parent.value.IsObject()) {
             let isKey = true;
@@ -880,8 +888,8 @@ export default class KeyValues3 {
                                             throw new Error(
                                                 this._parse_error(
                                                     data.line,
-                                                    `multi-line start identifier """ must be followed by newline`
-                                                )
+                                                    `multi-line start identifier """ must be followed by newline`,
+                                                ),
                                             );
                                         }
                                         data.pos += 1;
@@ -895,8 +903,8 @@ export default class KeyValues3 {
                                                 throw new Error(
                                                     this._parse_error(
                                                         data.line,
-                                                        `multi-line end identifier """ must be at the beginning of line`
-                                                    )
+                                                        `multi-line end identifier """ must be at the beginning of line`,
+                                                    ),
                                                 );
                                             }
                                             data.pos += 2;
@@ -904,8 +912,8 @@ export default class KeyValues3 {
                                             throw new Error(
                                                 this._parse_error(
                                                     data.line,
-                                                    `multi-line string must be end with """`
-                                                )
+                                                    `multi-line string must be end with """`,
+                                                ),
                                             );
                                         }
                                     }
@@ -928,14 +936,14 @@ export default class KeyValues3 {
                                 if (MatchBoolean.test(str)) {
                                     lastKV = parent.CreateObjectValue(
                                         key,
-                                        new ValueBoolean(str === 'true')
+                                        new ValueBoolean(str === 'true'),
                                     );
                                 } else if (MatchNull.test(str)) {
                                     lastKV = parent.CreateObjectValue(key, new ValueNull());
                                 } else if (MatchInt.test(str)) {
                                     lastKV = parent.CreateObjectValue(
                                         key,
-                                        new ValueInt(parseInt(str))
+                                        new ValueInt(parseInt(str)),
                                     );
                                 } else if (
                                     MatchDouble.test(str) ||
@@ -944,7 +952,7 @@ export default class KeyValues3 {
                                 ) {
                                     lastKV = parent.CreateObjectValue(
                                         key,
-                                        new ValueDouble(Number(str))
+                                        new ValueDouble(Number(str)),
                                     );
                                 } else if (MatchFeature.test(str)) {
                                     const index = str.indexOf(':');
@@ -952,13 +960,13 @@ export default class KeyValues3 {
                                     let v = str.slice(index + 2, str.length - 1);
                                     lastKV = parent.CreateObjectValue(
                                         key,
-                                        new ValueFeature(feature, v)
+                                        new ValueFeature(feature, v),
                                     );
                                 } else if (MatchStrangeNumber.test(str)) {
                                     lastKV = parent.CreateObjectValue(key, new ValueString(str));
                                 } else {
                                     throw new Error(
-                                        this._parse_error(data.line, `Invalid value '${str}'`)
+                                        this._parse_error(data.line, `Invalid value '${str}'`),
                                     );
                                 }
                                 lastKV.value.Comments.SetComments(commentCache);
@@ -985,7 +993,7 @@ export default class KeyValues3 {
                         const nextIndex = data.body.indexOf('\n', data.pos + 2);
                         if (isEndOfLineComment && lastKV) {
                             lastKV.value.Comments.SetEndOfLineComment(
-                                data.body.slice(data.pos + 2, nextIndex).trimStart()
+                                data.body.slice(data.pos + 2, nextIndex).trimStart(),
                             );
                             isEndOfLineComment = false;
                         } else {
@@ -1060,7 +1068,7 @@ export default class KeyValues3 {
                     }
                     if (!inQoute && !MatchKeyNoQuote.test(key)) {
                         throw new Error(
-                            this._parse_error(data.line, `Invalid member name '${key}'`)
+                            this._parse_error(data.line, `Invalid member name '${key}'`),
                         );
                     }
                     isKey = false;
@@ -1109,8 +1117,8 @@ export default class KeyValues3 {
                                         throw new Error(
                                             this._parse_error(
                                                 data.line,
-                                                `multi-line start identifier """ must be followed by newline`
-                                            )
+                                                `multi-line start identifier """ must be followed by newline`,
+                                            ),
                                         );
                                     }
                                     data.pos += 1;
@@ -1124,8 +1132,8 @@ export default class KeyValues3 {
                                             throw new Error(
                                                 this._parse_error(
                                                     data.line,
-                                                    `multi-line end identifier """ must be at the beginning of line`
-                                                )
+                                                    `multi-line end identifier """ must be at the beginning of line`,
+                                                ),
                                             );
                                         }
                                         data.pos += 2;
@@ -1133,8 +1141,8 @@ export default class KeyValues3 {
                                         throw new Error(
                                             this._parse_error(
                                                 data.line,
-                                                `multi-line string must be end with """`
-                                            )
+                                                `multi-line string must be end with """`,
+                                            ),
                                         );
                                     }
                                 }
@@ -1181,7 +1189,7 @@ export default class KeyValues3 {
                                 parent.AppendValue(lastValue);
                             } else {
                                 throw new Error(
-                                    this._parse_error(data.line, `Invalid value '${str}'`)
+                                    this._parse_error(data.line, `Invalid value '${str}'`),
                                 );
                             }
                             lastValue.Comments.SetComments(commentCache);
@@ -1205,7 +1213,7 @@ export default class KeyValues3 {
                         const nextIndex = data.body.indexOf('\n', data.pos + 2);
                         if (isEndOfLineComment && lastValue) {
                             lastValue.Comments.SetEndOfLineComment(
-                                data.body.slice(data.pos + 2, nextIndex).trimStart()
+                                data.body.slice(data.pos + 2, nextIndex).trimStart(),
                             );
                             isEndOfLineComment = false;
                         } else {
