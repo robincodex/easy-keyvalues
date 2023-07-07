@@ -48,13 +48,13 @@ describe('KeyValues3', () => {
         expect(d.GetValue().IsBoolean()).toBe(true);
         expect(d.GetValue().Value()).toBe(true);
 
-        const e = root.CreateObjectValue('e', KeyValues3.Resource('x'));
-        expect(e.GetValue().IsResource()).toBe(true);
-        expect(e.GetValue().Value()).toBe('x');
+        const e = root.CreateObjectValue('e', KeyValues3.Feature('resource', 'x'));
+        expect(e.GetValue().IsFeature()).toBe(true);
+        expect(e.GetValue().Format()).toBe('resource:"x"');
 
-        const f = root.CreateObjectValue('f', KeyValues3.DeferredResource('x'));
-        expect(f.GetValue().IsDeferredResource()).toBe(true);
-        expect(f.GetValue().Value()).toBe('x');
+        const f = root.CreateObjectValue('f', KeyValues3.Feature('deferred_resource', 'x'));
+        expect(f.GetValue().IsFeature()).toBe(true);
+        expect(f.GetValue().Format()).toBe('deferred_resource:"x"');
 
         const g_ary = KeyValues3.Array([]);
         const g = root.CreateObjectValue('g', g_ary);
@@ -107,7 +107,7 @@ describe('KeyValues3', () => {
                 .IsArray()
         ).toBe(true);
 
-        expect(root.FindKey('e')?.GetValue().IsResource()).toBe(true);
+        expect(root.FindKey('e')?.GetValue().IsFeature()).toBe(true);
 
         expect(root.FindAllKeys('e').length).toBe(1);
 
@@ -150,7 +150,8 @@ describe('KeyValues3', () => {
                 new KeyValues3(
                     'c3',
                     KeyValues3.Array([
-                        KeyValues3.Resource(
+                        KeyValues3.Feature(
+                            'resource',
                             'particles/avalon_assets/environment/battle_ring/battle_ring_d.vpcf'
                         ),
                     ])
@@ -158,11 +159,11 @@ describe('KeyValues3', () => {
                 new KeyValues3(
                     'c3',
                     KeyValues3.Array([
-                        KeyValues3.Resource('particles/a.vpcf'),
-                        KeyValues3.Resource('particles/b.vpcf'),
-                        KeyValues3.Resource('particles/c.vpcf'),
-                        KeyValues3.Resource('particles/d.vpcf'),
-                        KeyValues3.Resource('particles/e.vpcf'),
+                        KeyValues3.Feature('resource', 'particles/a.vpcf'),
+                        KeyValues3.Feature('resource', 'particles/b.vpcf'),
+                        KeyValues3.Feature('resource', 'particles/c.vpcf'),
+                        KeyValues3.Feature('resource', 'particles/d.vpcf'),
+                        KeyValues3.Feature('resource', 'particles/e.vpcf'),
                     ])
                 ),
             ])
@@ -189,7 +190,7 @@ Second line of a multi-line string literal.
         a.GetValue().Comments.AppendComment('multi-line 1\nmulti-line 2');
         a.GetValue().Comments.AppendComment('*multi-line 1\n* multi-line 2\n*    ml3\nm4');
         a.GetValue().Comments.SetEndOfLineComment('end a');
-        const pa = KeyValues3.Resource('particles/a.vpcf');
+        const pa = KeyValues3.Feature('resource', 'particles/a.vpcf');
         pa.Comments.AppendComment('line 1');
         pa.Comments.AppendComment('line 1 \n line 2');
         pa.Comments.SetEndOfLineComment('eeend');
@@ -293,8 +294,12 @@ Second line of a multi-line string literal.
             expect(ary.Value()[0].Value()).toBe(1);
             expect(ary.Value()[1].Value()).toBe(2);
             expect(ary.Value()[2].IsObject()).toBe(true);
-            expect(ary.Value()[3].IsResource()).toBe(true);
-            expect(ary.Value()[3].Value()).toBe('particles/items3_fx/star_emblem.vpcf');
+            const soundevent = ary.Value()[3];
+            expect(soundevent.IsFeature()).toBe(true);
+            if (soundevent.IsFeature()) {
+                expect(soundevent.Feature).toBe('soundevent');
+            }
+            expect(soundevent.Value()).toBe('evelynney.Footsteps');
         }
 
         const obj = root.FindKey('objectValue')?.GetValue();
@@ -502,8 +507,8 @@ Second line of a multi-line string literal.
         root.CreateObjectValue('b', KeyValues3.Boolean(false));
         root.CreateObjectValue('c', KeyValues3.Int(1));
         root.CreateObjectValue('d', KeyValues3.Double(2));
-        root.CreateObjectValue('e', KeyValues3.Resource('path.vpcf'));
-        root.CreateObjectValue('f', KeyValues3.DeferredResource('path.vpcf'));
+        root.CreateObjectValue('e', KeyValues3.Feature('resource', 'path.vpcf'));
+        root.CreateObjectValue('f', KeyValues3.Feature('deferred_resource', 'path.vpcf'));
         root.CreateObjectValue('g', KeyValues3.Array([KeyValues3.String('b')]));
         root.CreateObjectValue('h', KeyValues3.Object([]));
 

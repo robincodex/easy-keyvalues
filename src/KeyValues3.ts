@@ -15,8 +15,7 @@ export interface IKV3Value {
     IsInt(): this is ValueInt;
     IsDouble(): this is ValueDouble;
     IsString(): this is ValueString;
-    IsResource(): this is ValueResource;
-    IsDeferredResource(): this is ValueDeferredResource;
+    IsFeature(): this is ValueFeature;
     IsArray(): this is ValueArray;
     IsObject(): this is ValueObject;
     IsNull(): this is ValueNull;
@@ -57,11 +56,8 @@ export class KV3BaseValue implements IKV3Value {
     public IsString(): this is ValueString {
         return this instanceof ValueString;
     }
-    public IsResource(): this is ValueResource {
-        return this instanceof ValueResource;
-    }
-    public IsDeferredResource(): this is ValueDeferredResource {
-        return this instanceof ValueDeferredResource;
+    public IsFeature(): this is ValueFeature {
+        return this instanceof ValueFeature;
     }
     public IsArray(): this is ValueArray {
         return this instanceof ValueArray;
@@ -235,45 +231,15 @@ class ValueDouble extends KV3BaseValue {
 }
 
 /**
+ * Similar values:
  * resource:""
- */
-class ValueResource extends KV3BaseValue {
-    protected value: string = '';
-
-    constructor(initValue?: string) {
-        super();
-        if (initValue) {
-            this.SetValue(initValue);
-        }
-    }
-
-    public Value() {
-        return this.value;
-    }
-
-    public SetValue(v: string) {
-        this.value = v;
-        return this;
-    }
-
-    public Format(): string {
-        return `resource:"${this.value}"`;
-    }
-
-    public Clone() {
-        const v = new ValueResource(this.value);
-        v.SetOwner(this.owner);
-        return v;
-    }
-}
-
-/**
  * deferred_resource:""
+ * soundevent:""
  */
-class ValueDeferredResource extends KV3BaseValue {
+class ValueFeature extends KV3BaseValue {
     protected value: string = '';
 
-    constructor(initValue?: string) {
+    constructor(public Feature = 'resource', initValue?: string) {
         super();
         if (initValue) {
             this.SetValue(initValue);
@@ -290,11 +256,11 @@ class ValueDeferredResource extends KV3BaseValue {
     }
 
     public Format(): string {
-        return `deferred_resource:"${this.value}"`;
+        return `${this.Feature}:"${this.value}"`;
     }
 
     public Clone() {
-        const v = new ValueDeferredResource(this.value);
+        const v = new ValueFeature(this.value);
         v.SetOwner(this.owner);
         return v;
     }
@@ -589,8 +555,7 @@ const MatchDouble2 = /^-?\.\d+$/;
 const MatchDouble3 = /^-?\d+\.$/;
 const MatchStrangeNumber = /^[\d\+-\.]+$/;
 const MatchBoolean = /^(true|false)$/;
-const MatchResource = /^resource:"(.*)"$/;
-const MatchDeferredResource = /^deferred_resource:"(.*)"$/;
+const MatchFeature = /^[0-9a-zA-Z_]+:"(.*)"$/;
 const MatchNull = /^null$/;
 
 /**
@@ -609,11 +574,8 @@ export default class KeyValues3 {
     public static Double(value?: number) {
         return new ValueDouble(value);
     }
-    public static Resource(value?: string) {
-        return new ValueResource(value);
-    }
-    public static DeferredResource(value?: string) {
-        return new ValueDeferredResource(value);
+    public static Feature(feature: string, value?: string) {
+        return new ValueFeature(feature, value);
     }
     public static Array(value?: IKV3Value[]) {
         return new ValueArray(value);
@@ -984,16 +946,13 @@ export default class KeyValues3 {
                                         key,
                                         new ValueDouble(Number(str))
                                     );
-                                } else if (MatchResource.test(str)) {
-                                    const m = MatchResource.exec(str) as RegExpExecArray;
-                                    let v = m[1] || '';
-                                    lastKV = parent.CreateObjectValue(key, new ValueResource(v));
-                                } else if (MatchDeferredResource.test(str)) {
-                                    const m = MatchDeferredResource.exec(str) as RegExpExecArray;
-                                    let v = m[1] || '';
+                                } else if (MatchFeature.test(str)) {
+                                    const index = str.indexOf(':');
+                                    const feature = str.slice(0, index);
+                                    let v = str.slice(index + 2, str.length - 1);
                                     lastKV = parent.CreateObjectValue(
                                         key,
-                                        new ValueDeferredResource(v)
+                                        new ValueFeature(feature, v)
                                     );
                                 } else if (MatchStrangeNumber.test(str)) {
                                     lastKV = parent.CreateObjectValue(key, new ValueString(str));
@@ -1211,15 +1170,11 @@ export default class KeyValues3 {
                             ) {
                                 lastValue = new ValueDouble(Number(str));
                                 parent.AppendValue(lastValue);
-                            } else if (MatchResource.test(str)) {
-                                const m = MatchResource.exec(str) as RegExpExecArray;
-                                let v = m[1] || '';
-                                lastValue = new ValueResource(v);
-                                parent.AppendValue(lastValue);
-                            } else if (MatchDeferredResource.test(str)) {
-                                const m = MatchDeferredResource.exec(str) as RegExpExecArray;
-                                let v = m[1] || '';
-                                lastValue = new ValueDeferredResource(v);
+                            } else if (MatchFeature.test(str)) {
+                                const index = str.indexOf(':');
+                                const feature = str.slice(0, index);
+                                let v = str.slice(index + 2, str.length - 1);
+                                lastValue = new ValueFeature(feature, v);
                                 parent.AppendValue(lastValue);
                             } else if (MatchStrangeNumber.test(str)) {
                                 lastValue = new ValueString(str);

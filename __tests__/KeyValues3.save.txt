@@ -19,7 +19,7 @@ Second line of a multi-line string literal.
             b = "456" // single line comment
             c = -1.500000
         },
-        resource:"particles/items3_fx/star_emblem.vpcf",
+        soundevent:"evelynney.Footsteps",
         "b\n",
     ]
     objectValue =
