@@ -610,4 +610,14 @@ Second line of a multi-line string literal.
         const b = root.GetObject().FindKey('b')?.GetValue();
         expect(b?.Value()).toBe(null);
     });
+
+    test('Check KeyValues3 Search', async () => {
+        const root = await KeyValues3.Load(join(__dirname, 'KeyValues3.txt'));
+        const result = root.Search((v) => v.IsFeature() && v.Feature === 'soundevent');
+        expect(result?.IsFeature()).toBe(true);
+        if (result?.IsFeature()) {
+            expect(result.Feature).toBe('soundevent');
+            expect(result.Value()).toBe('evelynney.Footsteps');
+        }
+    });
 });

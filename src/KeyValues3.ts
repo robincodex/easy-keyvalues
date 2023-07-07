@@ -323,6 +323,28 @@ class ValueArray extends KV3BaseValue {
         }
     }
 
+    /**
+     * Recursively iterate through all children to find the value that matches the callback
+     */
+    public Search(callback: (v: IKV3Value) => boolean): IKV3Value | undefined {
+        for (const v of this.value) {
+            if (callback(v)) {
+                return v;
+            }
+            if (v.IsObject()) {
+                const result = v.Search(callback);
+                if (result) {
+                    return result;
+                }
+            } else if (v.IsArray()) {
+                const result = v.Search(callback);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+    }
+
     public Get(index: number): IKV3Value | undefined {
         return this.value[index];
     }
@@ -518,6 +540,29 @@ class ValueObject extends KV3BaseValue {
             const result = kv.FindIDTraverse(id);
             if (result) {
                 return result;
+            }
+        }
+    }
+
+    /**
+     * Recursively iterate through all children to find the value that matches the callback
+     */
+    public Search(callback: (value: IKV3Value) => boolean): IKV3Value | undefined {
+        for (const kv of this.value) {
+            const v = kv.GetValue();
+            if (callback(v) === true) {
+                return v;
+            }
+            if (v.IsObject()) {
+                const result = v.Search(callback);
+                if (result) {
+                    return result;
+                }
+            } else if (v.IsArray()) {
+                const result = v.Search(callback);
+                if (result) {
+                    return result;
+                }
             }
         }
     }
@@ -718,6 +763,15 @@ export default class KeyValues3 {
     public FindIDTraverse(id: string): KeyValues3 | undefined {
         if (this.value.IsObject() || this.value.IsArray()) {
             return this.value.FindIDTraverse(id);
+        }
+    }
+
+    /**
+     * Recursively iterate through all children to find the value that matches the callback
+     */
+    public Search(callback: (value: IKV3Value) => boolean): IKV3Value | undefined {
+        if (this.value.IsObject() || this.value.IsArray()) {
+            return this.value.Search(callback);
         }
     }
 
