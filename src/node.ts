@@ -13,8 +13,7 @@ export { KeyValues, KeyValues3, KeyValues3Comments, KeyValuesComments };
 
 setKeyValuesAdapter({
     async readFile(path, encoding = 'utf8') {
-        const buf = await readFile(path, encoding as BufferEncoding);
-        return buf.toString();
+        return await readFile(path, encoding as BufferEncoding);
     },
     async writeFile(path, data, encoding = 'utf8') {
         await writeFile(path, data, encoding as BufferEncoding);

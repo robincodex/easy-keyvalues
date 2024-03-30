@@ -1363,6 +1363,9 @@ export default class KeyValues3 {
     public static async Load(filename: string, encoding?: string): Promise<KeyValues3> {
         const adapter = getKeyValuesAdapter();
         const text = await adapter.readFile(filename, encoding);
+        if (text.charCodeAt(0) === 0xfeff) {
+            return this.Parse(text.slice(1), filename);
+        }
         return this.Parse(text, filename);
     }
 

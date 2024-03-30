@@ -594,6 +594,9 @@ export default class KeyValues {
     public static async Load(filename: string, encoding?: string): Promise<KeyValues> {
         const adapter = getKeyValuesAdapter();
         const text = await adapter.readFile(filename, encoding);
+        if (text.charCodeAt(0) === 0xfeff) {
+            return await this.Parse(text.slice(1), filename);
+        }
         return await this.Parse(text, filename);
     }
 

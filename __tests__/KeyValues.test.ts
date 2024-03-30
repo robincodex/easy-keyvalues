@@ -1,7 +1,7 @@
-import { join } from 'path';
-import { KeyValues, getKeyValuesAdapter } from '../src/node';
 import { describe, expect, test } from '@jest/globals';
 import crypto from 'crypto';
+import { join } from 'path';
+import { KeyValues, getKeyValuesAdapter } from '../src/node';
 
 function testKV(kv: KeyValues) {
     expect(kv.GetChildCount()).toBe(3);
