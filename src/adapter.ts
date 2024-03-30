@@ -1,6 +1,6 @@
 export interface KeyValuesAdapter {
-    readFile(path: string): Promise<string>;
-    writeFile(path: string, data: string): Promise<void>;
+    readFile(path: string, encoding?: string): Promise<string>;
+    writeFile(path: string, data: string, encoding?: string): Promise<void>;
     resolvePath(filename: string, basePath: string): string;
     createKeyValuesID(): string;
 }

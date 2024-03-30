@@ -1360,21 +1360,21 @@ export default class KeyValues3 {
     /**
      * Load KeyValues3 from file
      */
-    public static async Load(filename: string): Promise<KeyValues3> {
+    public static async Load(filename: string, encoding?: string): Promise<KeyValues3> {
         const adapter = getKeyValuesAdapter();
-        const text = await adapter.readFile(filename);
+        const text = await adapter.readFile(filename, encoding);
         return this.Parse(text, filename);
     }
 
     /**
      * Save KeyValues3 to file
      */
-    public async Save(otherFilename?: string): Promise<void> {
+    public async Save(otherFilename?: string, encoding?: string): Promise<void> {
         const filename = otherFilename ?? this.filename;
         if (!filename) {
             throw new Error('Not found filename in KeyValues3');
         }
         const adapter = getKeyValuesAdapter();
-        await adapter.writeFile(filename, this.Format());
+        await adapter.writeFile(filename, this.Format(), encoding);
     }
 }

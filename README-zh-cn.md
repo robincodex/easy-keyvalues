@@ -24,13 +24,15 @@ yarn add easy-keyvalues
 
 ## UTF-8 BOM
 
-这个库遇到`UTF-8 BOM`的文件会出错，原因是`UTF-8 BOM`的文件的第一个字符会是`65279`，导致解析错误，
+这个库遇到`UTF-8 BOM`的文件会出错，原因是`UTF-8 BOM`的文件的第一个字符会是`65279`，导致解析错误，需要提前使用如 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 这样的库去掉 `BOM`。
 
-该库已经对 nodejs 进行了适配，使用 [chardet](https://www.npmjs.com/package/chardet) 判断编码格式，在
-读写时使用 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 进行解码和编码。
+~~该库已经对 nodejs 进行了适配，使用 [chardet](https://www.npmjs.com/package/chardet) 判断编码格式，在
+读写时使用 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 进行解码和编码。~~
 
-如果是自定义适配器，需要提前使用如 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 这样的库去
-掉 `BOM`。
+~~如果是自定义适配器，需要提前使用如 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) 这样的库去
+掉 `BOM`。~~
+
+nodejs的适配已经去掉了`chardet`和`iconv-lite`，由于自动判断文件编码以及自动转换编码会带来不确定性的结果，现在去掉了这个支持，添加了一个`encoding`的参数。
 
 ```js
 const buf = readFileSync(join(__dirname, 'chat_english.txt'));
@@ -55,9 +57,9 @@ import {
     KeyValues,
 } from 'easy-keyvalues';
 
-KeyValues.Load(file: string): Promise<KeyValues>;
+KeyValues.Load(file: string, encoding?: string): Promise<KeyValues>;
 KeyValues.Save(): Promise<void>;
-KeyValues.Save(otherFile: string): Promise<void>;
+KeyValues.Save(otherFile: string, encoding?: string): Promise<void>;
 ```
 
 ## 使用
@@ -66,7 +68,7 @@ KeyValues.Save(otherFile: string): Promise<void>;
 
 ```ts
 // 解析KeyValues
-const kv = await KeyValues.Load('/path/to/file.txt');
+const kv = await KeyValues.Load('/path/to/file.txt', 'utf8');
 console.log(kv.toString());
 ```
 
@@ -268,16 +270,16 @@ import {
     KeyValues3,
 } from 'easy-keyvalues';
 
-KeyValues3.Load(file: string): Promise<KeyValues3>;
+KeyValues3.Load(file: string, encoding?: string): Promise<KeyValues3>;
 KeyValues3.Save(): Promise<void>;
-KeyValues3.Save(otherFile: string): Promise<void>;
+KeyValues3.Save(otherFile: string, encoding?: string): Promise<void>;
 ```
 
 ## 使用
 
 ```ts
 // 解析KeyValues3
-const kv3 = await KeyValues3.Load('/path/to/file.txt');
+const kv3 = await KeyValues3.Load('/path/to/file.txt', 'utf8');
 console.log(kv3.toString());
 ```
 

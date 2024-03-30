@@ -33,9 +33,11 @@ This library will get errors when encountering `UTF-8 BOM` files, because the fi
 `UTF-8 BOM` files will be 65279, which causes parsing errors. So you need to use a library such as
 [iconv-lite](https://github.com/ashtuchkin/iconv-lite) to remove the `BOM` in advance.
 
-The library has been adapted for nodejs, uses [chardet](https://www.npmjs.com/package/chardet) to
+~~The library has been adapted for nodejs, uses [chardet](https://www.npmjs.com/package/chardet) to
 determine the encoding format, and uses [iconv-lite](https://github.com/ashtuchkin/iconv-lite) for
-decoding and encoding when reading and writing.
+decoding and encoding when reading and writing.~~
+
+The nodejs adaptation has removed `chardet` and `iconv-lite`. Due to the uncertainty of automatically determining file encodings and automatically converting encodings, this support has been removed and a `encoding` parameter has been added.
 
 ```js
 const buf = readFileSync(join(__dirname, 'chat_english.txt'));

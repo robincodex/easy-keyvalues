@@ -1,6 +1,6 @@
 {
     "name": "easy-keyvalues",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "Parse Valve KeyValues Format and easy to use in nodejs or browser.",
     "main": "dist/node.js",
     "engines": {
@@ -30,10 +30,6 @@
         "Source2 KeyValues3"
     ],
     "license": "MIT",
-    "dependencies": {
-        "chardet": "^1.6.0",
-        "iconv-lite": "^0.6.3"
-    },
     "devDependencies": {
         "@jest/globals": "^29.6.1",
         "@rollup/plugin-commonjs": "25.0.2",

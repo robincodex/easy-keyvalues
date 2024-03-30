@@ -591,22 +591,22 @@ export default class KeyValues {
     /**
      * Load KeyValues from file
      */
-    public static async Load(filename: string): Promise<KeyValues> {
+    public static async Load(filename: string, encoding?: string): Promise<KeyValues> {
         const adapter = getKeyValuesAdapter();
-        const text = await adapter.readFile(filename);
+        const text = await adapter.readFile(filename, encoding);
         return await this.Parse(text, filename);
     }
 
     /**
      * Save KeyValues to file
      */
-    public async Save(otherFilename?: string): Promise<void> {
+    public async Save(otherFilename?: string, encoding?: string): Promise<void> {
         const filename = otherFilename ?? this.filename;
         if (!filename) {
             throw new Error('Not found filename in KeyValues');
         }
         const adapter = getKeyValuesAdapter();
-        await adapter.writeFile(filename, this.Format());
+        await adapter.writeFile(filename, this.Format(), encoding);
 
         // Save #base
         const baseList = this.FindAllKeys('#base');
@@ -617,9 +617,9 @@ export default class KeyValues {
                 .join('\n');
             if (otherFilename) {
                 const filePath = adapter.resolvePath(filename, base.GetBaseFilePath());
-                await adapter.writeFile(filePath, content);
+                await adapter.writeFile(filePath, content, encoding);
             } else {
-                await adapter.writeFile(base.filename!, content);
+                await adapter.writeFile(base.filename!, content, encoding);
             }
         }
     }

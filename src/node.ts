@@ -1,34 +1,23 @@
-import { readFileSync, writeFileSync, promises } from 'fs';
-import { join, resolve } from 'path';
+import { promises } from 'fs';
+import { resolve } from 'path';
+import { KeyValues3Comments, KeyValuesComments } from './Comments';
 import KeyValues from './KeyValues';
 import KeyValues3 from './KeyValues3';
-import { KeyValuesComments, KeyValues3Comments } from './Comments';
 import { setKeyValuesAdapter } from './adapter';
-import * as iconv from 'iconv-lite';
-import chardet from 'chardet';
 
 const { readFile, writeFile } = promises;
 
 export * from './adapter';
 
-export { KeyValues, KeyValues3, KeyValuesComments, KeyValues3Comments };
-
-const fileEncoding: Record<string, string> = {};
+export { KeyValues, KeyValues3, KeyValues3Comments, KeyValuesComments };
 
 setKeyValuesAdapter({
-    async readFile(path) {
-        const buf = await readFile(path);
-        const encoding = chardet.detect(buf);
-        if (!encoding) {
-            throw new Error('Unable to detect encoding from ' + path);
-        }
-        fileEncoding[path] = encoding;
-        const result = iconv.decode(buf, encoding);
-        return result.toString();
+    async readFile(path, encoding = 'utf8') {
+        const buf = await readFile(path, encoding as BufferEncoding);
+        return buf.toString();
     },
-    async writeFile(path, data) {
-        const result = iconv.encode(data, fileEncoding[path] || 'utf8');
-        await writeFile(path, result);
+    async writeFile(path, data, encoding = 'utf8') {
+        await writeFile(path, data, encoding as BufferEncoding);
     },
     resolvePath(filename, basePath) {
         return resolve(filename, '../' + basePath);
