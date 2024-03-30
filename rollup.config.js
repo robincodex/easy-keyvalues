@@ -1,11 +1,10 @@
-import rollupTypescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
-import { join } from 'path';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import p from './package.json';
+import rollupTypescript from '@rollup/plugin-typescript';
+import { join } from 'path';
 import dts from 'rollup-plugin-dts';
 
-const external = Object.keys(p.dependencies);
+const external = [];//Object.keys(p.dependencies);
 
 module.exports = [
     // build node
