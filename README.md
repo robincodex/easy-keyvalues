@@ -280,8 +280,8 @@ console.log(kv3.toString());
 | Double          | number          | When formatting as a string use`toFixed(6)`                         |
 | Array           | Array           | Array，Type:`IKV3Value[]`                                           |
 | Object          | Object          | Object，Type:`KeyValues3[]`                                         |
-| Feature         | string | `resource:"example"` `soundevent:"example"` |
-| FeatureObject         | Object | `subclass: {}`|
+| Feature         | string          | `resource:"example"` `soundevent:"example"`                         |
+| FeatureObject   | Object          | `subclass: {}`                                                      |
 
 > Note that when parsing Int and Double, they are only parsed as Double if they contain a fractional
 > part, otherwise they are treated as Int
@@ -356,9 +356,10 @@ root.CreateObjectValue('d', KeyValues3.Double(0.0));
 root.CreateObjectValue('e', KeyValues3.Array([]));
 root.CreateObjectValue('f', KeyValues3.Object([]));
 root.CreateObjectValue('g', KeyValues3.Feature('resource', 'path/to/file.vpcf'));
-root.CreateObjectValue('h', KeyValues3.FeatureObject('subclass', [
-    new KeyValues3("child", KeyValues3.String("value"))
-]));
+root.CreateObjectValue(
+    'h',
+    KeyValues3.FeatureObject('subclass', [new KeyValues3('child', KeyValues3.String('value'))]),
+);
 
 KeyValues3.Array([KeyValues3.String('one'), KeyValues3.String('two'), KeyValues3.String('three')]);
 

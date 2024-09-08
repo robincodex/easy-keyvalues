@@ -271,16 +271,16 @@ console.log(kv3.toString());
 
 ### 数据类型
 
-| KeyValues3 类型 | 对应的 Javascript 类型 | 描述                                      |
-| --------------- | ---------------------- | ----------------------------------------- |
-| String          | string                 | KV3 支持多行字符串，用`"""`作为开头和结尾 |
-| Boolean         | boolean                | true 或者 false                           |
-| Int             | number                 | 整数                                      |
-| Double          | number                 | 格式化为字符串的时候使用`toFixed(6)`      |
-| Array           | Array                  | 数组，数据结构为`IKV3Value[]`             |
-| Object          | Object                 | 对象，数据结构为`KeyValues3[]`            |
-| Feature         | string | 例如`resource:"path/to/file.vpcf"` `soundevent:"Example"` |
-| FeatureObject         | Object | 例如`subclass: {}`|
+| KeyValues3 类型 | 对应的 Javascript 类型 | 描述                                                      |
+| --------------- | ---------------------- | --------------------------------------------------------- |
+| String          | string                 | KV3 支持多行字符串，用`"""`作为开头和结尾                 |
+| Boolean         | boolean                | true 或者 false                                           |
+| Int             | number                 | 整数                                                      |
+| Double          | number                 | 格式化为字符串的时候使用`toFixed(6)`                      |
+| Array           | Array                  | 数组，数据结构为`IKV3Value[]`                             |
+| Object          | Object                 | 对象，数据结构为`KeyValues3[]`                            |
+| Feature         | string                 | 例如`resource:"path/to/file.vpcf"` `soundevent:"Example"` |
+| FeatureObject   | Object                 | 例如`subclass: {}`                                        |
 
 > 注意解析 Int 和 Double 的时候，如果包含小数部分才会解析为 Double，否则都视为 Int
 
@@ -353,9 +353,10 @@ root.CreateObjectValue('d', KeyValues3.Double(0.0));
 root.CreateObjectValue('e', KeyValues3.Array([]));
 root.CreateObjectValue('f', KeyValues3.Object([]));
 root.CreateObjectValue('g', KeyValues3.Feature('resource', 'path/to/file.vpcf'));
-root.CreateObjectValue('h', KeyValues3.FeatureObject('subclass', [
-    new KeyValues3("child", KeyValues3.String("value"))
-]));
+root.CreateObjectValue(
+    'h',
+    KeyValues3.FeatureObject('subclass', [new KeyValues3('child', KeyValues3.String('value'))]),
+);
 
 KeyValues3.Array([KeyValues3.String('one'), KeyValues3.String('two'), KeyValues3.String('three')]);
 

@@ -4,7 +4,7 @@ import rollupTypescript from '@rollup/plugin-typescript';
 import { join } from 'path';
 import dts from 'rollup-plugin-dts';
 
-const external = [];//Object.keys(p.dependencies);
+const external = []; //Object.keys(p.dependencies);
 
 module.exports = [
     // build node
