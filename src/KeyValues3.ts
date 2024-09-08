@@ -16,6 +16,7 @@ export interface IKV3Value {
     IsDouble(): this is ValueDouble;
     IsString(): this is ValueString;
     IsFeature(): this is ValueFeature;
+    IsFeatureObject(): this is ValueFeatureObject;
     IsArray(): this is ValueArray;
     IsObject(): this is ValueObject;
     IsNull(): this is ValueNull;
@@ -67,6 +68,9 @@ export class KV3BaseValue implements IKV3Value {
     }
     public IsNull(): this is ValueNull {
         return this instanceof ValueNull;
+    }
+    public IsFeatureObject(): this is ValueFeatureObject {
+        return this instanceof ValueFeatureObject;
     }
 
     public Format(): string {
@@ -358,6 +362,7 @@ class ValueArray extends KV3BaseValue {
                 (v) =>
                     v.IsArray() ||
                     v.IsObject() ||
+                    v.IsFeatureObject() ||
                     v.Comments.HasComments() ||
                     v.Comments.HasEndOfLineComment(),
             )
@@ -396,6 +401,16 @@ class ValueArray extends KV3BaseValue {
                             str = '\n' + tab + '   ' + str;
                         }
                         return comment + str + ',' + endComment;
+                    } else if (v.IsFeatureObject()) {
+                        return (
+                            comment +
+                            '\n' +
+                            tab +
+                            '    ' +
+                            v.Format(tab + '    ') +
+                            ',' +
+                            endComment
+                        );
                     } else if (v.IsObject()) {
                         return comment + v.Format(tab + '    ') + ',' + endComment;
                     }
@@ -596,6 +611,57 @@ class ValueObject extends KV3BaseValue {
     }
 }
 
+/**
+ * Similar values:
+ * ```
+ * m_subclassScaleFunction = subclass:
+ * {
+ *     _class = "scale_function_single_stat"
+ *     _my_subclass_name = "AbilityCooldown_scale_function"
+ *     m_eSpecificStatScaleType = "ETechCooldown"
+ * }
+ * ```
+ */
+class ValueFeatureObject extends ValueObject {
+    constructor(
+        public Feature = 'subclass',
+        initValue?: KeyValues3[],
+    ) {
+        super(initValue);
+    }
+
+    public Format(tab: string = ''): string {
+        let text = `${this.Feature}:\n${tab}{`;
+        text += this.value.map((v) => '\n' + v.Format(tab + '    ')).join('');
+        text += `\n${tab}}`;
+        return text;
+    }
+
+    /**
+     * Convert to javascript object
+     */
+    public toObject(): any {
+        const result: any = {
+            Feature: this.Feature,
+            Values: {},
+        };
+        for (const kv of this.value) {
+            if (kv.GetValue().IsArray() || kv.GetValue().IsObject()) {
+                result.Values[kv.Key] = kv.toObject();
+            } else {
+                result.Values[kv.Key] = kv.GetValue().Value();
+            }
+        }
+        return result;
+    }
+
+    public Clone() {
+        const v = new ValueObject(this.value.map((v) => v.Clone()));
+        v.SetOwner(this.owner);
+        return v;
+    }
+}
+
 const MatchKeyNoQuote = /^[\w\d_\.]+$/;
 const MatchInt = /^-?\d+$/;
 const MatchDouble = /^-?\d+(\.\d+)?$/;
@@ -604,6 +670,7 @@ const MatchDouble3 = /^-?\d+\.$/;
 const MatchStrangeNumber = /^[\d\+-\.]+$/;
 const MatchBoolean = /^(true|false)$/;
 const MatchFeature = /^[0-9a-zA-Z_]+:"(.*)"$/;
+const MatchFeatureObject = /^[0-9a-zA-Z_]+:$/;
 const MatchNull = /^null$/;
 
 /**
@@ -633,6 +700,9 @@ export default class KeyValues3 {
     }
     public static Null() {
         return new ValueNull();
+    }
+    public static FeatureObject(feature: string, value?: KeyValues3[]) {
+        return new ValueFeatureObject(feature, value);
     }
 
     private __filename?: string;
@@ -802,6 +872,9 @@ export default class KeyValues3 {
                 text += this.value.Format(tab);
             } else {
                 text += prefix;
+                if (this.value.IsFeatureObject()) {
+                    text += ' ';
+                }
                 text += this.value.Format(tab);
             }
         } else {
@@ -872,8 +945,8 @@ export default class KeyValues3 {
         parent: KeyValues3,
         data: { body: string; line: number; pos: number; tokenCounter: number },
     ) {
-        if (parent.value.IsObject()) {
-            let isKey = true;
+        if (parent.value.IsObject() || parent.value.IsFeatureObject()) {
+            let isKey = !parent.value.IsFeatureObject();
             let startMark = false;
             let inQoute = false;
             let key = '';
@@ -972,6 +1045,11 @@ export default class KeyValues3 {
                                         }
                                     }
                                 }
+                                if (MatchFeature.test(str + c)) {
+                                    str += c;
+                                    inQoute = false;
+                                    continue;
+                                }
                                 lastKV = parent.CreateObjectValue(key, new ValueString(str));
                                 lastKV.value.Comments.SetComments(commentCache);
                                 commentCache = [];
@@ -1016,6 +1094,19 @@ export default class KeyValues3 {
                                         key,
                                         new ValueFeature(feature, v),
                                     );
+                                } else if (MatchFeatureObject.test(str)) {
+                                    const index = str.indexOf(':');
+                                    const feature = str.slice(0, index);
+                                    const kv = new KeyValues3('', new ValueFeatureObject());
+                                    data.pos += 1;
+                                    this._parse(kv, data);
+                                    const child = parent.CreateObjectValue(
+                                        key,
+                                        new ValueFeatureObject(feature, [
+                                            ...kv.GetObject().Value()[0].GetObject().Value(),
+                                        ]),
+                                    );
+                                    lastKV = child;
                                 } else if (MatchStrangeNumber.test(str)) {
                                     lastKV = parent.CreateObjectValue(key, new ValueString(str));
                                 } else {
@@ -1034,6 +1125,9 @@ export default class KeyValues3 {
                                     data.pos -= 1;
                                 }
                                 continue;
+                            }
+                            if (str.endsWith(':') && c === '"') {
+                                inQoute = true;
                             }
                             str += c;
                             continue;
@@ -1088,6 +1182,9 @@ export default class KeyValues3 {
                     isKey = true;
                     inQoute = false;
                     startMark = false;
+                    if (parent.value.IsFeatureObject()) {
+                        return;
+                    }
                     continue;
                 }
 
@@ -1237,6 +1334,16 @@ export default class KeyValues3 {
                                 const feature = str.slice(0, index);
                                 let v = str.slice(index + 2, str.length - 1);
                                 lastValue = new ValueFeature(feature, v);
+                                parent.AppendValue(lastValue);
+                            } else if (MatchFeatureObject.test(str)) {
+                                const index = str.indexOf(':');
+                                const feature = str.slice(0, index);
+                                const child = new KeyValues3('', new ValueFeatureObject(feature));
+                                data.pos += 1;
+                                this._parse(child, data);
+                                lastValue = new ValueFeatureObject(feature, [
+                                    ...child.GetObject().Value()[0].GetObject().Value(),
+                                ]);
                                 parent.AppendValue(lastValue);
                             } else if (MatchStrangeNumber.test(str)) {
                                 lastValue = new ValueString(str);

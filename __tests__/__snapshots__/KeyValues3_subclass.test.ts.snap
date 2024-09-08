@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`KeyValues3 Check KeyValues3 FeatureObject 1`] = `
+"<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+    generic_data_type = "CitadelAbilityVData"
+    _include =
+    [
+        resource_name:"scripts/abilities/astro.vdata_inc",
+        resource_name:"scripts/abilities/atlas.vdata_inc",
+        panorama:"file://{images}/hud/abilities/weapon_damage.psd",
+    ]
+    AbilityCooldown =
+    {
+        m_strValue = "0"
+        m_strDisableValue = "0"
+        m_strCSSClass = "cooldown"
+        m_bCanSetTokenOverride = true
+        m_subclassScaleFunction = subclass:
+        {
+            _class = "scale_function_single_stat"
+            _my_subclass_name = "AbilityCooldown_scale_function"
+            m_eSpecificStatScaleType = "ETechCooldown"
+        }
+    }
+    m_AutoIntrinsicModifiers =
+    [
+        subclass:
+        {
+            _class = "modifier_intrinsic_base"
+            _my_subclass_name = "modifier_intrinsic_base"
+            m_vecAutoRegisterModifierValueFromAbilityPropertyName = [ "BonusAbilityDurationPercent", "TechPower", "BonusHealth" ]
+        },
+    ]
+    m_AutoIntrinsicModifiers2 =
+    [
+        subclass:
+        {
+            _class = "modifier_intrinsic_base"
+            _my_subclass_name = "modifier_intrinsic_base"
+            m_vecAutoRegisterModifierValueFromAbilityPropertyName = [ "BonusAbilityDurationPercent", "TechPower", "BonusHealth" ]
+        },
+    ]
+    m_AutoIntrinsicModifiers3 =
+    [
+        subclass:
+        {
+            _class = "modifier_intrinsic_base"
+            _my_subclass_name = "modifier_intrinsic_base"
+            m_vecAutoRegisterModifierValueFromAbilityPropertyName = [ "BonusAbilityDurationPercent", "TechPower", "BonusHealth" ]
+        },
+        subclass:
+        {
+            _class = "modifier_intrinsic_base"
+            _my_subclass_name = "modifier_intrinsic_base"
+            m_vecAutoRegisterModifierValueFromAbilityPropertyName = [ "BonusAbilityDurationPercent", "TechPower", "BonusHealth" ]
+        },
+    ]
+    m_SummonFlyingCarpetVisualModifier = subclass:
+    {
+        _class = "modifier_magiccarpet_summon"
+        _my_subclass_name = "modifier_magiccarpet_summon"
+        m_bIsHidden = true
+        m_SummonParticle = resource_name:"particles/items/magic_carpet_summon.vpcf"
+    }
+    m_FlyingCarpetVisualModifier = subclass:
+    {
+        _class = "modifier_base"
+        _my_subclass_name = "modifier_magiccarpet_flying_visual"
+        m_strParticleEffect = resource_name:"particles/items/magic_carpet.vpcf"
+        m_bIsHidden = true
+    }
+    m_ShieldModifier = subclass:
+    {
+        _class = "modifier_magiccarpet_shields"
+        _my_subclass_name = "modifier_magiccarpet_shields"
+        m_bIsHidden = true
+        m_strParticleEffect = resource_name:"particles/upgrades/vex_shield_buff.vpcf"
+    }
+    m_strAbilityImage = panorama:"file://{images}/hud/abilities/weapon_damage.psd"
+}"
+`;
