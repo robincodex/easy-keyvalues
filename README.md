@@ -278,9 +278,10 @@ console.log(kv3.toString());
 | Boolean         | boolean         | true or false                                                       |
 | Int             | number          | integer                                                             |
 | Double          | number          | When formatting as a string use`toFixed(6)`                         |
-| Resource        | string          | Represents the value of `{path}` in `resource:"{path}"`             |
 | Array           | Array           | Array，Type:`IKV3Value[]`                                           |
 | Object          | Object          | Object，Type:`KeyValues3[]`                                         |
+| Feature         | string | `resource:"example"` `soundevent:"example"` |
+| FeatureObject         | Object | `subclass: {}`|
 
 > Note that when parsing Int and Double, they are only parsed as Double if they contain a fractional
 > part, otherwise they are treated as Int
@@ -325,8 +326,8 @@ interface IKV3Value {
     IsInt(): this is ValueInt;
     IsDouble(): this is ValueDouble;
     IsString(): this is ValueString;
-    IsResource(): this is ValueResource;
-    IsDeferredResource(): this is ValueDeferredResource;
+    IsFeature(): this is ValueFeature;
+    IsFeatureObject(): this is ValueFeatureObject;
     IsArray(): this is ValueArray;
     IsObject(): this is ValueObject;
     Format(): string;
@@ -338,9 +339,10 @@ KeyValues3.String( initValue?: string )
 KeyValues3.Boolean( initValue?: boolean )
 KeyValues3.Int( initValue?: number )
 KeyValues3.Double( initValue?: number )
-KeyValues3.Resource( initValue?: string )
 KeyValues3.Array( initValue?: IKV3Value[] )
 KeyValues3.Object( initValue?: KeyValues3[] )
+KeyValues3.Feature( feature: string, value?: string )
+KeyValues3.FeatureObject( feature: string, initValue?: KeyValues3[] )
 ```
 
 Example
@@ -351,9 +353,12 @@ root.CreateObjectValue('a', KeyValues3.String('string'));
 root.CreateObjectValue('b', KeyValues3.Boolean(false));
 root.CreateObjectValue('c', KeyValues3.Int(0));
 root.CreateObjectValue('d', KeyValues3.Double(0.0));
-root.CreateObjectValue('e', KeyValues3.Resource('path/to/file.vpcf'));
-root.CreateObjectValue('f', KeyValues3.Array([]));
-root.CreateObjectValue('g', KeyValues3.Object([]));
+root.CreateObjectValue('e', KeyValues3.Array([]));
+root.CreateObjectValue('f', KeyValues3.Object([]));
+root.CreateObjectValue('g', KeyValues3.Feature('resource', 'path/to/file.vpcf'));
+root.CreateObjectValue('h', KeyValues3.FeatureObject('subclass', [
+    new KeyValues3("child", KeyValues3.String("value"))
+]));
 
 KeyValues3.Array([KeyValues3.String('one'), KeyValues3.String('two'), KeyValues3.String('three')]);
 
@@ -431,7 +436,6 @@ kv3.toObject();
 | Boolean         | true                            | true                                        |
 | Int             | 5                               | 5                                           |
 | Double          | 2.5                             | 2.500000                                    |
-| Resource        | `path/to/file.vpcf`             | `resource:"path/to/file.vpcf"`              |
 
 # Custom adapter
 
