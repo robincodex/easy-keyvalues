@@ -135,4 +135,8 @@ Second line of a multi-line string literal.
         r1 = deferred_resource:""
         r2 = resource:""
     }
+    "1" =
+    {
+        a = 1
+    }
 }

@@ -662,7 +662,8 @@ class ValueFeatureObject extends ValueObject {
     }
 }
 
-const MatchKeyNoQuote = /^[\w\d_\.]+$/;
+const MatchKeyNoQuote = /^[0-9a-zA-Z_\.]+$/;
+const MatchKeyNumber = /^\d+$/;
 const MatchInt = /^-?\d+$/;
 const MatchDouble = /^-?\d+(\.\d+)?$/;
 const MatchDouble2 = /^-?\.\d+$/;
@@ -850,7 +851,7 @@ export default class KeyValues3 {
         let prefix = '';
         const root = this.IsRoot();
 
-        if (MatchKeyNoQuote.test(this.Key)) {
+        if (MatchKeyNoQuote.test(this.Key) && !MatchKeyNumber.test(this.Key)) {
             prefix = `${tab}${this.Key} =`;
         } else {
             prefix = `${tab}"${this.Key}" =`;

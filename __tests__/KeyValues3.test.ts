@@ -1,8 +1,8 @@
+import { describe, expect, test } from '@jest/globals';
+import crypto from 'crypto';
 import { join } from 'path';
 import { KV3BaseValue } from '../src/KeyValues3';
 import { KeyValues3, getKeyValuesAdapter } from '../src/node';
-import { describe, expect, test } from '@jest/globals';
-import crypto from 'crypto';
 
 describe('KeyValues3', () => {
     test('Check KeyValues3 Methods', () => {
@@ -303,10 +303,17 @@ Second line of a multi-line string literal.
         }
 
         const obj = root.FindKey('objectValue')?.GetValue();
+        expect(obj?.IsObject()).toBe(true);
         if (obj?.IsObject()) {
             expect(obj.FindKey('n')?.GetValue().Value()).toBe(5);
             expect(obj.FindKey('s')?.GetValue().Value()).toBe('foo');
             expect(obj.FindKey('h')?.GetValue().IsArray()).toBe(true);
+        }
+
+        const obj1 = root.FindKey('1')?.GetValue();
+        expect(obj1?.IsObject()).toBe(true);
+        if (obj1?.IsObject()) {
+            expect(obj1.FindKey('a')?.GetValue().Value()).toBe(1);
         }
 
         expect(
