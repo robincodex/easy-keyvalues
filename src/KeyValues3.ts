@@ -741,6 +741,10 @@ export default class KeyValues3 {
         return this.header;
     }
 
+    public SetHeader(header: string) {
+        this.header = header;
+    }
+
     public static CreateRoot() {
         const kv = new KeyValues3('', new ValueObject());
         kv.header = this.CommonHeader;
