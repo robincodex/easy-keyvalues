@@ -35,9 +35,9 @@ The BOM will be automatically removed when load this format file.
 
 ## Features
 
--   Retain comments
--   Support Node.js and browser
--   Support auto load `#base`
+- Retain comments
+- Support Node.js and browser
+- Support auto load `#base`
 
 ## Import
 
@@ -246,9 +246,9 @@ Reference https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/KeyValu
 
 ## Features
 
--   Retain comments
--   Support Node.js and browser
--   Friendly data type inference
+- Retain comments
+- Support Node.js and browser
+- Friendly data type inference
 
 ## Import
 
@@ -297,13 +297,13 @@ fixed to Object, with the following basic format:
 }
 ```
 
--   Static property `KeyValues3.CommonHeader` is default header
+- Static property `KeyValues3.CommonHeader` is default header
 
--   Static method `KeyValues3.CreateRoot(): KeyValues3` Create root node
+- Static method `KeyValues3.CreateRoot(): KeyValues3` Create root node
 
--   Method `GetHeader(): string | undefined` Get file header
+- Method `GetHeader(): string | undefined` Get file header
 
--   Method `IsRoot(): boolean` Determine if it is the root node
+- Method `IsRoot(): boolean` Determine if it is the root node
 
 ### Create
 
@@ -372,7 +372,7 @@ obj.Create('c', KeyValues3.Boolean(true));
 
 ### Add / Delete
 
--   KeyValues3 Object
+- KeyValues3 Object
 
 ```js
 // Append to the end of Object
@@ -383,7 +383,7 @@ Insert(index: number, ...values: KeyValues3[]): this
 Delete(v: string | KeyValues3): KeyValues3
 ```
 
--   KeyValues3 Array
+- KeyValues3 Array
 
 ```js
 // Append to the end of Array
@@ -396,7 +396,7 @@ Delete(v: IKV3Value): this
 
 ### Find
 
--   KeyValues3 Object
+- KeyValues3 Object
 
 ```js
 // Find a KeyValues3

@@ -30,13 +30,13 @@ yarn add easy-keyvalues
 
 ## 功能
 
--   保留注释
--   支持 nodejs 和浏览器
--   支持自动载入`#base`
+- 保留注释
+- 支持 nodejs 和浏览器
+- 支持自动载入`#base`
 
 ## 导入
 
--   Node.js
+- Node.js
 
 ```ts
 import {
@@ -50,7 +50,7 @@ KeyValues.Save(otherFile: string, encoding?: string): Promise<void>;
 
 ## 使用
 
--   Node.js
+- Node.js
 
 ```ts
 // 解析KeyValues
@@ -245,9 +245,9 @@ kv.toObject();
 
 ## 功能
 
--   保留注释
--   支持 nodejs 和浏览器
--   友好的数据类型推断
+- 保留注释
+- 支持 nodejs 和浏览器
+- 友好的数据类型推断
 
 ## 导入
 
@@ -294,13 +294,13 @@ KeyValues3 的根节点有点特殊，它包含一个文件头，并且其值固
 }
 ```
 
--   静态属性`KeyValues3.CommonHeader`是默认的文件头
+- 静态属性`KeyValues3.CommonHeader`是默认的文件头
 
--   静态方法`KeyValues3.CreateRoot(): KeyValues3`创建根节点
+- 静态方法`KeyValues3.CreateRoot(): KeyValues3`创建根节点
 
--   方法 `GetHeader(): string | undefined`获取文件头
+- 方法 `GetHeader(): string | undefined`获取文件头
 
--   方法 `IsRoot(): boolean`判断是否为根节点
+- 方法 `IsRoot(): boolean`判断是否为根节点
 
 ### 创建
 
@@ -369,7 +369,7 @@ obj.Create('c', KeyValues3.Boolean(true));
 
 ### 添加 / 删除
 
--   KeyValues3 Object
+- KeyValues3 Object
 
 ```js
 // 追加到 Object 末尾
@@ -380,7 +380,7 @@ Insert(index: number, ...values: KeyValues3[]): this
 Delete(v: string | KeyValues3): KeyValues3
 ```
 
--   KeyValues3 Array
+- KeyValues3 Array
 
 ```js
 // 追加到 Array 末尾
@@ -393,7 +393,7 @@ Delete(v: IKV3Value): this
 
 ### 查找
 
--   KeyValues3 Object
+- KeyValues3 Object
 
 ```js
 // 查找单个KeyValues3
