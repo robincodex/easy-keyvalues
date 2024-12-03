@@ -303,4 +303,14 @@ describe('KeyValues', () => {
         expect(root.FindIDTraverse(d.ID) === d).toBe(true);
         expect(root.FindIDTraverse(e.ID) === e).toBe(true);
     });
+
+    test('Check comments', async () => {
+        const kv = await KeyValues.Load(join(__dirname, 'KeyValues_comment1.txt'));
+        expect(kv.IsRoot()).toBe(true);
+        expect(kv.GetChildCount()).toBe(0);
+
+        const kv2 = await KeyValues.Load(join(__dirname, 'KeyValues_comment2.txt'));
+        expect(kv2.IsRoot()).toBe(true);
+        expect(kv2.GetChildCount()).toBe(1);
+    });
 });

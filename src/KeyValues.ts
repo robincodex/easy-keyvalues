@@ -508,6 +508,9 @@ export default class KeyValues {
                 }
                 if (data.body[data.pos + 1] === '/') {
                     const endIndex = data.body.indexOf('\n', data.pos + 1);
+                    if (endIndex < 0) {
+                        break;
+                    }
                     const comment = data.body.slice(data.pos + 2, endIndex).trim();
                     if (comment) {
                         if (isEndOfLineComment) {
