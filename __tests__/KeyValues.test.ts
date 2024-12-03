@@ -263,6 +263,10 @@ describe('KeyValues', () => {
         expect(typeof obj2['Ha']['t1']['ggg']).toBe('object');
         expect(typeof obj2['test']).toBe('object');
 
+        const kv3 = await KeyValues.Load(join(__dirname, 'KeyValues.base.txt'));
+        const obj3 = kv3.toObject();
+        expect(obj3).toMatchSnapshot();
+
         try {
             new KeyValues('a', '123').toObject();
         } catch (e) {

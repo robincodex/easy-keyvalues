@@ -2,6 +2,21 @@
 
 exports[`KeyValues Check KeyValues #base 1`] = `"#base    "npc/file01.txt" // file01"`;
 
+exports[`KeyValues Check KeyValues.toObject 1`] = `
+{
+  "DOTAAbilities": {
+    "ability01": {
+      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT",
+      "BaseClass": "ability_lua",
+    },
+    "ability02": {
+      "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT",
+      "BaseClass": "ability_datadriven",
+    },
+  },
+}
+`;
+
 exports[`KeyValues Check KeyValues.txt 1`] = `
 ""DOTAAbilities"
 {

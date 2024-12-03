@@ -578,10 +578,30 @@ export default class KeyValues {
         }
 
         for (const kv of this.children!) {
+            if (kv.Key === '#base') {
+                continue;
+            }
             if (!kv.HasChildren()) {
                 obj[kv.Key] = kv.GetValue();
             } else {
                 obj[kv.Key] = kv.toObject();
+            }
+        }
+
+        if (this.IsRoot()) {
+            for (const base of this.GetBaseList()) {
+                const root = base.toObject();
+                for (const key in root) {
+                    const baseChildren = root[key];
+                    if (obj[key] === undefined) {
+                        obj[key] = baseChildren;
+                    } else {
+                        const children = obj[key];
+                        for (const k in baseChildren) {
+                            children[k] = baseChildren[k];
+                        }
+                    }
+                }
             }
         }
 
