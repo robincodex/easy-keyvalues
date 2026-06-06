@@ -224,7 +224,13 @@ class ValueDouble extends KV3BaseValue {
     }
 
     public Format(): string {
-        return this.value.toFixed(6);
+        if (this.value < Number.MAX_SAFE_INTEGER && this.value > Number.MIN_SAFE_INTEGER) {
+            return this.value.toFixed(6);
+        }
+        const f = Math.floor(this.value);
+        const left = BigInt(f);
+        const right = (this.value - f).toFixed(1);
+        return `${left}${right.slice(1)}`;
     }
 
     public Clone() {

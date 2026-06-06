@@ -92,4 +92,5 @@ Second line of a multi-line string literal.
     {
         a = 1
     }
+    m_inputTimeRemapRange =  { m_flMin = 340282346638528859811704183484516925440.0 m_flMax = -340282346638528859811704183484516925440.0 }
 }
