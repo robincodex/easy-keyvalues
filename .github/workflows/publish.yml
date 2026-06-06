@@ -1,18 +1,24 @@
 name: Publish
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: latest
           run_install: false
@@ -20,5 +26,3 @@ jobs:
       - run: pnpm build
       - run: cp README.md package/README.md
       - run: pnpm publish package/ --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
